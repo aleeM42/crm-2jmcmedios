@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "skills": {
+    "backend-patterns": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "computedHash": "6456e45aca107569db0bf67910f58b60af891330864bfdb3fc1c7a9df1ceffbc"
+    },
+    "code-review-quality": {
+      "source": "proffesor-for-testing/agentic-qe",
+      "sourceType": "github",
+      "computedHash": "70ff4a1d6320628a87c3a0d60e63b2bdc0e063127e00f666380f4eff2b7440a1"
+    },
+    "color-palette": {
+      "source": "jezweb/claude-skills",
+      "sourceType": "github",
+      "computedHash": "420858aa3619b755f6de3037cb85c0546e5d665c9c4cc391769fbd7ab08de4de"
+    },
+    "frontend-react-best-practices": {
+      "source": "sergiodxa/agent-skills",
+      "sourceType": "github",
+      "computedHash": "d79af29866e2c8cac7285743a3b049a92124bb0e466a43f71a136a614b78085f"
+    },
+    "nodejs-backend-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "47f9ab40a7ddedd69089da1390080735f6715356916d6fc43f525522887d7dfe"
+    },
+    "nodejs-express-server": {
+      "source": "aj-geddes/useful-ai-prompts",
+      "sourceType": "github",
+      "computedHash": "8a7fe50351131f99b7bc7750bb4be6e7cbd7919b3b346c8fc7f857fb1ecad059"
+    },
+    "react-best-practices": {
+      "source": "trsoliu/react-best-practices",
+      "sourceType": "github",
+      "computedHash": "4cc7c435036d5c9b23e284e1f7df5ed8510a52cfe31af280d0dcf035b412c79d"
+    },
+    "react-expert": {
+      "source": "reactjs/react.dev",
+      "sourceType": "github",
+      "computedHash": "e4f38b4f38c6ff4124c0b776d3ff352097bd061ccef5e583bad44a543879c30b"
+    },
+    "shadcn-ui": {
+      "source": "jezweb/claude-skills",
+      "sourceType": "github",
+      "computedHash": "cd631c67f61e7bc001576d4b3063bacef6602f0555e5dae414b9893a0a540de9"
+    },
+    "software-clean-code-standard": {
+      "source": "vasilyu1983/ai-agents-public",
+      "sourceType": "github",
+      "computedHash": "d157ae4c7ab6408e7e62ad0d72a4c244f02ff92aaf4a78677f2d4dd3845f1566"
+    },
+    "tailwind-design-system": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "0fc7b79d08ee5168d46c6887014cbe5bd02f2c5e458858470e20fc8ecedefb46"
+    },
+    "tailwind-theme-builder": {
+      "source": "jezweb/claude-skills",
+      "sourceType": "github",
+      "computedHash": "da374e337aa164d77b310b952aebf3fa99c8f7f0440a9bad3f22af2eacecdca4"
+    },
+    "tailwindcss-animations": {
+      "source": "josiahsiegel/claude-plugin-marketplace",
+      "sourceType": "github",
+      "computedHash": "49d9eb21d0046a936106389897d36c8f6c610239efa99701fba60efc59180362"
+    }
+  }
+}
