@@ -1,0 +1,9 @@
+// ==============================================
+// config/db.js — Instancia Singleton de PrismaClient
+// ==============================================
+
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export default prisma;
