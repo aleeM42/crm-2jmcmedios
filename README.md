@@ -4,17 +4,18 @@ Sistema de Gestión Comercial para la red local de 2jmcMedios.
 
 ## Arquitectura
 
-El proyecto sigue una arquitectura **MVC con Silos Estrictos**:
+El proyecto sigue una arquitectura **MVC con Silos Estrictos** y **Docker** para base de datos.
 
 ```
 crm-2jmcmedios/
-├── backend/                    # Silo Backend (Express + Prisma)
-│   ├── prisma/
-│   │   └── schema.prisma       # Modelos de datos
+├── docker-compose.yml          # Configuración de PostgreSQL local
+├── backend/                    # Silo Backend (Express + pg)
+│   ├── db/
+│   │   └── init.sql            # Estructura inicial (creación de tablas)
 │   ├── src/
 │   │   ├── config/
-│   │   │   └── db.js           # Instancia PrismaClient
-│   │   ├── model/              # TODA la lógica de queries
+│   │   │   └── db.js           # Pool de conexión PostgreSQL (pg)
+│   │   ├── model/              # Queries de SQL Puro
 │   │   │   ├── cliente.model.js
 │   │   │   ├── contacto.model.js
 │   │   │   ├── vendedor.model.js
@@ -30,7 +31,7 @@ crm-2jmcmedios/
 │   │   │   ├── vendedor.router.js
 │   │   │   └── visita.router.js
 │   │   └── server.js           # Entry point Express
-│   ├── .env                    # Variables de entorno (NO commitear)
+│   ├── .env                    # Variables de entorno
 │   └── package.json
 ├── frontend/                   # Silo Frontend (React + Vite + Tailwind)
 │   ├── public/                 # Assets estáticos
@@ -54,17 +55,19 @@ crm-2jmcmedios/
 
 | Capa | Carpeta | Responsabilidad |
 |------|---------|-----------------|
-| **Model** | `backend/src/model/` | Queries Prisma aisladas. TODA interacción con BD |
+| **Model** | `backend/src/model/` | SQL Puro usando cliente `pg`. TODA interacción BD aisalda aquí. |
 | **Controller** | `backend/src/controller/` | Validaciones y lógica de negocio |
 | **Router** | `backend/src/router/` | Definición de endpoints REST |
 | **View** | `frontend/views/` | Componentes React (.jsx) + Tailwind CSS |
 
-## Modelos de Datos
+## Base de Datos (Docker)
 
-- **Cliente** — Empresas/razones sociales gestionadas
-- **Contacto** — Personas de contacto asociadas a un cliente
-- **Vendedor** — Equipo comercial
-- **Visita** — Registro de visitas comerciales
+La base de datos se despliega de forma autónoma con **Docker Compose**.
+El script `backend/db/init.sql` aprovisiona automáticamente 4 tablas:
+- **clientes**
+- **contactos**
+- **vendedores**
+- **visitas**
 
 ## Endpoints API
 
@@ -83,15 +86,15 @@ crm-2jmcmedios/
 npm install --prefix backend
 npm install --prefix frontend
 
-# 2. Configurar base de datos
-# Editar backend/.env con tus credenciales PostgreSQL:
-# DATABASE_URL="postgresql://postgres:TU_CLAVE@localhost:5432/crm_2jmc?schema=public"
+# 2. Configurar base de datos (crear .env si no existe)
+# Editar backend/.env con:
+# DATABASE_URL="postgresql://postgres:TU_CLAVE@localhost:5432/crm_2jmc"
 
-# 3. Crear tablas en PostgreSQL
-cd backend && npx prisma db push
+# 3. Levantar PostgreSQL
+docker-compose up -d
 
-# 4. Ejecutar en desarrollo
-npm run dev   # Lanza backend (:3001) y frontend (:5173) juntos
+# 4. Ejecutar infraestructura (Backend y Frontend al mismo tiempo)
+npm run dev
 ```
 
 ## Regla de Oro

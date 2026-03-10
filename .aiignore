@@ -27,9 +27,8 @@ Thumbs.db
 *.exe
 *.dll
 
-# Prisma generados
-backend/prisma/migrations/
-backend/node_modules/.prisma/
+# Docker
+postgres_data/
 
 # Lock files (ruido para contexto IA)
 package-lock.json

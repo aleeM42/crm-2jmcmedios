@@ -5,12 +5,16 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
-    "prisma:push": "npx prisma db push",
-    "prisma:studio": "npx prisma studio"
+    "start": "node src/server.js"
   },
-  "keywords": ["crm", "2jmcmedios"],
+  "keywords": [
+    "crm",
+    "2jmcmedios"
+  ],
   "author": "2jmcMedios",
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "pg": "^8.20.0"
+  }
 }

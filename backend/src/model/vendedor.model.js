@@ -1,37 +1,55 @@
 // ==============================================
-// model/vendedor.model.js — Queries Prisma para VENDEDOR
+// model/vendedor.model.js — SQL puro para VENDEDOR
 // ==============================================
 
-import prisma from '../config/db.js';
+import pool from '../config/db.js';
 
 export const findAll = async () => {
-  return prisma.vendedor.findMany({
-    include: { clientes: true },
-    orderBy: { createdAt: 'desc' },
-  });
+  const query = `SELECT * FROM vendedores ORDER BY created_at DESC`;
+  const result = await pool.query(query);
+  return result.rows;
 };
 
 export const findById = async (id) => {
-  return prisma.vendedor.findUnique({
-    where: { id: Number(id) },
-    include: { clientes: true, visitas: true },
-  });
+  const query = `SELECT * FROM vendedores WHERE id = $1`;
+  const result = await pool.query(query, [id]);
+  return result.rows[0];
 };
 
 export const create = async (data) => {
-  return prisma.vendedor.create({ data });
+  const { nombre, apellido, email, telefono, cargo } = data;
+  const query = `
+    INSERT INTO vendedores (nombre, apellido, email, telefono, cargo)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *
+  `;
+  const values = [nombre, apellido, email, telefono, cargo];
+  const result = await pool.query(query, values);
+  return result.rows[0];
 };
 
 export const update = async (id, data) => {
-  return prisma.vendedor.update({
-    where: { id: Number(id) },
-    data,
-  });
+  const { nombre, apellido, email, telefono, cargo, activo } = data;
+  const query = `
+    UPDATE vendedores 
+    SET nombre = COALESCE($1, nombre),
+        apellido = COALESCE($2, apellido),
+        email = COALESCE($3, email),
+        telefono = COALESCE($4, telefono),
+        cargo = COALESCE($5, cargo),
+        activo = COALESCE($6, activo),
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = $7
+    RETURNING *
+  `;
+  const values = [nombre, apellido, email, telefono, cargo, activo, id];
+  const result = await pool.query(query, values);
+  return result.rows[0];
 };
 
 export const remove = async (id) => {
-  return prisma.vendedor.update({
-    where: { id: Number(id) },
-    data: { activo: false },
-  });
+  // Soft delete
+  const query = `UPDATE vendedores SET activo = false WHERE id = $1 RETURNING *`;
+  const result = await pool.query(query, [id]);
+  return result.rows[0];
 };

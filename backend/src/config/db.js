@@ -1,9 +1,21 @@
 // ==============================================
-// config/db.js — Instancia Singleton de PrismaClient
+// config/db.js — Connection Pool de PostgreSQL (pg)
 // ==============================================
 
-import { PrismaClient } from '@prisma/client';
+import pkg from 'pg';
+const { Pool } = pkg;
 
-const prisma = new PrismaClient();
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
-export default prisma;
+pool.on('connect', () => {
+  console.log('✅ Conectado a PostgreSQL');
+});
+
+pool.on('error', (err) => {
+  console.error('❌ Error fatal en PostgreSQL', err);
+  process.exit(-1);
+});
+
+export default pool;
