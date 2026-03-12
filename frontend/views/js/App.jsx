@@ -1,75 +1,89 @@
 // ==============================================
-// App.jsx — Componente Raíz CRM 2jmcMedios
+// App.jsx — Pantalla Principal / Login
 // ==============================================
 
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">2J</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-800">CRM 2jmcMedios</h1>
-              <p className="text-xs text-slate-500">Sistema de Gestión Comercial</p>
+    <div className="flex h-screen w-full">
+      {/* Left Side: Gradient & Brand Visual */}
+      <div className="hidden lg:flex w-1/2 relative items-center justify-center overflow-hidden" style={{ background: 'linear-gradient(147.99deg, #8DC63F 0%, #55CCD3 35%, #16B1B8 70%, #A1DEE5 100%)' }}>
+        {/* Subtle Vortex/Spiral Watermark */}
+        <div className="absolute inset-0 opacity-10 flex items-center justify-center">
+          <svg fill="white" height="600" viewBox="0 0 512 512" width="600" xmlns="http://www.w3.org/2000/svg">
+            <path clip-rule="evenodd" d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm0 464c-114.7 0-208-93.3-208-208S141.3 48 256 48s208 93.3 208 208-93.3 208-208 208zm-96-208c0-53 43-96 96-96s96 43 96 96-43 96-96 96-96-43-96-96z" fill-rule="evenodd" opacity="0.3"></path>
+            <circle cx="256" cy="256" fill="none" opacity="0.2" r="150" stroke="white" stroke-width="2"></circle>
+            <circle cx="256" cy="256" fill="none" opacity="0.1" r="100" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div className="relative z-10 text-center text-white px-12">
+          <div className="mb-8 flex justify-center">
+            <div className="p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 shadow-2xl">
+              <img
+                src="/Vortice.png"
+                alt="2JMC Medios"
+                className="w-32 h-32 object-contain drop-shadow-lg"
+              />
             </div>
           </div>
-          <nav className="flex gap-6 text-sm font-medium text-slate-600">
-            <a href="#" className="hover:text-blue-600 transition-colors">Clientes</a>
-            <a href="#" className="hover:text-blue-600 transition-colors">Vendedores</a>
-            <a href="#" className="hover:text-blue-600 transition-colors">Visitas</a>
-            <a href="#" className="hover:text-blue-600 transition-colors">Contactos</a>
-          </nav>
+          <h2 className="text-4xl font-bold tracking-tight mb-4">2JMC Medios</h2>
+          <p className="text-white/80 text-lg font-light max-w-md mx-auto">Gestión inteligente de medios y comunicación para la era digital.</p>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <DashCard title="Clientes" value="—" icon="👥" color="blue" />
-          <DashCard title="Vendedores" value="—" icon="💼" color="violet" />
-          <DashCard title="Visitas" value="—" icon="📋" color="amber" />
-          <DashCard title="Contactos" value="—" icon="📇" color="emerald" />
-        </div>
-
-        {/* Status */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-2">🚀 Sistema Activo</h2>
-          <p className="text-slate-600 text-sm">
-            El CRM 2jmcMedios está configurado y listo. 
-            Conecta la base de datos PostgreSQL para comenzar a gestionar clientes, 
-            vendedores y visitas.
-          </p>
-        </div>
-      </main>
-    </div>
-  );
-}
-
-/**
- * DashCard — Tarjeta de dashboard reutilizable
- */
-function DashCard({ title, value, icon, color }) {
-  const colorMap = {
-    blue:    'from-blue-500 to-blue-600',
-    violet:  'from-violet-500 to-violet-600',
-    amber:   'from-amber-500 to-amber-600',
-    emerald: 'from-emerald-500 to-emerald-600',
-  };
-
-  return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-2xl">{icon}</span>
-        <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${colorMap[color]} text-white text-xs font-semibold`}>
-          {value}
+        {/* Decorative Elements */}
+        <div className="absolute top-10 left-10 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+      </div>
+      {/* Right Side: Login Form */}
+      <div className="w-full lg:w-1/2 bg-white flex flex-col items-center justify-center p-8 lg:p-24">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo (shown only on small screens) */}
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-12">
+            <img src="/Vortice-01.png" alt="" />
+            <h2 className="text-text-dark text-2xl font-bold font-display">2JMC Medios</h2>
+          </div>
+          <div className="mb-10 text-center lg:text-left">
+            <h1 className="text-text-dark text-3xl font-bold font-display mb-2">Iniciar Sesión</h1>
+            <p className="text-text-muted font-light">Bienvenido de nuevo al CRM de 2JMC Medios.</p>
+          </div>
+          <form className="space-y-6">
+            {/* User Input */}
+            <div>
+              <label className="block text-text-dark text-sm font-semibold mb-2 font-display">Usuario</label>
+              <div className="relative">
+                <input className="w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display" placeholder="Nombre de usuario o correo" type="text" />
+              </div>
+            </div>
+            {/* Password Input */}
+            <div>
+              <div className="flex justify-between mb-2">
+                <label className="block text-text-dark text-sm font-semibold font-display">Contraseña</label>
+                <a className="text-xs text-primary font-medium hover:underline" href="#">¿Olvidó su contraseña?</a>
+              </div>
+              <div className="relative">
+                <input className="w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display" placeholder="••••••••••••" type="password" />
+                <button className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors" type="button">
+                  <span className="material-symbols-outlined text-xl">visibility</span>
+                </button>
+              </div>
+            </div>
+            {/* Remember Me */}
+            <div className="flex items-center">
+              <input className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" id="remember" type="checkbox" />
+              <label className="ml-2 text-sm text-text-muted cursor-pointer" htmlFor="remember">Mantener sesión iniciada</label>
+            </div>
+            {/* Submit Button */}
+            <button className="w-full h-14 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 group" type="submit">
+              <span>Ingresar</span>
+              <span className="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">login</span>
+            </button>
+          </form>
+          {/* Footer Text */}
+          <div className="mt-16 text-center">
+            <p className="text-text-muted text-xs tracking-widest font-medium uppercase font-display">
+              CRM 2JMC Medios © 2026
+            </p>
+          </div>
         </div>
       </div>
-      <h3 className="text-sm font-medium text-slate-600">{title}</h3>
     </div>
   );
 }

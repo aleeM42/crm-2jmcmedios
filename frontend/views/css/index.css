@@ -1,29 +1,47 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/container-queries";
+
+@theme {
+  --color-primary: #16B1B8;
+  /* Teal principal (botones, bordes activos) */
+  --color-secondary: #55CCD3;
+  /* Teal medio (gradientes, elementos secundarios) */
+  --color-accent-green: #8DC63F;
+  /* Verde acento (estados activos, KPIs de éxito) */
+  --color-accent-light: #A1DEE5;
+  /* Teal claro (fondos de gráficos, badges) */
+  --color-background-main: #F5F7FA;
+  /* Gris muy claro (fondo de la aplicación) */
+  --color-white: #FFFFFF;
+  /* Blanco puro (sidebar, tarjetas, formularios) */
+  --color-text-dark: #1F2937;
+  /* Gris oscuro para títulos y texto principal */
+  --color-text-muted: #6B7280;
+  /* Gris medio para etiquetas y placeholders */
+
+  /* Variables originales de Stitch requeridas en la estructura */
+  --color-background-light: #f6f8f8;
+  --color-background-dark: #112021;
+  --font-display: "Montserrat", "Inter", sans-serif;
+
+  --radius-DEFAULT: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+}
 
 /* ==============================================
    CRM 2jmcMedios — Estilos Globales
    ============================================== */
 
-:root {
-  --color-primary: #1e40af;
-  --color-secondary: #7c3aed;
-  --color-accent: #f59e0b;
-  --color-bg: #f8fafc;
-  --color-surface: #ffffff;
-  --color-text: #1e293b;
-  --color-text-muted: #64748b;
-}
-
 * {
-  margin: 0;
-  padding: 0;
+
   box-sizing: border-box;
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  font-family: 'Montserrat', sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
