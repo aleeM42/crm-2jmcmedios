@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>CRM Reports Directory - 2JMC Medios</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Montserrat:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16B1B8",
+                        "secondary": "#8DC63F",
+                        "accent-light": "#A1DEE5",
+                        "accent-medium": "#55CCD3",
+                        "background-light": "#F5F7FA",
+                        "background-dark": "#112021",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"],
+                        "sans": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-display {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .sidebar-item-active {
+            border-left: 4px solid #16B1B8;
+            background-color: rgba(22, 177, 184, 0.05);
+            color: #16B1B8;
+        }
+
+        .report-card:hover {
+            border-color: #16B1B8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+    <!-- Sidebar -->
+    <aside
+        class="w-[240px] bg-white dark:bg-slate-900 h-screen fixed left-0 top-0 border-r border-slate-200 dark:border-slate-800 flex flex-col z-50">
+        <div class="p-6">
+            <h1 class="font-display text-xl font-bold text-primary tracking-tight">CRM 2JMC</h1>
+        </div>
+        <nav class="flex-1 px-0 py-4 space-y-1 overflow-y-auto">
+            <a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined text-[22px]">dashboard</span>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined text-[22px]">account_circle</span>
+                <span class="text-sm font-medium">Mi Perfil</span>
+            </a>
+            <a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined text-[22px]">group</span>
+                <span class="text-sm font-medium">Equipo de Ventas</span>
+            </a>
+            <a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined text-[22px]">description</span>
+                <span class="text-sm font-medium">Pautas</span>
+            </a>
+            <a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined text-[22px]">handshake</span>
+                <span class="text-sm font-medium">Aliados Comerciales</span>
+            </a>
+            <a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined text-[22px]">show_chart</span>
+                <span class="text-sm font-medium">Actividad Comercial</span>
+            </a>
+            <a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined text-[22px]">account_tree</span>
+                <span class="text-sm font-medium">Pipeline</span>
+            </a>
+            <a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined text-[22px]">person_search</span>
+                <span class="text-sm font-medium">Clientes</span>
+            </a>
+            <a class="flex items-center gap-3 px-6 py-3 sidebar-item-active font-semibold" href="#">
+                <span class="material-symbols-outlined text-[22px]">bar_chart</span>
+                <span class="text-sm font-display">Reportes</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+            <button
+                class="flex items-center gap-3 px-4 py-3 w-full text-slate-500 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10">
+                <span class="material-symbols-outlined text-[22px]">logout</span>
+                <span class="text-sm font-medium">Cerrar Sesión</span>
+            </button>
+        </div>
+    </aside>
+    <!-- Main Content -->
+    <main class="flex-1 ml-[240px] p-8 lg:p-12">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-10">
+            <h2 class="font-display text-3xl font-bold text-slate-900 dark:text-white">Reportes</h2>
+            <button
+                class="bg-primary hover:bg-primary/90 text-white font-display text-sm font-semibold px-6 py-2.5 rounded-lg shadow-sm transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">download</span>
+                Exportar Todo
+            </button>
+        </header>
+        <!-- Section 1: Client & Guidelines -->
+        <section class="mb-12">
+            <div class="flex items-center gap-2 mb-6">
+                <span class="material-symbols-outlined text-primary">folder_open</span>
+                <h3 class="font-display text-lg font-bold text-slate-700 dark:text-slate-300">Reportes de Clientes y
+                    Pautas</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-accent-light/20 flex items-center justify-center mb-4 text-primary">
+                        <span class="material-symbols-outlined">leaderboard</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Ranking Clientes por
+                        Pautas</h4>
+                    <p class="text-xs text-slate-500 mt-2">Visualización de clientes con mayor volumen de pautas
+                        publicitarias.</p>
+                </div>
+                <!-- Card 2 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-secondary/20 flex items-center justify-center mb-4 text-secondary">
+                        <span class="material-symbols-outlined">pie_chart</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Clientes por Sector</h4>
+                    <p class="text-xs text-slate-500 mt-2">Distribución de cartera de clientes según industria y sector
+                        comercial.</p>
+                </div>
+                <!-- Card 3 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-accent-medium/20 flex items-center justify-center mb-4 text-accent-medium">
+                        <span class="material-symbols-outlined">map</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Regiones por Cliente</h4>
+                    <p class="text-xs text-slate-500 mt-2">Análisis geográfico de la presencia de clientes en el
+                        territorio nacional.</p>
+                </div>
+                <!-- Card 4 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mb-4 text-primary">
+                        <span class="material-symbols-outlined">query_stats</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Ingresos Mensuales</h4>
+                    <p class="text-xs text-slate-500 mt-2">Seguimiento histórico de facturación y proyecciones
+                        mensuales.</p>
+                </div>
+                <!-- Card 5 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-secondary/20 flex items-center justify-center mb-4 text-secondary">
+                        <span class="material-symbols-outlined">filter_alt</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Pautas por Filtro</h4>
+                    <p class="text-xs text-slate-500 mt-2">Búsqueda avanzada de pautas por fecha, categoría o estado.
+                    </p>
+                </div>
+                <!-- Card 6 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-accent-light/20 flex items-center justify-center mb-4 text-primary">
+                        <span class="material-symbols-outlined">payments</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Gastos por Cliente</h4>
+                    <p class="text-xs text-slate-500 mt-2">Detalle de inversión publicitaria desglosado por cada cuenta.
+                    </p>
+                </div>
+            </div>
+        </section>
+        <!-- Section 2: Sales Reps -->
+        <section class="mb-12">
+            <div class="flex items-center gap-2 mb-6">
+                <span class="material-symbols-outlined text-secondary">groups</span>
+                <h3 class="font-display text-lg font-bold text-slate-700 dark:text-slate-300">Reportes de Vendedores
+                </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-secondary/20 flex items-center justify-center mb-4 text-secondary">
+                        <span class="material-symbols-outlined">emoji_events</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Ranking por Efectividad
+                    </h4>
+                    <p class="text-xs text-slate-500 mt-2">Comparativa de cierre de ventas y cumplimiento de objetivos.
+                    </p>
+                </div>
+                <!-- Card 2 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-accent-medium/20 flex items-center justify-center mb-4 text-accent-medium">
+                        <span class="material-symbols-outlined">account_balance_wallet</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Ranking por Gastos</h4>
+                    <p class="text-xs text-slate-500 mt-2">Control de gastos operativos asociados a la gestión
+                        comercial.</p>
+                </div>
+                <!-- Card 3 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mb-4 text-primary">
+                        <span class="material-symbols-outlined">list_alt</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Gastos por Vendedor</h4>
+                    <p class="text-xs text-slate-500 mt-2">Listado detallado de viáticos y recursos asignados por
+                        ejecutivo.</p>
+                </div>
+            </div>
+        </section>
+        <!-- Section 3: Radio Stations -->
+        <section class="mb-12">
+            <div class="flex items-center gap-2 mb-6">
+                <span class="material-symbols-outlined text-accent-medium">radio</span>
+                <h3 class="font-display text-lg font-bold text-slate-700 dark:text-slate-300">Reportes de Emisoras</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
+                        <span class="material-symbols-outlined">grade</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Top 5 Emisoras por Cuñas
+                    </h4>
+                    <p class="text-xs text-slate-500 mt-2">Las emisoras con mayor frecuencia de transmisión
+                        publicitaria.</p>
+                </div>
+                <!-- Card 2 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4 text-secondary">
+                        <span class="material-symbols-outlined">public</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Emisoras por Región</h4>
+                    <p class="text-xs text-slate-500 mt-2">Clasificación de medios radiales según cobertura geográfica.
+                    </p>
+                </div>
+                <!-- Card 3 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-accent-medium/10 flex items-center justify-center mb-4 text-accent-medium">
+                        <span class="material-symbols-outlined">label</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Marcas por Región</h4>
+                    <p class="text-xs text-slate-500 mt-2">Impacto de marcas específicas en las diferentes regiones.</p>
+                </div>
+                <!-- Card 4 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
+                        <span class="material-symbols-outlined">group_work</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Clientes por Emisora</h4>
+                    <p class="text-xs text-slate-500 mt-2">Cartera de anunciantes activa por cada estación de radio.</p>
+                </div>
+                <!-- Card 5 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4 text-secondary">
+                        <span class="material-symbols-outlined">analytics</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Emisoras Activas por
+                        Región</h4>
+                    <p class="text-xs text-slate-500 mt-2">Estado actual de la red de emisoras aliadas por zona.</p>
+                </div>
+                <!-- Card 6 -->
+                <div
+                    class="report-card bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 transition-all cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-accent-medium/10 flex items-center justify-center mb-4 text-accent-medium">
+                        <span class="material-symbols-outlined">equalizer</span>
+                    </div>
+                    <h4 class="font-display font-semibold text-slate-800 dark:text-slate-100">Top Emisoras por Clientes
+                    </h4>
+                    <p class="text-xs text-slate-500 mt-2">Emisoras preferidas por el volumen total de anunciantes.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

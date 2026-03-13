@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CRM Commercial Allies Directory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16B1B8",
+                        "accent-green": "#8DC63F",
+                        "light-teal": "#A1DEE5",
+                        "mid-teal": "#55CCD3",
+                        "background-light": "#F5F7FA",
+                        "background-dark": "#102122",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Montserrat', sans-serif; }
+        .sidebar-active { border-left: 4px solid #16B1B8; background-color: rgba(22, 177, 184, 0.05); }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="flex min-h-screen">
+<!-- LEFT SIDEBAR -->
+<aside class="w-[240px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-full z-50">
+<div class="p-6">
+<h1 class="text-primary text-xl font-800 tracking-tight">CRM 2JMC</h1>
+</div>
+<nav class="flex-1 px-0 py-4 space-y-1">
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-500">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">person</span>
+<span class="text-sm font-500">Mi Perfil</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">group</span>
+<span class="text-sm font-500">Equipo de Ventas</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">description</span>
+<span class="text-sm font-500">Pautas</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-primary sidebar-active font-600" href="#">
+<span class="material-symbols-outlined text-[22px]">radio</span>
+<span class="text-sm">Aliados Comerciales</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">insights</span>
+<span class="text-sm font-500">Actividad Comercial</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">account_tree</span>
+<span class="text-sm font-500">Pipeline</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">contact_page</span>
+<span class="text-sm font-500">Clientes</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">bar_chart</span>
+<span class="text-sm font-500">Reportes</span>
+</a>
+</nav>
+<div class="p-6 border-t border-slate-100 dark:border-slate-800">
+<a class="flex items-center gap-3 text-slate-500 hover:text-red-500 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">logout</span>
+<span class="text-sm font-500">Cerrar Sesión</span>
+</a>
+</div>
+</aside>
+<!-- MAIN CONTENT -->
+<main class="flex-1 ml-[240px] p-8 min-h-screen">
+<!-- Header -->
+<header class="mb-8">
+<h2 class="text-3xl font-800 text-slate-800 dark:text-white tracking-tight">Aliados Comerciales</h2>
+</header>
+<!-- KPI Cards Row -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-600 mb-1">Total Emisoras</p>
+<p class="text-3xl font-800 text-slate-800 dark:text-white">32</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-600 mb-1">Emisoras Activas</p>
+<div class="flex items-baseline gap-2">
+<p class="text-3xl font-800 text-accent-green">28</p>
+<span class="text-xs font-500 text-accent-green bg-accent-green/10 px-2 py-0.5 rounded-full">87.5%</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-600 mb-1">Regiones Cubiertas</p>
+<p class="text-3xl font-800 text-slate-800 dark:text-white">8</p>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-4 mb-8">
+<div class="flex-1 min-w-[300px] relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-background-light dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 placeholder:text-slate-400" placeholder="Buscar emisora o frecuencia..." type="text"/>
+</div>
+<div class="flex gap-3">
+<select class="bg-background-light dark:bg-slate-800 border-none rounded-lg text-sm py-2 pl-4 pr-10 focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer">
+<option>Región</option>
+<option>Caracas</option>
+<option>Valencia</option>
+<option>Maracaibo</option>
+</select>
+<select class="bg-background-light dark:bg-slate-800 border-none rounded-lg text-sm py-2 pl-4 pr-10 focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer">
+<option>Categoría</option>
+<option>Musical</option>
+<option>Informativa</option>
+<option>Deportiva</option>
+</select>
+<select class="bg-background-light dark:bg-slate-800 border-none rounded-lg text-sm py-2 pl-4 pr-10 focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer">
+<option>Estado</option>
+<option>Activa</option>
+<option>Inactiva</option>
+<option>Cerrada</option>
+</select>
+</div>
+</div>
+<!-- Station Catalog Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+<!-- Card 1 -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-700 text-lg text-slate-800 dark:text-white">La Romántica 88.9</h3>
+<div class="h-2.5 w-2.5 rounded-full bg-accent-green" title="Activa"></div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="px-3 py-1 bg-primary/10 text-primary text-xs font-700 rounded-full">88.9 FM</span>
+<span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-600 rounded-full">Caracas</span>
+</div>
+<div class="flex items-center gap-2 mb-4 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-base">person</span>
+<span class="text-sm font-500">Ricardo Pérez</span>
+<span class="material-symbols-outlined text-base ml-auto text-primary cursor-pointer">call</span>
+</div>
+<div class="mt-auto pt-4 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center">
+<span class="text-[11px] text-slate-400 font-500 uppercase tracking-wider">Cobertura: Caracas - Los Teques</span>
+<a class="text-primary text-xs font-700 hover:underline" href="#">Ver Detalle</a>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-700 text-lg text-slate-800 dark:text-white">Éxitos 99.9</h3>
+<div class="h-2.5 w-2.5 rounded-full bg-accent-green" title="Activa"></div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="px-3 py-1 bg-primary/10 text-primary text-xs font-700 rounded-full">99.9 FM</span>
+<span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-600 rounded-full">Caracas</span>
+</div>
+<div class="flex items-center gap-2 mb-4 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-base">person</span>
+<span class="text-sm font-500">Mariana García</span>
+<span class="material-symbols-outlined text-base ml-auto text-primary cursor-pointer">call</span>
+</div>
+<div class="mt-auto pt-4 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center">
+<span class="text-[11px] text-slate-400 font-500 uppercase tracking-wider">Cobertura: Gran Caracas</span>
+<a class="text-primary text-xs font-700 hover:underline" href="#">Ver Detalle</a>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-700 text-lg text-slate-800 dark:text-white">Onda 107.9</h3>
+<div class="h-2.5 w-2.5 rounded-full bg-slate-300 dark:bg-slate-600" title="Inactiva"></div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="px-3 py-1 bg-primary/10 text-primary text-xs font-700 rounded-full">107.9 FM</span>
+<span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-600 rounded-full">Caracas</span>
+</div>
+<div class="flex items-center gap-2 mb-4 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-base">person</span>
+<span class="text-sm font-500">Carlos Méndez</span>
+<span class="material-symbols-outlined text-base ml-auto text-primary cursor-pointer">call</span>
+</div>
+<div class="mt-auto pt-4 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center">
+<span class="text-[11px] text-slate-400 font-500 uppercase tracking-wider">Cobertura: Caracas Central</span>
+<a class="text-primary text-xs font-700 hover:underline" href="#">Ver Detalle</a>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-700 text-lg text-slate-800 dark:text-white">Radio Tiempo 95.1</h3>
+<div class="h-2.5 w-2.5 rounded-full bg-accent-green" title="Activa"></div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="px-3 py-1 bg-primary/10 text-primary text-xs font-700 rounded-full">95.1 FM</span>
+<span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-600 rounded-full">Valencia</span>
+</div>
+<div class="flex items-center gap-2 mb-4 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-base">person</span>
+<span class="text-sm font-500">José Gregorio</span>
+<span class="material-symbols-outlined text-base ml-auto text-primary cursor-pointer">call</span>
+</div>
+<div class="mt-auto pt-4 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center">
+<span class="text-[11px] text-slate-400 font-500 uppercase tracking-wider">Cobertura: Carabobo - Aragua</span>
+<a class="text-primary text-xs font-700 hover:underline" href="#">Ver Detalle</a>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-700 text-lg text-slate-800 dark:text-white">Mágica 99.1</h3>
+<div class="h-2.5 w-2.5 rounded-full bg-red-500" title="Cerrada"></div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="px-3 py-1 bg-primary/10 text-primary text-xs font-700 rounded-full">99.1 FM</span>
+<span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-600 rounded-full">Caracas</span>
+</div>
+<div class="flex items-center gap-2 mb-4 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-base">person</span>
+<span class="text-sm font-500">Elena Rodríguez</span>
+<span class="material-symbols-outlined text-base ml-auto text-primary cursor-pointer">call</span>
+</div>
+<div class="mt-auto pt-4 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center">
+<span class="text-[11px] text-slate-400 font-500 uppercase tracking-wider">Cobertura: Caracas Este</span>
+<a class="text-primary text-xs font-700 hover:underline" href="#">Ver Detalle</a>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-700 text-lg text-slate-800 dark:text-white">Unión Radio 90.3</h3>
+<div class="h-2.5 w-2.5 rounded-full bg-accent-green" title="Activa"></div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="px-3 py-1 bg-primary/10 text-primary text-xs font-700 rounded-full">90.3 FM</span>
+<span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-600 rounded-full">Nacional</span>
+</div>
+<div class="flex items-center gap-2 mb-4 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-base">person</span>
+<span class="text-sm font-500">Luisa Martínez</span>
+<span class="material-symbols-outlined text-base ml-auto text-primary cursor-pointer">call</span>
+</div>
+<div class="mt-auto pt-4 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center">
+<span class="text-[11px] text-slate-400 font-500 uppercase tracking-wider">Cobertura: Todo el país</span>
+<a class="text-primary text-xs font-700 hover:underline" href="#">Ver Detalle</a>
+</div>
+</div>
+</div>
+<!-- Pagination Controls -->
+<div class="flex items-center justify-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white font-700">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 transition-colors">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 transition-colors">3</button>
+<span class="px-2 text-slate-400">...</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 transition-colors">8</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</main>
+</div>
+</body></html>

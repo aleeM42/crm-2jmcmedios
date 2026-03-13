@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # Arquitectura del Proyecto CRM
 
 Este documento sirve como "El Mapa" del proyecto para entender su estructura, tecnologías, convenciones y modelos de datos de un vistazo.
@@ -13,11 +17,13 @@ La arquitectura se basa en el patrón MVC (Modelo-Vista-Controlador), dividida e
 ```text
 / (raíz del proyecto)
 ├── frontend/
-│   ├── public/          # Assets estáticos del proyecto en general (imágenes, iconos, fuentes)
-│   └── views/           # Vistas del frontend
-│       ├── html/        # Archivos y plantillas HTML
-│       ├── css/         # Estilos y configuración de Tailwind CSS
-│       └── js/          # Componentes React y lógica de interacción
+├── public/        # Favicon, imágenes estáticas
+└── src/
+    ├── assets/    # CSS global, logos
+    ├── components/# Botones, tarjetas, formularios (reutilizables)
+    ├── pages/     # Vistas completas (Login, Dashboard, Clientes)
+    ├── services/  # Conexión con el Backend (Fetch/Axios)
+    └── App.jsx    # Enrutador principal del frontend       # Componentes React y lógica   
 └── backend/
     ├── config/          # Configuración general y conexión a la base de datos PostgreSQL
     ├── model/           # Modelos de bases de datos y consultas (queries aisladas)
@@ -32,33 +38,25 @@ La arquitectura se basa en el patrón MVC (Modelo-Vista-Controlador), dividida e
 
 ## Esquema de Base de Datos (Modelo ER)
 Resumen de las tablas, entidades y atributos principales extraídos del modelo relacional del CRM.
+## Esquema de Base de Datos (Modelo Lógico PostgreSQL)
+El sistema utiliza una base de datos relacional robusta en PostgreSQL, con claves foráneas (FK) estrictas e integridad referencial.
 
-### Clientes y Contacto
-*   **CLIENTE (EMPRESA):** Cod (PK), nombre, razón_social, Direccion, RIF fiscal, Clasificacion (Agencia o Cliente directo), Sector, Estado (Activo, Inactivo), Observacion
-*   **CONTACTO (EMISORA O CLIENTE):** ID (PK), fecha_nacimiento, primer_nombre, segundo_nombre, primer_apellido, departamento, correo, anotaciones_especiales, rol, tipo (emisora, cliente)
-*   **TELEFONO:** codigo_area, cuerpo
+### 1. Seguridad y Autenticación
+* **USUARIOS:** `id` (UUID PK), `nombre`, `apellido`, `email` (Unique), `password_hash` (Argon2/Bcrypt), `rol` (Enum: Admin, Director, Vendedor), `estado`, `intentos_fallidos`. (Tabla central de RBAC).
+* **VENDEDORES:** `usuario_id` (UUID PK/FK -> usuarios.id), `meta_mensual`. (Extensión 1:1 de usuarios).
 
-### Proveedores y Aliados
-*   **ALIADO COMERCIAL:** ID (PK), razón_social, nombre emisora, Rif, Frecuencia, categoría, dirección, estado (Activo,Inactivo,Cerrado)
-*   **CATEGORÍA_EMISORA:** ID (PK), nombre
+### 2. Directorio Comercial
+* **CLIENTES:** `id` (UUID PK), `nombre`, `razon_social`, `rif_fiscal` (Unique), `clasificacion`, `nombre_agencia` (Nulo si es directo).
+* **ALIADOS_COMERCIALES:** `id` (UUID PK), `razon_social`, `nombre_emisora`, `categoria_id` (FK -> categorias).
+* **CONTACTOS:** `id` (UUID PK), `cliente_id` (FK nulo si es emisora), `aliado_id` (FK nulo si es cliente), `tipo` (Enum: Emisora, Cliente), `primer_nombre`, `primer_apellido`, `correo`.
+* **TELEFONOS:** `codigo_area` (PK), `cuerpo` (PK), `contacto_id` (FK).
 
-### Publicidad y Pautas
-*   **PAUTA:** numero_OT (PK), fecha_emision, marca, segundos, Fecha_inicio, Fecha_Fin, cantidad_cuñas, costo_cuña, monto_OC, monto_OT, tipo_compra (rotativa, en vivo), estado (programada, en transmisión, suspendida, finalizada), observaciones
-*   **CUÑA:** id (PK), duración, cortina, segundos, mensaje
-*   **MARCA:** Nombre, observaciones
-*   **COBERTURA:** ID (PK), Punto Inicio, Punto Fin, Descripcion
+### 3. Operaciones Core (Pautas)
+* **PAUTAS:** `numero_ot` (Serial PK), `cliente_id` (FK), `vendedor_id` (FK), `marca_id` (FK), `monto_ot`, `tipo_compra`, `estado` (Enum: Programada, En transmisión...).
+* **PAUTA_ALIADO (Tabla M:N):** `pauta_id` (FK), `aliado_id` (FK), `cantidad_emisoras`. Conecta en qué emisoras suena una pauta.
+* **CUÑAS:** `id` (UUID PK), `pauta_id` (FK), `duracion`, `mensaje`. (Depende estrictamente de la pauta).
 
-### Negociaciones e Interacciones
-*   **HISTORICO DE NEGOCIACIONES:** ID (PK), Fecha_inicio, Fecha_fin, Monto_negociación, Cantidad_cuñas
-*   **VENDEDOR:** Cod (PK), Nombre, segundo nombre, apellido, segundo apellido, Meta, Correo
-*   **VISITA:** ID (PK), Fecha, Hora, Objetivo_visita, lugar, efectiva (si, no), tipo (llamada, presencial), detalle
-*   **LUGAR:** Cod (PK), Nombre, Tipo (región, estado, ciudad), Descripcion
-
-### Gastos
-*   **GASTO VISITA:** ID (PK), Fecha, Concepto, monto, categoría (transporte, alimentación, peaje, estacionamiento, regalos, otros)
-*   **GASTO MARKETING:** ID (PK), Fecha, Concepto, monto, tipo (campaña, remota, regalos corporativos)
-
-### Usuarios y Roles del Sistema
-*   **USUARIO:** ID (PK), Nombre_Cuenta, Contraseña
-*   **ADMIN:** ID (PK), Nombre, Apellido, Correo
-*   **DIRECTOR:** ID (PK), Nombre, Apellido, Correo
+### 4. Tracking y Finanzas
+* **HISTORICO_NEGOCIACIONES:** `id` (UUID PK), `cliente_id` (FK), `vendedor_id` (FK), `monto_negociacion`.
+* **VISITAS:** `id` (UUID PK), `vendedor_id` (FK), `cliente_id` (FK), `lugar_id` (FK), `fecha`, `efectiva` (Boolean).
+* **GASTOS (Visitas y Mkt):** Tablas separadas vinculadas a las visitas o campañas para auditar montos y conceptos.

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CRM 2JMC - Agregar Sub-Empresa</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16B1B8",
+                        "secondary": "#8DC63F",
+                        "accent-light": "#A1DEE5",
+                        "accent-medium": "#55CCD3",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#112021",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"],
+                        "body": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-montserrat { font-family: 'Montserrat', sans-serif; }
+        .sidebar-active { border-right: 4px solid #16B1B8; background-color: rgba(22, 177, 184, 0.05); }
+        .gradient-primary { background: linear-gradient(135deg, #16B1B8 0%, #55CCD3 100%); }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<!-- LEFT SIDEBAR -->
+<aside class="fixed inset-y-0 left-0 w-[240px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-50 flex flex-col">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">corporate_fare</span>
+</div>
+<div>
+<h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">CRM 2JMC</h1>
+<p class="text-[10px] uppercase tracking-widest text-primary font-bold mt-1">Administración</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-3 mt-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-primary transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary sidebar-active rounded-l-none rounded-r-lg" href="#">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1">group</span>
+<span class="text-sm font-bold">Clientes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-primary transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="text-sm font-medium">Proyectos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-primary transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-medium">Reportes</span>
+</a>
+<div class="pt-4 pb-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sistema</div>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-primary transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Configuración</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2 rounded-lg bg-slate-50 dark:bg-slate-800">
+<div class="w-8 h-8 rounded-full bg-slate-300 overflow-hidden">
+<img alt="Usuario" data-alt="Avatar profile image of a user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCy_n9YoYC-SeyA0K_1J2ZF9sVf6Z8lo1bzQtXM64M-5jgW9FBMFwPxalzx41d__qXUZtTtPlvnWUZd220FJWomcpNqGZFxUmPUzTswIClRDMILd5tMx1hrLnQ_ouyFkU4aQSOY_FMnD1uSZffXD99-SNtLjD-TygztK2kQbPMrUJu5lxkqWUfeZVv_YW8KuY8FmkY1gaFLmm86vVN-m5rsQOW7crDykQd12NSJOMsfs0z-K4IAMm5fJChw5Bna8QvDBT8yla3hQgg"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold truncate">Juan Pérez</p>
+<p class="text-[10px] text-slate-500 truncate">Admin</p>
+</div>
+<span class="material-symbols-outlined text-slate-400 text-sm">logout</span>
+</div>
+</div>
+</aside>
+<!-- MAIN CONTENT -->
+<main class="ml-[240px] flex-1">
+<!-- HEADER -->
+<header class="sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-40 px-8 py-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<nav class="flex items-center gap-2 text-xs font-medium text-slate-500 mb-2">
+<a class="hover:text-primary" href="#">Clientes</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<a class="hover:text-primary" href="#">Alimentos Polar</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary">Nueva Sub-Empresa</span>
+</nav>
+<h2 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white font-montserrat">Agregar Sub-Empresa</h2>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-2.5 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                        Cancelar
+                    </button>
+<button class="px-8 py-2.5 gradient-primary text-white font-bold text-sm rounded-lg shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">save</span>
+                        Guardar
+                    </button>
+</div>
+</div>
+</header>
+<div class="px-8 pb-12 max-w-6xl">
+<!-- TOP INFO BAR -->
+<div class="bg-accent-light/30 border border-accent-medium/30 rounded-xl p-4 mb-8 flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-accent-medium/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">domain</span>
+</div>
+<div>
+<p class="text-xs font-bold text-primary uppercase tracking-wider">Empresa Padre</p>
+<h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 font-montserrat">Alimentos Polar <span class="text-slate-500 font-medium ml-2 text-sm">(J-00041883-6)</span></h3>
+</div>
+</div>
+<!-- MAIN FORM CARD -->
+<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+<form class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- SECTION: Datos de la Sub-Empresa -->
+<section class="p-8">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">info</span>
+<h3 class="text-lg font-bold font-montserrat">Datos de la Sub-Empresa</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Nombre de la Sub-Empresa <span class="text-red-500">*</span></label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Polar Planta Turmero" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Razón Social <span class="text-red-500">*</span></label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Razón legal completa" type="text"/>
+</div>
+<div class="md:col-span-2 space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Dirección Fiscal <span class="text-red-500">*</span></label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Av. Principal, Edif. Polar, Piso 4" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">RIF Fiscal <span class="text-red-500">*</span></label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="J-00000000-0" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Clasificación <span class="text-red-500">*</span></label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary">
+<option value="">Seleccione...</option>
+<option value="directo">Cliente Directo</option>
+<option value="agencia">Agencia</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Sector <span class="text-red-500">*</span></label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Alimentos y Bebidas" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Estado <span class="text-red-500">*</span></label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary">
+<option value="">Seleccione Estado...</option>
+<option value="miranda">Miranda</option>
+<option value="distrito-capital">Distrito Capital</option>
+<option value="aragua">Aragua</option>
+<option value="carabobo">Carabobo</option>
+</select>
+</div>
+</div>
+</section>
+<!-- SECTION: Marcas -->
+<section class="p-8 bg-slate-50/30 dark:bg-slate-800/10">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">sell</span>
+<h3 class="text-lg font-bold font-montserrat">Marcas <span class="text-red-500">*</span></h3>
+</div>
+<button class="text-sm font-bold text-primary flex items-center gap-1 hover:underline" type="button">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                                Agregar Marca
+                            </button>
+</div>
+<div class="bg-accent-light/20 border border-accent-medium/20 rounded-lg p-3 flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary text-sm">info</span>
+<p class="text-xs font-medium text-slate-600 dark:text-slate-400 italic">Toda sub-empresa debe tener al menos una marca asociada.</p>
+</div>
+<div class="space-y-4">
+<!-- Repeatable Brand Row -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="md:col-span-4 space-y-1.5">
+<label class="text-[10px] font-bold text-slate-500 uppercase">Nombre de Marca <span class="text-red-500">*</span></label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Harina PAN" type="text"/>
+</div>
+<div class="md:col-span-7 space-y-1.5">
+<label class="text-[10px] font-bold text-slate-500 uppercase">Observaciones</label>
+<div class="flex flex-wrap gap-2 items-center bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 min-h-[38px]">
+<span class="bg-primary/10 text-primary text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">Consumo Masivo <button class="material-symbols-outlined text-[12px]">close</button></span>
+<span class="bg-primary/10 text-primary text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">Líder <button class="material-symbols-outlined text-[12px]">close</button></span>
+<input class="bg-transparent border-none p-0 text-sm focus:ring-0 flex-1 min-w-[80px]" placeholder="Añadir tag..." type="text"/>
+</div>
+</div>
+<div class="md:col-span-1 flex justify-end">
+<button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-500">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION: Contacto Principal -->
+<section class="p-8">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">person</span>
+<h3 class="text-lg font-bold font-montserrat">Contacto Principal</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Primer Nombre <span class="text-red-500">*</span></label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Juan" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Segundo Nombre</label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="José" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Primer Apellido <span class="text-red-500">*</span></label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Rodríguez" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Departamento <span class="text-red-500">*</span></label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Mercadeo" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Correo Electrónico <span class="text-red-500">*</span></label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="juan.rodriguez@polar.com" type="email"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Rol <span class="text-red-500">*</span></label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary">
+<option value="">Seleccione Rol...</option>
+<option value="gerente">Gerente de Marca</option>
+<option value="director">Director Comercial</option>
+<option value="compras">Jefe de Compras</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Tipo de Contacto</label>
+<div class="w-full bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-sm flex items-center">
+<span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">
+                                        Cliente
+                                    </span>
+</div>
+</div>
+<div class="md:col-span-2 space-y-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400">Anotaciones</label>
+<textarea class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-sm focus:ring-primary focus:border-primary" placeholder="Información relevante sobre el contacto..." rows="1"></textarea>
+</div>
+</div>
+</section>
+<!-- SECTION: Teléfonos -->
+<section class="p-8 bg-slate-50/30 dark:bg-slate-800/10">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">call</span>
+<h3 class="text-lg font-bold font-montserrat">Teléfonos</h3>
+</div>
+<button class="text-sm font-bold text-primary flex items-center gap-1 hover:underline" type="button">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                                Agregar Teléfono
+                            </button>
+</div>
+<div class="space-y-4">
+<!-- Phone Row -->
+<div class="flex flex-wrap gap-4 items-end">
+<div class="w-32 space-y-1.5">
+<label class="text-[10px] font-bold text-slate-500 uppercase">Cód. Área <span class="text-red-500">*</span></label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+<option value="0212">0212</option>
+<option value="0414">0414</option>
+<option value="0424">0424</option>
+<option value="0412">0412</option>
+</select>
+</div>
+<div class="flex-1 min-w-[200px] space-y-1.5">
+<label class="text-[10px] font-bold text-slate-500 uppercase">Número <span class="text-red-500">*</span></label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary" placeholder="1234567" type="text"/>
+</div>
+<div class="w-10">
+<button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-500">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</form>
+<!-- FINAL FOOTER ACTIONS -->
+<div class="p-8 bg-slate-100/50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-3">
+<button class="px-6 py-2.5 text-slate-500 font-bold text-sm hover:text-slate-800 transition-colors">
+                        Restablecer Formulario
+                    </button>
+<button class="px-10 py-2.5 gradient-primary text-white font-bold text-sm rounded-lg shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">
+                        Guardar Sub-Empresa
+                    </button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

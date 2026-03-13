@@ -25,6 +25,9 @@
   --color-background-dark: #112021;
   --font-display: "Montserrat", "Inter", sans-serif;
 
+  /* Aliases de compatibilidad para vistas del dashboard */
+  --color-accent-medium: #55CCD3;   /* = secondary en el CSS base */
+
   --radius-DEFAULT: 0.25rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CRM 2JMC - Agregar Visita</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16B1B8",
+                        "secondary": "#8DC63F",
+                        "accent-light": "#A1DEE5",
+                        "accent-medium": "#55CCD3",
+                        "background-light": "#F5F7FA",
+                        "background-dark": "#112021",
+                    },
+                    fontFamily: {
+                        "sans": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply font-sans;
+            }
+        }
+        .sidebar-active {
+            border-left: 4px solid #16B1B8;
+            background-color: rgba(22, 177, 184, 0.05);
+        }
+        .form-input-styled {
+            @apply border border-slate-200 rounded-lg px-4 py-2.5 w-full transition-all bg-white dark:bg-slate-800 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10;
+        }
+        .label-required::after {
+            content: "*";
+            @apply text-red-500 ml-1;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<aside class="w-[240px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-screen z-10">
+<div class="p-6">
+<h1 class="text-primary text-xl font-extrabold tracking-tight">CRM 2JMC</h1>
+<p class="text-slate-400 text-xs font-medium uppercase tracking-widest mt-1">Administrador</p>
+</div>
+<nav class="flex-1 px-0 py-4 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">account_circle</span>
+<span class="text-sm font-semibold">Mi Perfil</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">group</span>
+<span class="text-sm font-semibold">Equipo de Ventas</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">description</span>
+<span class="text-sm font-semibold">Pautas</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">handshake</span>
+<span class="text-sm font-semibold">Aliados Comerciales</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 sidebar-active text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px] fill-1">work</span>
+<span class="text-sm font-bold">Actividad Comercial</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">view_kanban</span>
+<span class="text-sm font-semibold">Pipeline</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">person_search</span>
+<span class="text-sm font-semibold">Clientes</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">bar_chart</span>
+<span class="text-sm font-semibold">Reportes</span>
+</a>
+</nav>
+<div class="p-6 border-t border-slate-100 dark:border-slate-800">
+<button class="flex items-center gap-3 text-slate-500 hover:text-red-500 transition-colors w-full">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-sm font-semibold">Cerrar Sesión</span>
+</button>
+</div>
+</aside>
+<main class="flex-1 ml-[240px] p-8 max-w-[1200px] mx-auto">
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<div>
+<nav class="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">
+<a class="hover:text-primary transition-colors" href="#">Actividad Comercial</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-slate-600 dark:text-slate-300">Nueva Visita</span>
+</nav>
+<h2 class="text-3xl font-bold text-slate-800 dark:text-white">Agregar Visita</h2>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-2.5 rounded-lg border border-slate-300 text-slate-600 font-semibold hover:bg-slate-50 transition-all text-sm">
+                Cancelar
+            </button>
+<button class="px-8 py-2.5 rounded-lg bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:opacity-90 transition-all text-sm">
+                Guardar
+            </button>
+</div>
+</header>
+<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+<form class="p-8 space-y-10">
+<section>
+<div class="flex items-center gap-2 mb-6 border-b border-slate-50 dark:border-slate-800 pb-4">
+<span class="material-symbols-outlined text-primary">event_note</span>
+<h3 class="text-lg font-bold text-slate-800 dark:text-white uppercase tracking-tight">Datos de la Visita</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+<div class="space-y-1.5">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300 label-required" for="cliente">Cliente</label>
+<div class="relative">
+<select class="form-input-styled appearance-none" id="cliente" required="">
+<option disabled="" selected="" value="">Seleccione un cliente...</option>
+<option value="1">Bavaria S.A.</option>
+<option value="2">Coca-Cola FEMSA</option>
+<option value="3">Grupo Nutresa</option>
+<option value="4">Bancolombia</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300 label-required" for="lugar">Lugar</label>
+<input class="form-input-styled" id="lugar" placeholder="Ej. Oficina Principal, Bogotá" required="" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-1.5">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300 label-required" for="fecha">Fecha</label>
+<input class="form-input-styled" id="fecha" required="" type="date"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300 label-required" for="hora">Hora</label>
+<input class="form-input-styled" id="hora" required="" type="time"/>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300 label-required block mb-3">Tipo</label>
+<div class="flex gap-8 items-center pt-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input checked="" class="w-5 h-5 text-primary border-slate-300 focus:ring-primary/20 cursor-pointer" name="tipo" type="radio" value="presencial"/>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-primary transition-colors">Presencial</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="w-5 h-5 text-primary border-slate-300 focus:ring-primary/20 cursor-pointer" name="tipo" type="radio" value="llamada"/>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-primary transition-colors">Llamada</span>
+</label>
+</div>
+</div>
+<div class="space-y-1.5 md:col-span-2">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300 label-required" for="objetivo">Objetivo de la Visita</label>
+<textarea class="form-input-styled resize-none" id="objetivo" placeholder="Describa el propósito principal de esta visita..." required="" rows="3"></textarea>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center gap-2 mb-6 border-b border-slate-50 dark:border-slate-800 pb-4">
+<span class="material-symbols-outlined text-primary">assignment_turned_in</span>
+<h3 class="text-lg font-bold text-slate-800 dark:text-white uppercase tracking-tight">Resultado</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+<div class="space-y-1.5">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300" for="detalle">Detalle</label>
+<textarea class="form-input-styled resize-none h-full" id="detalle" placeholder="Notas adicionales sobre el resultado de la visita (opcional)..." rows="4"></textarea>
+</div>
+<div class="flex flex-col justify-center">
+<div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[20px]">verified</span>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-700 dark:text-slate-200 label-required">¿Fue Efectiva?</p>
+<p class="text-xs text-slate-400">Marque si se cumplió el objetivo</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-secondary"></div>
+<span class="ml-3 text-xs font-bold text-slate-500 uppercase min-w-[20px]">Sí</span>
+</label>
+</div>
+</div>
+</div>
+</section>
+<div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-4">
+<button class="px-10 py-3 rounded-lg bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:opacity-90 transition-all" type="submit">
+                    Guardar
+                </button>
+</div>
+</form>
+</div>
+<div class="mt-8 flex items-center justify-center gap-8 text-slate-400">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+<span class="text-xs font-medium">Conexión Segura</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">cloud_done</span>
+<span class="text-xs font-medium">Autoguardado activado</span>
+</div>
+</div>
+</main>
+
+</body></html>

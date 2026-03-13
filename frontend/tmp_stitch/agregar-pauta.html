@@ -1,0 +1,302 @@
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16B1B8",
+                        "secondary": "#8DC63F",
+                        "accent-light": "#A1DEE5",
+                        "accent-mid": "#55CCD3",
+                        "background-light": "#F5F7FA",
+                        "background-dark": "#102122",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .active-nav {
+            border-left: 4px solid #16B1B8;
+            background-color: rgba(22, 177, 184, 0.05);
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none !important;
+            border-color: #16B1B8 !important;
+            box-shadow: 0 0 0 2px rgba(22, 177, 184, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<aside class="w-[240px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-screen z-10">
+<div class="p-6">
+<h1 class="text-primary text-xl font-bold tracking-tight uppercase">CRM 2JMC</h1>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">account_circle</span>
+<span class="text-sm font-medium">Mi Perfil</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">group</span>
+<span class="text-sm font-medium">Equipo de Ventas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 active-nav text-primary rounded-r-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">description</span>
+<span class="text-sm font-semibold">Pautas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">handshake</span>
+<span class="text-sm font-medium">Aliados Comerciales</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">query_stats</span>
+<span class="text-sm font-medium">Actividad Comercial</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">account_tree</span>
+<span class="text-sm font-medium">Pipeline</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">person_search</span>
+<span class="text-sm font-medium">Clientes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">bar_chart</span>
+<span class="text-sm font-medium">Reportes</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<button class="flex items-center gap-3 px-4 py-3 w-full text-slate-600 dark:text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-[22px]">logout</span>
+<span class="text-sm font-medium">Cerrar Sesión</span>
+</button>
+</div>
+</aside>
+<main class="flex-1 ml-[240px] p-8 max-w-[1200px] mx-auto">
+<header class="flex justify-between items-end mb-8">
+<div>
+<nav class="flex text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">
+<span class="hover:text-primary cursor-pointer">Pautas</span>
+<span class="mx-2">/</span>
+<span class="text-slate-600 dark:text-slate-300">Nueva Pauta</span>
+</nav>
+<h2 class="text-3xl font-bold text-slate-800 dark:text-white">Agregar Pauta</h2>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                    Cancelar
+                </button>
+<button class="px-8 py-2.5 rounded-lg bg-gradient-to-r from-primary to-accent-mid text-white font-semibold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                    Guardar
+                </button>
+</div>
+</header>
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 mb-12">
+<form class="space-y-12">
+<section>
+<div class="flex items-center gap-2 mb-6 border-b border-slate-100 dark:border-slate-800 pb-2">
+<span class="material-symbols-outlined text-primary">assignment</span>
+<h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight">Datos de la Pauta</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Número OT<span class="text-red-500 ml-1">*</span></label>
+<input class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm" placeholder="Ej. OT-2024-001" required="" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Fecha de Emisión<span class="text-red-500 ml-1">*</span></label>
+<input class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm" required="" type="date"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Cliente<span class="text-red-500 ml-1">*</span></label>
+<select class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm" required="">
+<option value="">Seleccione un cliente</option>
+<option>Cliente A</option>
+<option>Cliente B</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Marca<span class="text-red-500 ml-1">*</span></label>
+<input class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm" placeholder="Nombre de la marca" required="" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Coordinadora<span class="text-red-500 ml-1">*</span></label>
+<input class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm" placeholder="Nombre de la coordinadora" required="" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Fecha Inicio<span class="text-red-500 ml-1">*</span></label>
+<input class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm" required="" type="date"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Fecha Fin<span class="text-red-500 ml-1">*</span></label>
+<input class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm" required="" type="date"/>
+</div>
+</div>
+<div class="col-span-full flex flex-col gap-3">
+<label class="text-xs font-bold text-slate-500 uppercase">Tipo de Compra<span class="text-red-500 ml-1">*</span></label>
+<div class="flex gap-8 mt-1">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input checked="" class="text-primary focus:ring-primary w-4 h-4" name="tipo_compra" type="radio" value="rotativa"/>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">Rotativa</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="text-primary focus:ring-primary w-4 h-4" name="tipo_compra" type="radio" value="envivo"/>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">En Vivo</span>
+</label>
+</div>
+<div class="mt-2 w-full max-w-md">
+<input class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm w-full" placeholder="Nombre del Programa (Solo para En Vivo)" type="text"/>
+</div>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center gap-2 mb-6 border-b border-slate-100 dark:border-slate-800 pb-2">
+<span class="material-symbols-outlined text-primary">payments</span>
+<h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight">Cuñas y Montos</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Cantidad de Cuñas Negociadas<span class="text-red-500 ml-1">*</span></label>
+<input class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm" placeholder="0" required="" type="number"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Costo por Cuña ($)<span class="text-red-500 ml-1">*</span></label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">$</span>
+<input class="pl-7 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm w-full" placeholder="0.00" required="" step="0.01" type="number"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Monto OC ($)<span class="text-red-500 ml-1">*</span></label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">$</span>
+<input class="pl-7 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm w-full" placeholder="0.00" required="" step="0.01" type="number"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Monto OT ($)<span class="text-red-500 ml-1">*</span></label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">$</span>
+<input class="pl-7 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm w-full" placeholder="0.00" required="" step="0.01" type="number"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Estado<span class="text-red-500 ml-1">*</span></label>
+<select class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm" required="">
+<option>Programada</option>
+<option>En transmisión</option>
+<option>Suspendida</option>
+<option>Finalizada</option>
+</select>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center gap-2 mb-6 border-b border-slate-100 dark:border-slate-800 pb-2">
+<span class="material-symbols-outlined text-primary">campaign</span>
+<h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight">Detalles de la Cuña</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Duración (segundos)<span class="text-red-500 ml-1">*</span></label>
+<input class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm" placeholder="Ej. 30" required="" type="number"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Cortina<span class="text-red-500 ml-1">*</span></label>
+<input class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm" placeholder="Identificador de la cortina" required="" type="text"/>
+</div>
+<div class="col-span-full flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase">Mensaje<span class="text-red-500 ml-1">*</span></label>
+<textarea class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-4 text-sm" placeholder="Contenido del mensaje publicitario..." required="" rows="3"></textarea>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center gap-2 mb-6 border-b border-slate-100 dark:border-slate-800 pb-2">
+<span class="material-symbols-outlined text-primary">radio</span>
+<h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight">Emisoras Asociadas</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<label class="flex items-center p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:border-primary transition-all group">
+<input class="rounded text-primary focus:ring-primary w-5 h-5 mr-4" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-800 dark:text-slate-200">La Romántica 88.9</span>
+<span class="text-xs text-slate-500">Caracas</span>
+</div>
+</label>
+<label class="flex items-center p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:border-primary transition-all group">
+<input class="rounded text-primary focus:ring-primary w-5 h-5 mr-4" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-800 dark:text-slate-200">Éxitos 99.9</span>
+<span class="text-xs text-slate-500">Caracas</span>
+</div>
+</label>
+<label class="flex items-center p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:border-primary transition-all group">
+<input class="rounded text-primary focus:ring-primary w-5 h-5 mr-4" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-800 dark:text-slate-200">Onda 107.9</span>
+<span class="text-xs text-slate-500">Valencia</span>
+</div>
+</label>
+<label class="flex items-center p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:border-primary transition-all group">
+<input class="rounded text-primary focus:ring-primary w-5 h-5 mr-4" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-800 dark:text-slate-200">Unión Radio 90.3</span>
+<span class="text-xs text-slate-500">Maracaibo</span>
+</div>
+</label>
+<label class="flex items-center p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:border-primary transition-all group">
+<input class="rounded text-primary focus:ring-primary w-5 h-5 mr-4" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-800 dark:text-slate-200">Play 95.5</span>
+<span class="text-xs text-slate-500">Caracas</span>
+</div>
+</label>
+<label class="flex items-center p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:border-primary transition-all group">
+<input class="rounded text-primary focus:ring-primary w-5 h-5 mr-4" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-800 dark:text-slate-200">Radio K 105.3</span>
+<span class="text-xs text-slate-500">Barquisimeto</span>
+</div>
+</label>
+</div>
+</section>
+<section>
+<div class="flex items-center gap-2 mb-6 border-b border-slate-100 dark:border-slate-800 pb-2">
+<span class="material-symbols-outlined text-primary">notes</span>
+<h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight">Observaciones</h3>
+</div>
+<textarea class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-4 text-sm" placeholder="Agregue comentarios adicionales opcionales..." rows="4"></textarea>
+</section>
+</form>
+</div>
+<footer class="mt-8 flex justify-end gap-3 pb-12">
+<button class="px-6 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                Cancelar
+            </button>
+<button class="px-12 py-2.5 rounded-lg bg-gradient-to-r from-primary to-accent-mid text-white font-semibold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                Guardar Pauta
+            </button>
+</footer>
+</main>
+
+</body></html>

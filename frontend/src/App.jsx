@@ -37,8 +37,8 @@ function App() {
         <div className="w-full max-w-md">
           {/* Mobile Logo (shown only on small screens) */}
           <div className="lg:hidden flex items-center justify-center gap-3 mb-12">
-            <img src="/Vortice-01.png" alt="" />
-            <h2 className="text-text-dark text-2xl font-bold font-display">2JMC Medios</h2>
+            <img src="/Vortice-01.png" alt="" className="w-26 h-26 object-contain drop-shadow-lg" />
+            <h2 className="text-text-dark text-5xl font-bold font-display ">2JMC Medios</h2>
           </div>
           <div className="mb-10 text-center lg:text-left">
             <h1 className="text-text-dark text-3xl font-bold font-display mb-2">Iniciar Sesión</h1>

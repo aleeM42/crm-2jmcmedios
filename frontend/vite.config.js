@@ -10,13 +10,10 @@ export default defineConfig({
   ],
   root: '.',
   build: {
-    rollupOptions: {
-      input: './views/html/index.html',
-    },
     outDir: 'dist',
   },
   server: {
     port: 5173,
-    open: '/views/html/index.html',
+    open: '/index.html',
   },
 });

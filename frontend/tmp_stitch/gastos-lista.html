@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#16B1B8",
+              "secondary": "#8DC63F",
+              "accent-light": "#A1DEE5",
+              "accent-medium": "#55CCD3",
+              "background-light": "#F5F7FA",
+              "background-dark": "#112021",
+            },
+            fontFamily: {
+              "display": ["Montserrat", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Montserrat', sans-serif; }
+        .sidebar-active { border-left: 4px solid #16B1B8; background-color: rgba(22, 177, 184, 0.05); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
+<title>CRM Salesperson Expenses List</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex min-h-screen">
+<!-- Sidebar -->
+<aside class="w-[240px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-full z-20">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-none text-slate-900 dark:text-white">CRM 2JMC</h1>
+<p class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Gestión Comercial</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-0 mt-4">
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-medium">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">trending_up</span>
+<span class="text-sm font-medium">Ventas</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">group</span>
+<span class="text-sm font-medium">Clientes</span>
+</a>
+<a class="sidebar-active flex items-center gap-3 px-6 py-3 text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">description</span>
+<span class="text-sm font-bold">Reportes</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">settings</span>
+<span class="text-sm font-medium">Configuración</span>
+</a>
+</div>
+</nav>
+<div class="p-4 border-t border-slate-100 dark:border-slate-800">
+<button class="w-full bg-primary hover:bg-primary/90 text-white py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-bold transition-all shadow-sm">
+<span class="material-symbols-outlined text-sm">add</span>
+                    Nuevo Gasto
+                </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 ml-[240px] p-8 max-w-[1200px] mx-auto">
+<!-- Breadcrumbs & Title -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div>
+<nav class="flex text-xs font-medium text-slate-400 mb-2 gap-2">
+<a class="hover:text-primary transition-colors" href="#">Reportes</a>
+<span>&gt;</span>
+<span class="text-slate-600 dark:text-slate-300">Gastos por Vendedor</span>
+</nav>
+<h2 class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Lista de Gastos por Vendedor</h2>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-sm">
+<span class="material-symbols-outlined text-lg">download</span>
+                        Exportar Excel
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-lg">picture_as_pdf</span>
+                        Exportar PDF
+                    </button>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm mb-8">
+<div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+<div class="space-y-1.5">
+<label class="text-[10px] uppercase font-bold text-slate-400 ml-1">Vendedor</label>
+<select class="w-full h-10 rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-primary focus:border-primary">
+<option>Todos los vendedores</option>
+<option>Carlos Rodríguez</option>
+<option>Ana Martínez</option>
+<option>Luis García</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="text-[10px] uppercase font-bold text-slate-400 ml-1">Categoría</label>
+<select class="w-full h-10 rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-primary focus:border-primary">
+<option>Todas las categorías</option>
+<option>Transporte</option>
+<option>Alimentación</option>
+<option>Marketing</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="text-[10px] uppercase font-bold text-slate-400 ml-1">Tipo Gasto</label>
+<select class="w-full h-10 rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-primary focus:border-primary">
+<option>Visita / Marketing</option>
+<option>Visita comercial</option>
+<option>Marketing</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="text-[10px] uppercase font-bold text-slate-400 ml-1">Rango de Fechas</label>
+<div class="relative">
+<input class="w-full h-10 pl-9 rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-primary focus:border-primary" type="text" value="01/10/2023 - 31/10/2023"/>
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-sm">calendar_month</span>
+</div>
+</div>
+<button class="h-10 bg-primary text-white rounded-lg font-bold text-sm hover:bg-primary/90 transition-all shadow-md">
+                        Aplicar Filtros
+                    </button>
+</div>
+</div>
+<!-- Top Section: Chart -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm mb-8">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-bold text-slate-800 dark:text-white">Distribución por Categoría</h3>
+<div class="text-xs text-slate-500 font-medium">Octubre 2023</div>
+</div>
+<div class="flex flex-col md:flex-row items-center gap-12">
+<div class="relative w-48 h-48">
+<!-- Simulated Donut Chart using Gradients -->
+<div class="w-full h-full rounded-full border-[18px] border-slate-100 dark:border-slate-800" style="background: conic-gradient(#16B1B8 0% 35%, #8DC63F 35% 60%, #55CCD3 60% 75%, #A1DEE5 75% 85%, #cbd5e1 85% 95%, #f97316 95% 100%);">
+<div class="absolute inset-4 bg-white dark:bg-slate-900 rounded-full flex flex-col items-center justify-center">
+<span class="text-[10px] font-bold text-slate-400 uppercase">Total</span>
+<span class="text-lg font-black text-slate-900 dark:text-white">$14.2k</span>
+</div>
+</div>
+</div>
+<div class="flex-1 grid grid-cols-2 gap-x-8 gap-y-4">
+<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-800 pb-2">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400">Transporte</span>
+</div>
+<span class="text-sm font-bold">$4,970</span>
+</div>
+<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-800 pb-2">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400">Alimentación</span>
+</div>
+<span class="text-sm font-bold">$3,550</span>
+</div>
+<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-800 pb-2">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-accent-medium"></span>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400">Estacionamiento</span>
+</div>
+<span class="text-sm font-bold">$2,130</span>
+</div>
+<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-800 pb-2">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-accent-light"></span>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400">Peajes</span>
+</div>
+<span class="text-sm font-bold">$1,420</span>
+</div>
+<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-800 pb-2">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-slate-300"></span>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400">Regalos</span>
+</div>
+<span class="text-sm font-bold">$1,420</span>
+</div>
+<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-800 pb-2">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-orange-500"></span>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400">Marketing</span>
+</div>
+<span class="text-sm font-bold">$710</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Section: Table -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<h3 class="font-bold text-slate-800 dark:text-white">Desglose de Gastos</h3>
+<div class="flex items-center gap-2 text-xs font-medium text-slate-400">
+<span class="material-symbols-outlined text-sm">info</span>
+                        Mostrando últimos 10 registros
+                    </div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+<th class="px-6 py-4 text-[10px] uppercase tracking-wider font-bold text-slate-500">Fecha</th>
+<th class="px-6 py-4 text-[10px] uppercase tracking-wider font-bold text-slate-500">Vendedor</th>
+<th class="px-6 py-4 text-[10px] uppercase tracking-wider font-bold text-slate-500">Tipo</th>
+<th class="px-6 py-4 text-[10px] uppercase tracking-wider font-bold text-slate-500">Categoría</th>
+<th class="px-6 py-4 text-[10px] uppercase tracking-wider font-bold text-slate-500">Concepto</th>
+<th class="px-6 py-4 text-[10px] uppercase tracking-wider font-bold text-slate-500">Cliente</th>
+<th class="px-6 py-4 text-[10px] uppercase tracking-wider font-bold text-slate-500 text-right">Monto</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-50 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-xs font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap">24 Oct, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="size-7 rounded-full bg-primary/20 text-primary text-[10px] font-bold flex items-center justify-center">CR</div>
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Carlos Rodríguez</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase">Visita</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Transporte</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 max-w-[150px] truncate">Uber a oficinas centrales</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Banorte</td>
+<td class="px-6 py-4 text-sm font-bold text-slate-900 dark:text-white text-right">$450.00</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-xs font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap">23 Oct, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="size-7 rounded-full bg-orange-100 text-orange-600 text-[10px] font-bold flex items-center justify-center">AM</div>
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Ana Martínez</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-orange-100 text-orange-600 text-[10px] font-black uppercase">Marketing</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Publicidad</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 max-w-[150px] truncate">Facebook Ads Octubre</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Propio</td>
+<td class="px-6 py-4 text-sm font-bold text-slate-900 dark:text-white text-right">$1,200.00</td>
+</tr>
+<!-- Sample Row 3 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-xs font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap">22 Oct, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="size-7 rounded-full bg-secondary/20 text-secondary text-[10px] font-bold flex items-center justify-center">LG</div>
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Luis García</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase">Visita</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Alimentación</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 max-w-[150px] truncate">Comida con cliente potencial</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Pepsico</td>
+<td class="px-6 py-4 text-sm font-bold text-slate-900 dark:text-white text-right">$890.00</td>
+</tr>
+<!-- Repeated structure for rows 4-10 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-xs font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap">20 Oct, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="size-7 rounded-full bg-primary/20 text-primary text-[10px] font-bold flex items-center justify-center">CR</div>
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Carlos Rodríguez</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase">Visita</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Peajes</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 max-w-[150px] truncate">Caseta Mexico-Toluca</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Diversos</td>
+<td class="px-6 py-4 text-sm font-bold text-slate-900 dark:text-white text-right">$105.00</td>
+</tr>
+<!-- Empty fillers to represent 10 rows -->
+<tr class="border-t-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 font-bold">
+<td class="px-6 py-4 text-sm text-slate-900 dark:text-white text-right" colspan="6">TOTAL GENERAL:</td>
+<td class="px-6 py-4 text-sm text-primary text-right">$14,210.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<p class="text-xs text-slate-500">Mostrando 1 a 10 de 45 registros</p>
+<div class="flex gap-1">
+<button class="size-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 hover:border-primary hover:text-primary transition-all">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded bg-primary text-white text-xs font-bold">1</button>
+<button class="size-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold hover:border-primary hover:text-primary transition-all">2</button>
+<button class="size-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold hover:border-primary hover:text-primary transition-all">3</button>
+<button class="size-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 hover:border-primary hover:text-primary transition-all">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
