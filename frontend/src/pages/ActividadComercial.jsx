@@ -4,10 +4,10 @@
 import { Link } from 'react-router-dom';
 
 const VISITAS = [
-  { fecha: '24 Oct 2023', hora: '09:30 AM', vendedor: 'Carlos Mendoza', cliente: 'Supermercados Rey', tipo: 'Presencial', tipoClass: 'bg-primary/10 text-primary', objetivo: 'Presentación Plan de Medios Q4', efectiva: true, proximo: 'Enviar propuesta ajustada' },
-  { fecha: '24 Oct 2023', hora: '11:15 AM', vendedor: 'Lucía Fernández', cliente: 'Banco General', tipo: 'Llamada', tipoClass: 'bg-accent-light/30 text-secondary', objetivo: 'Seguimiento a pauta digital', efectiva: false, proximo: 'Re-agendar para el lunes' },
-  { fecha: '23 Oct 2023', hora: '02:00 PM', vendedor: 'Ricardo Silva', cliente: 'Toyota Panamá', tipo: 'Presencial', tipoClass: 'bg-primary/10 text-primary', objetivo: 'Cierre de contrato anual', efectiva: true, proximo: 'Solicitar firmas finales' },
-  { fecha: '23 Oct 2023', hora: '04:30 PM', vendedor: 'Carlos Mendoza', cliente: 'Farmacias Arrocha', tipo: 'Llamada', tipoClass: 'bg-accent-light/30 text-secondary', objetivo: 'Primer contacto prospecto', efectiva: true, proximo: 'Enviar broshure corporativo' },
+  { fecha: '2023-10-24', hora: '09:30', vendedor: 'Carlos Mendoza', cliente: 'Supermercados Rey', tipo: 'Presencial', tipoClass: 'bg-primary/10 text-primary', objetivo_visita: 'Presentación Plan de Medios Q4', efectiva: true, detalle: 'Se acordó enviar propuesta ajustada' },
+  { fecha: '2023-10-24', hora: '11:15', vendedor: 'Lucía Fernández', cliente: 'Banco General', tipo: 'Llamada', tipoClass: 'bg-accent-light/30 text-secondary', objetivo_visita: 'Seguimiento a pauta digital', efectiva: false, detalle: 'Re-agendar para el lunes' },
+  { fecha: '2023-10-23', hora: '14:00', vendedor: 'Ricardo Silva', cliente: 'Toyota Panamá', tipo: 'Presencial', tipoClass: 'bg-primary/10 text-primary', objetivo_visita: 'Cierre de contrato anual', efectiva: true, detalle: 'Solicitar firmas finales' },
+  { fecha: '2023-10-23', hora: '16:30', vendedor: 'Carlos Mendoza', cliente: 'Farmacias Arrocha', tipo: 'Llamada', tipoClass: 'bg-accent-light/30 text-secondary', objetivo_visita: 'Primer contacto prospecto', efectiva: true, detalle: 'Enviar brochure corporativo' },
 ];
 
 function ActividadComercial() {
@@ -54,12 +54,12 @@ function ActividadComercial() {
       <div className="space-y-6">
         <div className="flex items-center border-b border-slate-200 gap-8">
           <button className="pb-4 text-sm font-bold border-b-2 border-primary text-primary">Visitas</button>
-          <button className="pb-4 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-colors">Gastos</button>
+          <Link to="/actividad-comercial/gastos" className="pb-4 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-colors">Gastos</Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Rango de Fecha</label>
+            <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Fecha</label>
             <input className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary" type="date" />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -93,8 +93,8 @@ function ActividadComercial() {
           <div className="p-6 flex justify-between items-center border-b border-slate-100">
             <h3 className="text-lg font-bold text-slate-800 font-display">Registro de Visitas</h3>
             <div className="flex gap-3">
-              <Link to="/actividad-comercial/agregar-gasto" className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-200 transition-all border border-slate-200">Agregar Gasto</Link>
-              <Link to="/actividad-comercial/agregar-visita" className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg text-sm font-bold hover:opacity-90 shadow-md transition-all flex items-center gap-2">
+              <Link to="/actividad-comercial/gastos/agregar" className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-200 transition-all border border-slate-200">Agregar Gasto</Link>
+              <Link to="/actividad-comercial/visita" className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg text-sm font-bold hover:opacity-90 shadow-md transition-all flex items-center gap-2">
                 <span className="material-symbols-outlined text-base">add</span>Agregar Visita
               </Link>
             </div>
@@ -109,9 +109,9 @@ function ActividadComercial() {
                   <th className="px-6 py-4">Vendedor</th>
                   <th className="px-6 py-4">Cliente</th>
                   <th className="px-6 py-4">Tipo</th>
-                  <th className="px-6 py-4">Objetivo</th>
+                  <th className="px-6 py-4">Objetivo Visita</th>
                   <th className="px-6 py-4 text-center">Efectiva</th>
-                  <th className="px-6 py-4">Próximo Paso</th>
+                  <th className="px-6 py-4">Detalle</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -124,13 +124,13 @@ function ActividadComercial() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`${v.tipoClass} px-3 py-1 rounded-full text-[11px] font-bold uppercase`}>{v.tipo}</span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600 line-clamp-1 max-w-[200px]">{v.objetivo}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600 line-clamp-1 max-w-[200px]">{v.objetivo_visita}</td>
                     <td className="px-6 py-4 text-center">
                       <span className={`material-symbols-outlined ${v.efectiva ? 'text-accent-green' : 'text-red-400'}`}>
                         {v.efectiva ? 'check_circle' : 'cancel'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600 italic whitespace-nowrap">{v.proximo}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600 italic whitespace-nowrap">{v.detalle}</td>
                   </tr>
                 ))}
               </tbody>

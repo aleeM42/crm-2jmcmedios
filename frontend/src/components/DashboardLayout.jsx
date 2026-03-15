@@ -4,16 +4,15 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 
 const NAV_ITEMS = [
-  { to: '/dashboard',           icon: 'dashboard',       label: 'Dashboard' },
-  { to: '/mi-perfil',           icon: 'person',          label: 'Mi Perfil' },
-  { to: '/equipo-ventas',       icon: 'group',           label: 'Equipo de Ventas' },
-  { to: '/pautas',              icon: 'description',     label: 'Pautas' },
-  { to: '/aliados-comerciales', icon: 'handshake',       label: 'Aliados Comerciales' },
-  { to: '/actividad-comercial', icon: 'monitoring',      label: 'Actividad Comercial' },
-  { to: '/pipeline',            icon: 'account_tree',    label: 'Pipeline' },
-  { to: '/clientes',            icon: 'group_add',       label: 'Clientes' },
-  { to: '/gastos',              icon: 'payments',        label: 'Gastos' },
-  { to: '/reportes',            icon: 'bar_chart',       label: 'Reportes' },
+  { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
+  { to: '/mi-perfil', icon: 'person', label: 'Mi Perfil' },
+  { to: '/equipo-ventas', icon: 'group', label: 'Equipo de Ventas' },
+  { to: '/pautas', icon: 'description', label: 'Pautas' },
+  { to: '/aliados-comerciales', icon: 'handshake', label: 'Aliados Comerciales' },
+  { to: '/actividad-comercial', icon: 'monitoring', label: 'Actividad Comercial' },
+  { to: '/pipeline', icon: 'account_tree', label: 'Pipeline' },
+  { to: '/clientes', icon: 'group_add', label: 'Clientes' },
+  { to: '/reportes', icon: 'bar_chart', label: 'Reportes' },
 ];
 
 function DashboardLayout() {
@@ -57,7 +56,7 @@ function DashboardLayout() {
       </aside>
 
       {/* ===================== MAIN CONTENT ===================== */}
-      <main className="flex-1 ml-[240px] p-8 overflow-y-auto">
+      <main className="flex-1 ml-[240px] p-8 max-h-screen overflow-y-auto">
         <Outlet />
       </main>
     </div>

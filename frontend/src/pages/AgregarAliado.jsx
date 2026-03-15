@@ -32,35 +32,35 @@ function AgregarAliado() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Razón Social<span className="text-red-500 ml-0.5">*</span></label>
-                <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Circuito Radiofonico Nacional C.A." type="text" />
+                <input name="razon_social" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Circuito Radiofonico Nacional C.A." type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre de la Emisora<span className="text-red-500 ml-0.5">*</span></label>
-                <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: La Mega 107.3" type="text" />
+                <input name="nombre_emisora" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: La Mega 107.3" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">RIF<span className="text-red-500 ml-0.5">*</span></label>
-                <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="J-12345678-9" type="text" />
+                <input name="rif" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="J-12345678-9" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Frecuencia<span className="text-red-500 ml-0.5">*</span></label>
-                <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: 107.3 FM" type="text" />
-              </div>
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Dirección<span className="text-red-500 ml-0.5">*</span></label>
-                <textarea className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Av. Principal de las Mercedes..." rows="2"></textarea>
+                <input name="frecuencia" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: 107.3 FM" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Categoría<span className="text-red-500 ml-0.5">*</span></label>
-                <select className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
-                  <option>Seleccione una categoría</option><option>Musical</option><option>Informativa</option><option>Deportiva</option><option>Variedades</option>
+                <select name="categoria" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                  <option value="">Seleccione una categoría</option><option>Musical</option><option>Informativa</option><option>Deportiva</option><option>Variedades</option>
                 </select>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado<span className="text-red-500 ml-0.5">*</span></label>
-                <select className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                <select name="estado" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
                   <option>Activo</option><option>Inactivo</option><option>Cerrado</option>
                 </select>
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Dirección<span className="text-red-500 ml-0.5">*</span></label>
+                <textarea name="direccion" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Av. Principal de las Mercedes..." rows="2"></textarea>
               </div>
             </div>
           </section>
@@ -86,35 +86,7 @@ function AgregarAliado() {
             </div>
           </section>
 
-          {/* Section 3: Ubicación */}
-          <section>
-            <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
-              <span className="material-symbols-outlined text-primary">location_on</span>
-              <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Ubicación</h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Región<span className="text-red-500 ml-0.5">*</span></label>
-                <select className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
-                  <option>Central</option><option>Occidente</option><option>Oriente</option><option>Andina</option><option>Guayana</option>
-                </select>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado (Geográfico)</label>
-                <select className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
-                  <option>Miranda</option><option>Distrito Capital</option><option>Aragua</option><option>Carabobo</option>
-                </select>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Ciudad</label>
-                <select className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
-                  <option>Caracas</option><option>Los Teques</option><option>Guarenas</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
-          {/* Section 4: Contacto */}
+          {/* Section 3: Contacto de la Emisora */}
           <section>
             <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
               <span className="material-symbols-outlined text-primary">person</span>
@@ -123,42 +95,40 @@ function AgregarAliado() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Primer Nombre<span className="text-red-500 ml-0.5">*</span></label>
-                <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Juan" type="text" />
+                <input name="primer_nombre" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Juan" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Segundo Nombre</label>
-                <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Alberto" type="text" />
+                <input name="segundo_nombre" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Alberto" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Primer Apellido<span className="text-red-500 ml-0.5">*</span></label>
-                <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Pérez" type="text" />
+                <input name="primer_apellido" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Pérez" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Departamento<span className="text-red-500 ml-0.5">*</span></label>
-                <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Ventas" type="text" />
+                <input name="departamento" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Ventas" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Correo Electrónico<span className="text-red-500 ml-0.5">*</span></label>
-                <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="ejemplo@correo.com" type="email" />
+                <input name="correo" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="ejemplo@correo.com" type="email" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Rol en la Emisora<span className="text-red-500 ml-0.5">*</span></label>
-                <select className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
-                  <option>Gerente General</option><option>Director de Programación</option><option>Coordinador de Ventas</option><option>Técnico</option>
-                </select>
+                <input name="rol" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Gerente General" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de Nacimiento</label>
-                <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" type="date" />
+                <input name="fecha_nacimiento" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" type="date" />
               </div>
               <div className="space-y-1.5 md:col-span-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Anotaciones Especiales</label>
-                <textarea className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Información adicional sobre el contacto..." rows="1"></textarea>
+                <textarea name="anotaciones_especiales" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Información adicional sobre el contacto..." rows="1"></textarea>
               </div>
             </div>
           </section>
 
-          {/* Section 5: Teléfonos */}
+          {/* Section 4: Teléfonos */}
           <section>
             <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
               <div className="flex items-center gap-2">
@@ -173,22 +143,22 @@ function AgregarAliado() {
               <div className="grid grid-cols-4 gap-4">
                 <div className="space-y-1.5 col-span-1">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.*</label>
-                  <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="0412" type="text" />
+                  <input name="codigo_area" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="0412" type="text" />
                 </div>
                 <div className="space-y-1.5 col-span-3">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Número de Teléfono<span className="text-red-500 ml-0.5">*</span></label>
-                  <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="1234567" type="text" />
+                  <input name="cuerpo" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="1234567" type="text" />
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="grid grid-cols-4 gap-4 flex-1">
                   <div className="space-y-1.5 col-span-1">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.</label>
-                    <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="0212" type="text" />
+                    <input name="codigo_area_2" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="0212" type="text" />
                   </div>
                   <div className="space-y-1.5 col-span-3">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Número Fijo</label>
-                    <input className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="9876543" type="text" />
+                    <input name="cuerpo_2" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="9876543" type="text" />
                   </div>
                 </div>
                 <button className="mb-1 text-slate-300 hover:text-red-500 transition-colors" type="button">

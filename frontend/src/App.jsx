@@ -1,91 +1,118 @@
 // ==============================================
-// App.jsx — Pantalla Principal / Login
+// App.jsx — Enrutador principal del Frontend
 // ==============================================
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-function App() {
+// Layout
+import DashboardLayout from './components/DashboardLayout';
+
+// Pages
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import MiPerfil from './pages/MiPerfil';
+import EquipoVentas from './pages/EquipoVentas';
+import AgregarVendedor from './pages/AgregarVendedor';
+import DetalleVendedor from './pages/DetalleVendedor';
+import PautasLista from './pages/PautasLista';
+import PautasKanban from './pages/PautasKanban';
+import PautasCalendario from './pages/PautasCalendario';
+import AgregarPauta from './pages/AgregarPauta';
+import DetallePauta from './pages/DetallePauta';
+import AliadosComerciales from './pages/AliadosComerciales';
+import AgregarAliado from './pages/AgregarAliado';
+import DetalleEmisora from './pages/DetalleEmisora';
+import ActividadComercial from './pages/ActividadComercial';
+import AgregarVisita from './pages/AgregarVisita';
+import Pipeline from './pages/Pipeline';
+import Clientes from './pages/Clientes';
+import AgregarCliente from './pages/AgregarCliente';
+import DetalleCliente from './pages/DetalleCliente';
+import AgregarSubEmpresa from './pages/AgregarSubEmpresa';
+import GastosLista from './pages/GastosLista';
+import AgregarGasto from './pages/AgregarGasto';
+import ReportesDirectorio from './pages/ReportesDirectorio';
+import ReporteRankingClientesPautas from './pages/ReporteRankingClientesPautas';
+import ReporteClientesSector from './pages/ReporteClientesSector';
+import ReporteRegionesCliente from './pages/ReporteRegionesCliente';
+import ReporteIngresosMensuales from './pages/ReporteIngresosMensuales';
+import ReportePautasFiltro from './pages/ReportePautasFiltro';
+import ReporteGastosCliente from './pages/ReporteGastosCliente';
+import ReporteEfectividadVendedores from './pages/ReporteEfectividadVendedores';
+import ReporteGastosVendedores from './pages/ReporteGastosVendedores';
+import ReporteGastosDetalleVendedor from './pages/ReporteGastosDetalleVendedor';
+import ReporteTopEmisorasCunas from './pages/ReporteTopEmisorasCunas';
+import ReporteEmisorasRegion from './pages/ReporteEmisorasRegion';
+import ReporteMarcasRegion from './pages/ReporteMarcasRegion';
+import ReporteClientesEmisora from './pages/ReporteClientesEmisora';
+import ReporteEmisorasActivasRegion from './pages/ReporteEmisorasActivasRegion';
+import ReporteTopEmisorasClientes from './pages/ReporteTopEmisorasClientes';
+
+export default function App() {
   return (
-    <div className="flex h-screen w-full">
-      {/* Left Side: Gradient & Brand Visual */}
-      <div className="hidden lg:flex w-1/2 relative items-center justify-center overflow-hidden" style={{ background: 'linear-gradient(147.99deg, #8DC63F 0%, #55CCD3 35%, #16B1B8 70%, #A1DEE5 100%)' }}>
-        {/* Subtle Vortex/Spiral Watermark */}
-        <div className="absolute inset-0 opacity-10 flex items-center justify-center">
-          <svg fill="white" height="600" viewBox="0 0 512 512" width="600" xmlns="http://www.w3.org/2000/svg">
-            <path clip-rule="evenodd" d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm0 464c-114.7 0-208-93.3-208-208S141.3 48 256 48s208 93.3 208 208-93.3 208-208 208zm-96-208c0-53 43-96 96-96s96 43 96 96-43 96-96 96-96-43-96-96z" fill-rule="evenodd" opacity="0.3"></path>
-            <circle cx="256" cy="256" fill="none" opacity="0.2" r="150" stroke="white" stroke-width="2"></circle>
-            <circle cx="256" cy="256" fill="none" opacity="0.1" r="100" stroke="white" stroke-width="2"></circle>
-          </svg>
-        </div>
-        <div className="relative z-10 text-center text-white px-12">
-          <div className="mb-8 flex justify-center">
-            <div className="p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 shadow-2xl">
-              <img
-                src="/Vortice.png"
-                alt="2JMC Medios"
-                className="w-32 h-32 object-contain drop-shadow-lg"
-              />
-            </div>
-          </div>
-          <h2 className="text-4xl font-bold tracking-tight mb-4">2JMC Medios</h2>
-          <p className="text-white/80 text-lg font-light max-w-md mx-auto">Gestión inteligente de medios y comunicación para la era digital.</p>
-        </div>
-        {/* Decorative Elements */}
-        <div className="absolute top-10 left-10 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-      </div>
-      {/* Right Side: Login Form */}
-      <div className="w-full lg:w-1/2 bg-white flex flex-col items-center justify-center p-8 lg:p-24">
-        <div className="w-full max-w-md">
-          {/* Mobile Logo (shown only on small screens) */}
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-12">
-            <img src="/Vortice-01.png" alt="" className="w-26 h-26 object-contain drop-shadow-lg" />
-            <h2 className="text-text-dark text-5xl font-bold font-display ">2JMC Medios</h2>
-          </div>
-          <div className="mb-10 text-center lg:text-left">
-            <h1 className="text-text-dark text-3xl font-bold font-display mb-2">Iniciar Sesión</h1>
-            <p className="text-text-muted font-light">Bienvenido de nuevo al CRM de 2JMC Medios.</p>
-          </div>
-          <form className="space-y-6">
-            {/* User Input */}
-            <div>
-              <label className="block text-text-dark text-sm font-semibold mb-2 font-display">Usuario</label>
-              <div className="relative">
-                <input className="w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display" placeholder="Nombre de usuario o correo" type="text" />
-              </div>
-            </div>
-            {/* Password Input */}
-            <div>
-              <div className="flex justify-between mb-2">
-                <label className="block text-text-dark text-sm font-semibold font-display">Contraseña</label>
-                <a className="text-xs text-primary font-medium hover:underline" href="#">¿Olvidó su contraseña?</a>
-              </div>
-              <div className="relative">
-                <input className="w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display" placeholder="••••••••••••" type="password" />
-                <button className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors" type="button">
-                  <span className="material-symbols-outlined text-xl">visibility</span>
-                </button>
-              </div>
-            </div>
-            {/* Remember Me */}
-            <div className="flex items-center">
-              <input className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" id="remember" type="checkbox" />
-              <label className="ml-2 text-sm text-text-muted cursor-pointer" htmlFor="remember">Mantener sesión iniciada</label>
-            </div>
-            {/* Submit Button */}
-            <button className="w-full h-14 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 group" type="submit">
-              <span>Ingresar</span>
-              <span className="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">login</span>
-            </button>
-          </form>
-          {/* Footer Text */}
-          <div className="mt-16 text-center">
-            <p className="text-text-muted text-xs tracking-widest font-medium uppercase font-display">
-              CRM 2JMC Medios © 2026
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* ===================== PUBLIC ===================== */}
+        <Route path="/login" element={<Login />} />
+
+        {/* ===================== DASHBOARD (con sidebar) ===================== */}
+        <Route element={<DashboardLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/mi-perfil" element={<MiPerfil />} />
+
+          {/* Equipo de Ventas */}
+          <Route path="/equipo-ventas" element={<EquipoVentas />} />
+          <Route path="/equipo-ventas/agregar" element={<AgregarVendedor />} />
+          <Route path="/equipo-ventas/:id" element={<DetalleVendedor />} />
+
+          {/* Pautas */}
+          <Route path="/pautas" element={<PautasLista />} />
+          <Route path="/pautas/kanban" element={<PautasKanban />} />
+          <Route path="/pautas/calendario" element={<PautasCalendario />} />
+          <Route path="/pautas/agregar" element={<AgregarPauta />} />
+          <Route path="/pautas/:id" element={<DetallePauta />} />
+
+          {/* Aliados Comerciales */}
+          <Route path="/aliados-comerciales" element={<AliadosComerciales />} />
+          <Route path="/aliados-comerciales/agregar" element={<AgregarAliado />} />
+          <Route path="/aliados-comerciales/:id" element={<DetalleEmisora />} />
+
+          {/* Actividad Comercial */}
+          <Route path="/actividad-comercial"                element={<ActividadComercial />} />
+          <Route path="/actividad-comercial/visita"         element={<AgregarVisita />} />
+          <Route path="/actividad-comercial/gastos"         element={<GastosLista />} />
+          <Route path="/actividad-comercial/gastos/agregar" element={<AgregarGasto />} />
+
+          {/* Pipeline */}
+          <Route path="/pipeline" element={<Pipeline />} />
+
+          {/* Clientes */}
+          <Route path="/clientes" element={<Clientes />} />
+          <Route path="/clientes/agregar" element={<AgregarCliente />} />
+          <Route path="/clientes/:id" element={<DetalleCliente />} />
+          <Route path="/clientes/:clienteId/sub-empresa" element={<AgregarSubEmpresa />} />
+
+          {/* Reportes */}
+          <Route path="/reportes" element={<ReportesDirectorio />} />
+          <Route path="/reportes/ranking-clientes-pautas" element={<ReporteRankingClientesPautas />} />
+          <Route path="/reportes/clientes-sector" element={<ReporteClientesSector />} />
+          <Route path="/reportes/regiones-cliente" element={<ReporteRegionesCliente />} />
+          <Route path="/reportes/ingresos-mensuales" element={<ReporteIngresosMensuales />} />
+          <Route path="/reportes/pautas-filtro" element={<ReportePautasFiltro />} />
+          <Route path="/reportes/gastos-cliente" element={<ReporteGastosCliente />} />
+          <Route path="/reportes/efectividad-vendedores" element={<ReporteEfectividadVendedores />} />
+          <Route path="/reportes/gastos-vendedores" element={<ReporteGastosVendedores />} />
+          <Route path="/reportes/gastos-detalle-vendedor" element={<ReporteGastosDetalleVendedor />} />
+          <Route path="/reportes/top-emisoras-cunas" element={<ReporteTopEmisorasCunas />} />
+          <Route path="/reportes/emisoras-region" element={<ReporteEmisorasRegion />} />
+          <Route path="/reportes/marcas-region" element={<ReporteMarcasRegion />} />
+          <Route path="/reportes/clientes-emisora" element={<ReporteClientesEmisora />} />
+          <Route path="/reportes/emisoras-activas-region" element={<ReporteEmisorasActivasRegion />} />
+          <Route path="/reportes/top-emisoras-clientes" element={<ReporteTopEmisorasClientes />} />
+        </Route>
+
+        {/* ===================== REDIRECT ===================== */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;

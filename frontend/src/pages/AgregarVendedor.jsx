@@ -1,9 +1,64 @@
 // ==============================================
 // AgregarVendedor.jsx — Formulario Nuevo Vendedor
+// Entidades: USUARIO + VENDEDOR + TELEFONO (CSV)
 // ==============================================
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-function AgregarVendedor() {
+const INITIAL_FORM = {
+  // --- USUARIO ---
+  primer_nombre: '',
+  primer_apellido: '',
+  correo: '',
+  nombre_usuario: '',
+  contraseña: '',
+  rol: 'vendedor',
+  estado: 'activo',
+  // --- VENDEDOR ---
+  tipo: 'vendedor',
+  meta: '',
+  // --- TELEFONOS ---
+  telefonos: [{ codigo_area: '', cuerpo: '' }],
+};
+
+export default function AgregarVendedor() {
+  const [formData, setFormData] = useState(INITIAL_FORM);
+  const navigate = useNavigate();
+
+  /* ── helpers ── */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleTelChange = (index, field, value) => {
+    setFormData((prev) => {
+      const telefonos = [...prev.telefonos];
+      telefonos[index] = { ...telefonos[index], [field]: value };
+      return { ...prev, telefonos };
+    });
+  };
+
+  const addTelefono = () =>
+    setFormData((prev) => ({
+      ...prev,
+      telefonos: [...prev.telefonos, { codigo_area: '', cuerpo: '' }],
+    }));
+
+  const removeTelefono = (index) =>
+    setFormData((prev) => ({
+      ...prev,
+      telefonos: prev.telefonos.filter((_, i) => i !== index),
+    }));
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // TODO: enviar formData al backend
+    console.log('submit', formData);
+  };
+
+  const handleReset = () => setFormData(INITIAL_FORM);
+
   return (
     <>
       {/* HEADER */}
@@ -20,7 +75,7 @@ function AgregarVendedor() {
           <Link to="/equipo-ventas" className="px-6 py-2.5 rounded-full border border-slate-300 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-all">
             Cancelar
           </Link>
-          <button className="px-8 py-2.5 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">
+          <button onClick={handleSubmit} className="px-8 py-2.5 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">
             Guardar
           </button>
         </div>
@@ -28,9 +83,11 @@ function AgregarVendedor() {
 
       {/* FORM CARD */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <form className="p-10">
+        <form onSubmit={handleSubmit} onReset={handleReset} className="p-10">
           <div className="space-y-12">
-            {/* Datos Personales */}
+            {/* ════════════════════════════════
+                SECCIÓN 1 — Datos Personales (USUARIO + VENDEDOR)
+               ════════════════════════════════ */}
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
@@ -38,56 +95,138 @@ function AgregarVendedor() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-800">Datos Personales</h3>
-                  <p className="text-xs text-slate-400 font-medium italic">Entidad: Vendedor</p>
+                  <p className="text-xs text-slate-400 font-medium italic">Entidades: Usuario + Vendedor</p>
                 </div>
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
-                <div className="space-y-2">
-                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">Nombre<span className="text-red-500 ml-1">*</span></label>
-                  <input className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm" placeholder="Ej: Juan" type="text" />
-                </div>
+                {/* primer_nombre */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
-                    Segundo Nombre <span className="text-slate-400 font-normal lowercase tracking-normal">(opcional)</span>
+                    Primer Nombre<span className="text-red-500 ml-1">*</span>
                   </label>
-                  <input className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm" placeholder="Ej: Alberto" type="text" />
+                  <input
+                    name="primer_nombre"
+                    value={formData.primer_nombre}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm"
+                    placeholder="Ej: María"
+                    type="text"
+                    required
+                  />
                 </div>
+
+                {/* primer_apellido */}
                 <div className="space-y-2">
-                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">Apellido<span className="text-red-500 ml-1">*</span></label>
-                  <input className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm" placeholder="Ej: Pérez" type="text" />
+                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
+                    Primer Apellido<span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <input
+                    name="primer_apellido"
+                    value={formData.primer_apellido}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm"
+                    placeholder="Ej: González"
+                    type="text"
+                    required
+                  />
                 </div>
+
+                {/* correo */}
                 <div className="space-y-2">
-                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">Segundo Apellido<span className="text-red-500 ml-1">*</span></label>
-                  <input className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm" placeholder="Ej: Rodríguez" type="text" />
+                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
+                    Correo<span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <input
+                    name="correo"
+                    value={formData.correo}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm"
+                    placeholder="vendedor@2jmcmedios.com"
+                    type="email"
+                    required
+                  />
                 </div>
+
+                {/* meta */}
                 <div className="space-y-2">
-                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">Correo Electrónico<span className="text-red-500 ml-1">*</span></label>
-                  <input className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm" placeholder="juan.perez@ejemplo.com" type="email" />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">Meta Mensual ($)<span className="text-red-500 ml-1">*</span></label>
+                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
+                    Meta Mensual ($)<span className="text-red-500 ml-1">*</span>
+                  </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
-                    <input className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary pl-9 pr-4 py-3 text-sm" placeholder="0.00" step="0.01" type="number" />
+                    <input
+                      name="meta"
+                      value={formData.meta}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary pl-9 pr-4 py-3 text-sm"
+                      placeholder="0.00"
+                      step="0.01"
+                      type="number"
+                      required
+                    />
                   </div>
                 </div>
-                <div className="md:col-span-2 pt-4">
-                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase mb-4">Tipo de Perfil</label>
-                  <div className="flex gap-10">
-                    <label className="flex items-center cursor-pointer group">
-                      <input className="w-5 h-5 text-primary border-slate-300 focus:ring-primary transition-all" defaultChecked name="tipo_vendedor" type="radio" value="vendedor" />
-                      <span className="ml-3 text-sm font-semibold text-slate-600 group-hover:text-primary">Vendedor</span>
-                    </label>
-                    <label className="flex items-center cursor-pointer group">
-                      <input className="w-5 h-5 text-primary border-slate-300 focus:ring-primary transition-all" name="tipo_vendedor" type="radio" value="intermediario" />
-                      <span className="ml-3 text-sm font-semibold text-slate-600 group-hover:text-primary">Intermediario</span>
-                    </label>
-                  </div>
+
+                {/* tipo (VENDEDOR entity) */}
+                <div className="space-y-2">
+                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
+                    Tipo<span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <select
+                    name="tipo"
+                    value={formData.tipo}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white"
+                    required
+                  >
+                    <option value="vendedor">Vendedor</option>
+                    <option value="director">Director</option>
+                  </select>
+                </div>
+
+                {/* rol (USUARIO entity) */}
+                <div className="space-y-2">
+                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
+                    Rol<span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <select
+                    name="rol"
+                    value={formData.rol}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white"
+                    required
+                  >
+                    <option value="invitado">Invitado</option>
+                    <option value="gestor_pautas">Gestor de Pautas</option>
+                    <option value="vendedor">Vendedor</option>
+                    <option value="director">Director</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+
+                {/* estado (USUARIO entity) */}
+                <div className="space-y-2">
+                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
+                    Estado<span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <select
+                    name="estado"
+                    value={formData.estado}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white"
+                    required
+                  >
+                    <option value="activo">Activo</option>
+                    <option value="suspendido">Suspendido</option>
+                  </select>
                 </div>
               </div>
             </section>
 
-            {/* Teléfonos */}
+            {/* ════════════════════════════════
+                SECCIÓN 2 — Teléfonos (TELEFONO)
+               ════════════════════════════════ */}
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 rounded-xl bg-accent-green/10 text-accent-green flex items-center justify-center">
@@ -98,28 +237,57 @@ function AgregarVendedor() {
                   <p className="text-xs text-slate-400 font-medium italic">Entidad: Teléfono</p>
                 </div>
               </div>
+
               <div className="space-y-4">
-                <div className="flex gap-4 items-end">
-                  <div className="w-32 space-y-2">
-                    <label className="block text-[11px] font-bold text-slate-500 uppercase">Cód. Área<span className="text-red-500 ml-1">*</span></label>
-                    <input className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm text-center" maxLength="4" placeholder="0412" type="text" />
+                {formData.telefonos.map((tel, idx) => (
+                  <div key={idx} className="flex gap-4 items-end">
+                    <div className="w-32 space-y-2">
+                      <label className="block text-[11px] font-bold text-slate-500 uppercase">
+                        Cód. Área<span className="text-red-500 ml-1">*</span>
+                      </label>
+                      <input
+                        name="codigo_area"
+                        value={tel.codigo_area}
+                        onChange={(e) => handleTelChange(idx, 'codigo_area', e.target.value)}
+                        className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm text-center"
+                        maxLength="4"
+                        placeholder="0412"
+                        type="text"
+                        required
+                      />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <label className="block text-[11px] font-bold text-slate-500 uppercase">
+                        Cuerpo<span className="text-red-500 ml-1">*</span>
+                      </label>
+                      <input
+                        name="cuerpo"
+                        value={tel.cuerpo}
+                        onChange={(e) => handleTelChange(idx, 'cuerpo', e.target.value)}
+                        className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm"
+                        placeholder="1234567"
+                        type="text"
+                        required
+                      />
+                    </div>
+                    {formData.telefonos.length > 1 && (
+                      <button className="p-3 text-slate-300 hover:text-red-400 transition-colors" type="button" onClick={() => removeTelefono(idx)}>
+                        <span className="material-symbols-outlined">delete</span>
+                      </button>
+                    )}
                   </div>
-                  <div className="flex-1 space-y-2">
-                    <label className="block text-[11px] font-bold text-slate-500 uppercase">Número<span className="text-red-500 ml-1">*</span></label>
-                    <input className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm" placeholder="1234567" type="text" />
-                  </div>
-                  <button className="p-3 text-slate-300 hover:text-red-400 transition-colors" type="button">
-                    <span className="material-symbols-outlined">delete</span>
-                  </button>
-                </div>
+                ))}
               </div>
-              <button className="mt-6 flex items-center text-primary font-bold text-sm hover:text-secondary transition-all" type="button">
+
+              <button className="mt-6 flex items-center text-primary font-bold text-sm hover:text-secondary transition-all" type="button" onClick={addTelefono}>
                 <span className="material-symbols-outlined mr-1">add_circle</span>
                 Agregar Teléfono
               </button>
             </section>
 
-            {/* Credenciales */}
+            {/* ════════════════════════════════
+                SECCIÓN 3 — Credenciales (USUARIO)
+               ════════════════════════════════ */}
             <section className="bg-slate-50/50 -mx-10 px-10 py-10 border-t border-slate-100">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center">
@@ -130,15 +298,39 @@ function AgregarVendedor() {
                   <p className="text-xs text-slate-400 font-medium italic">Entidad: Usuario</p>
                 </div>
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                {/* nombre_usuario */}
                 <div className="space-y-2">
-                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">Nombre de Cuenta<span className="text-red-500 ml-1">*</span></label>
-                  <input className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white" placeholder="Ej: jperez2jmc" type="text" />
+                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
+                    Nombre de Usuario<span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <input
+                    name="nombre_usuario"
+                    value={formData.nombre_usuario}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white"
+                    placeholder="Ej: mgonzalez2jmc"
+                    type="text"
+                    required
+                  />
                 </div>
+
+                {/* contraseña */}
                 <div className="space-y-2">
-                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">Contraseña<span className="text-red-500 ml-1">*</span></label>
+                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
+                    Contraseña<span className="text-red-500 ml-1">*</span>
+                  </label>
                   <div className="relative">
-                    <input className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white" placeholder="••••••••" type="password" />
+                    <input
+                      name="contraseña"
+                      value={formData.contraseña}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white"
+                      placeholder="••••••••"
+                      type="password"
+                      required
+                    />
                     <button className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" type="button">
                       <span className="material-symbols-outlined text-[20px]">visibility</span>
                     </button>
@@ -191,5 +383,3 @@ function AgregarVendedor() {
     </>
   );
 }
-
-export default AgregarVendedor;

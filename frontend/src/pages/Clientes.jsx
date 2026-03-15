@@ -3,15 +3,71 @@
 // ==============================================
 import { Link } from 'react-router-dom';
 
-const CLIENTES = [
-  { initials: 'AP', name: 'Alimentos Polar', initialsColor: 'primary', rif: 'J-00001234-5', sector: 'Alimentos', clasif: 'Cliente Directo', clasifColor: 'slate', activo: true, vendedor: 'Carlos Ruiz', fecha: 'Hoy, 10:30 AM' },
-  { initials: 'FT', name: 'Farmatodo', initialsColor: 'accent-green', rif: 'J-00014523-1', sector: 'Retail', clasif: 'Agencia', clasifColor: 'primary', activo: true, vendedor: 'Maria Lopez', fecha: 'Ayer, 3:15 PM' },
-  { initials: 'BP', name: 'Banco Provincial', initialsColor: 'slate', rif: 'J-00000123-0', sector: 'Banca', clasif: 'Cliente Directo', clasifColor: 'slate', activo: false, vendedor: 'Carlos Ruiz', fecha: '12 Oct 2023' },
-  { initials: 'CR', name: 'Cervecería Regional', initialsColor: 'primary', rif: 'J-30123456-7', sector: 'Bebidas', clasif: 'Cliente Directo', clasifColor: 'slate', activo: true, vendedor: 'Andres Bello', fecha: 'Hoy, 9:00 AM' },
-  { initials: 'DG', name: 'Digitel', initialsColor: 'secondary', rif: 'J-30045123-9', sector: 'Telecom', clasif: 'Agencia', clasifColor: 'primary', activo: true, vendedor: 'Maria Lopez', fecha: '20 Oct 2023' },
+const CLIENTES_MOCK = [
+  {
+    id: 'c1',
+    nombre: 'Alimentos Polar',
+    razon_social: 'Alimentos Polar C.A.',
+    rif_fiscal: 'J-00041318-1',
+    tipo: 'empresa',
+    clasificacion: 'Cliente Directo',
+    sector: 'Alimentación',
+    estado: 'Activo',
+    nombre_agencia: null,
+  },
+  {
+    id: 'c2',
+    nombre: 'Farmatodo',
+    razon_social: 'Farmatodo C.A.',
+    rif_fiscal: 'J-00014523-1',
+    tipo: 'empresa',
+    clasificacion: 'Agencia',
+    sector: 'Salud',
+    estado: 'Activo',
+    nombre_agencia: 'Publicis Venezuela',
+  },
+  {
+    id: 'c3',
+    nombre: 'Banco Provincial',
+    razon_social: 'BBVA Provincial S.A.',
+    rif_fiscal: 'J-00000123-0',
+    tipo: 'empresa',
+    clasificacion: 'Cliente Directo',
+    sector: 'Bancario',
+    estado: 'Inactivo',
+    nombre_agencia: null,
+  },
+  {
+    id: 'c4',
+    nombre: 'Cervecería Regional',
+    razon_social: 'Cervecería Regional C.A.',
+    rif_fiscal: 'J-30123456-7',
+    tipo: 'empresa',
+    clasificacion: 'Cliente Directo',
+    sector: 'Fabricación',
+    estado: 'Activo',
+    nombre_agencia: null,
+  },
+  {
+    id: 'c5',
+    nombre: 'Digitel',
+    razon_social: 'Corporación Digitel C.A.',
+    rif_fiscal: 'J-30045123-9',
+    tipo: 'empresa',
+    clasificacion: 'Agencia',
+    sector: 'Telemática',
+    estado: 'Activo',
+    nombre_agencia: 'MindShare VE',
+  },
 ];
 
-function Clientes() {
+function getInitials(nombre) {
+  return nombre.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+const INITIALS_COLORS = ['primary', 'accent-green', 'slate', 'secondary'];
+
+export default function Clientes() {
   return (
     <>
       <header className="flex justify-between items-center mb-10">
@@ -40,7 +96,7 @@ function Clientes() {
           <h3 className="text-4xl font-bold text-slate-900 mt-4">87</h3>
           <p className="text-[11px] text-slate-400 mt-2"><span className="text-accent-green font-bold">↑ 4%</span> vs mes anterior</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100/50 border-b-4 border-b-accent-green">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100/50 border-b-4 border-b">
           <div className="flex justify-between items-start">
             <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Activos</p>
             <span className="material-symbols-outlined text-accent-green bg-accent-green/10 p-2 rounded-lg">check_circle</span>
@@ -56,7 +112,7 @@ function Clientes() {
           <h3 className="text-4xl font-bold text-slate-900 mt-4">15</h3>
           <p className="text-[11px] text-slate-400 mt-2">Requieren seguimiento comercial</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100/50 border-b-4 border-b-primary">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100/50 border-b-4 border-b">
           <div className="flex justify-between items-start">
             <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Nuevos Mes</p>
             <span className="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">person_add</span>
@@ -66,66 +122,83 @@ function Clientes() {
         </div>
       </div>
 
-      {/* Filter bar */}
+      {/* Filter bar — ENUMs del CSV: clasificacion, estado, sector */}
       <div className="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-wrap items-center gap-4">
         <div className="relative flex-1 min-w-[300px]">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-          <input className="w-full pl-10 pr-4 py-2.5 rounded-lg border-slate-200 text-sm focus:ring-primary focus:border-primary transition-all" placeholder="Buscar por nombre, RIF o vendedor..." type="text" />
+          <input className="w-full pl-10 pr-4 py-2.5 rounded-lg border-slate-200 text-sm focus:ring-primary focus:border-primary transition-all" placeholder="Buscar por nombre, RIF fiscal o razón social..." type="text" />
         </div>
-        <select className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
-          <option>Sector: Todos</option><option>Alimentos</option><option>Banca</option><option>Telecom</option>
+        <select name="sector" className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
+          <option value="">Sector: Todos</option>
+          <option value="Salud">Salud</option>
+          <option value="Alimentación">Alimentación</option>
+          <option value="Telemática">Telemática</option>
+          <option value="Fabricación">Fabricación</option>
+          <option value="Bancario">Bancario</option>
         </select>
-        <select className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
-          <option>Estado: Todos</option><option>Activo</option><option>Inactivo</option>
+        <select name="estado" className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
+          <option value="">Estado: Todos</option>
+          <option value="Activo">Activo</option>
+          <option value="Inactivo">Inactivo</option>
         </select>
-        <select className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
-          <option>Vendedor</option><option>Carlos Ruiz</option><option>Maria Lopez</option>
+        <select name="clasificacion" className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
+          <option value="">Clasificación: Todas</option>
+          <option value="Agencia">Agencia</option>
+          <option value="Cliente Directo">Cliente Directo</option>
         </select>
       </div>
 
-      {/* Table */}
+      {/* Table — columnas mapeadas a atributos CLIENTE del CSV */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-slate-100">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
                 <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Nombre</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">RIF</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Razón Social</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">RIF Fiscal</th>
                 <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Sector</th>
                 <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Clasificación</th>
                 <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Estado</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Vendedor</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Última Interacción</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Tipo</th>
                 <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {CLIENTES.map((c) => (
-                <tr key={c.rif} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full bg-${c.initialsColor}/10 flex items-center justify-center text-${c.initialsColor} font-bold text-xs`}>{c.initials}</div>
-                      <span className="text-sm font-semibold text-slate-900">{c.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600 font-medium">{c.rif}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{c.sector}</td>
-                  <td className="px-6 py-4"><span className={`text-[10px] font-bold px-2 py-1 rounded bg-${c.clasifColor}/10 text-${c.clasifColor === 'primary' ? 'primary' : 'slate-500'} uppercase`}>{c.clasif}</span></td>
-                  <td className="px-6 py-4">
-                    {c.activo
-                      ? <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full bg-accent-green/10 text-accent-green uppercase"><span className="w-1.5 h-1.5 rounded-full bg-accent-green"></span>Activo</span>
-                      : <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 uppercase"><span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Inactivo</span>
-                    }
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{c.vendedor}</td>
-                  <td className="px-6 py-4 text-xs text-slate-500">{c.fecha}</td>
-                  <td className="px-6 py-4">
-                    <Link to={`/clientes/${c.initials.toLowerCase()}`} className="text-slate-400 hover:text-primary transition-colors">
-                      <span className="material-symbols-outlined text-lg">visibility</span>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+              {CLIENTES_MOCK.map((c, i) => {
+                const initials = getInitials(c.nombre);
+                const color = INITIALS_COLORS[i % INITIALS_COLORS.length];
+                return (
+                  <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full bg-${color}/10 flex items-center justify-center text-${color} font-bold text-xs`}>{initials}</div>
+                        <span className="text-sm font-semibold text-slate-900">{c.nombre}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{c.razon_social}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600 font-medium">{c.rif_fiscal}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{c.sector}</td>
+                    <td className="px-6 py-4">
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase ${c.clasificacion === 'Agencia' ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-500'}`}>
+                        {c.clasificacion}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {c.estado === 'Activo'
+                        ? <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full bg-accent-green/10 text-accent-green uppercase"><span className="w-1.5 h-1.5 rounded-full bg-accent-green"></span>Activo</span>
+                        : <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 uppercase"><span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Inactivo</span>
+                      }
+                    </td>
+                    <td className="px-6 py-4 text-xs text-slate-500 capitalize">{c.tipo}</td>
+                    <td className="px-6 py-4">
+                      <Link to={`/clientes/${c.id}`} className="text-slate-400 hover:text-primary transition-colors">
+                        <span className="material-symbols-outlined text-lg">visibility</span>
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -145,5 +218,3 @@ function Clientes() {
     </>
   );
 }
-
-export default Clientes;

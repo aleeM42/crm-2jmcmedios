@@ -1,168 +1,152 @@
-import { Link } from 'react-router-dom';
+// ==============================================
+// DetalleEmisora.jsx — Detalle de Aliado Comercial
+// ==============================================
+import { Link, useParams } from 'react-router-dom';
+
+const STATUS_DOT = {
+  Activo: 'bg-accent-green',
+  Inactivo: 'bg-slate-300',
+  Cerrado: 'bg-red-500',
+};
 
 export default function DetalleEmisora() {
+  const { id } = useParams();
+
+  const emisora = {
+    razon_social: 'Circuitos Románticos de Venezuela C.A.',
+    nombre_emisora: 'La Romántica 88.9',
+    rif: 'J-30492834-1',
+    frecuencia: '88.9 FM',
+    categoria: 'Musical',
+    direccion: 'Av. Principal Las Mercedes, Torre La Castellana, Piso 4, Caracas, Miranda',
+    estado: 'Activo',
+  };
+
+  const contacto = {
+    primer_nombre: 'María',
+    segundo_nombre: 'Elena',
+    primer_apellido: 'Torres',
+    departamento: 'Comercial',
+    correo: 'maria.torres@romantica.com',
+    rol: 'Directora Comercial',
+    fecha_nacimiento: '1985-06-15',
+    anotaciones_especiales: 'Prefiere comunicación por email. Disponible L-V 9am-5pm.',
+    telefonos: [
+      { codigo_area: '0412', cuerpo: '5551234' },
+      { codigo_area: '0212', cuerpo: '2634589' },
+    ],
+  };
+
+  const pautasAsociadas = [
+    { numero_OT: 'OT-001', cliente: 'Alimentos Polar', marca: 'Harina PAN', estado: 'En transmisión', cantidad_cuñas: 90, monto_OC: '$5,850' },
+    { numero_OT: 'OT-004', cliente: 'Toyota Venezuela', marca: 'Hilux 2024', estado: 'En transmisión', cantidad_cuñas: 120, monto_OC: '$6,600' },
+    { numero_OT: 'OT-003', cliente: 'Banesco', marca: 'Cuenta Digital', estado: 'Finalizada', cantidad_cuñas: 40, monto_OC: '$2,720' },
+  ];
+
+  const STATUS_STYLE = {
+    'En transmisión': 'bg-primary/10 text-primary',
+    'Finalizada': 'bg-accent-green/10 text-accent-green',
+  };
+
   return (
     <>
       {/* HEADER */}
-      <header className="flex justify-between items-start mb-8">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <nav className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2">
-            <Link className="hover:text-primary transition-colors" to="/aliados">Aliados Comerciales</Link>
-            <span className="material-symbols-outlined text-sm">chevron_right</span>
-            <span className="text-primary">La Romántica 88.9</span>
+          <nav className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">
+            <Link className="hover:text-primary transition-colors" to="/aliados-comerciales">Aliados Comerciales</Link>
+            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+            <span className="text-slate-600">{emisora.nombre_emisora}</span>
           </nav>
           <div className="flex items-center gap-4">
-            <h2 className="text-3xl font-black text-slate-800 font-display">Detalle de Aliado</h2>
-            <span className="bg-accent-green/10 text-accent-green px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border border-accent-green/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-green"></span>
-              Activa
-            </span>
+            <h2 className="text-3xl font-black text-slate-900 font-display">{emisora.nombre_emisora}</h2>
+            <div className={`h-3 w-3 rounded-full ${STATUS_DOT[emisora.estado]}`} title={emisora.estado}></div>
+            <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">{emisora.frecuencia}</span>
           </div>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
-            <span className="material-symbols-outlined text-lg">delete</span>
-            Eliminar
-          </button>
-          <button className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
-            <span className="material-symbols-outlined text-lg">edit</span>
-            Editar
+          <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
+            <span className="material-symbols-outlined text-sm">edit</span> Editar
           </button>
         </div>
-      </header>
+      </div>
 
       <div className="grid grid-cols-12 gap-8">
         {/* LEFT COLUMN */}
         <div className="col-span-8 space-y-8">
           {/* INFORMACIÓN GENERAL */}
-          <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary">info</span>
-              <h3 className="text-lg font-bold font-display">Información General</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-y-6 gap-x-12">
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Razón Social</p>
-                <p className="text-sm font-semibold">Circuitos Románticos de Venezuela C.A.</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nombre Emisora</p>
-                <p className="text-sm font-semibold">La Romántica 88.9 FM</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">RIF</p>
-                <p className="text-sm font-semibold">J-30492834-1</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Frecuencia</p>
-                <span className="inline-block mt-1 px-3 py-0.5 bg-primary/10 text-primary text-xs font-bold rounded-lg border border-primary/20">88.9 MHz</span>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Categoría</p>
-                <p className="text-sm font-semibold">Música Romántica / Adulto Contemporáneo</p>
-              </div>
-              <div>
+          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
+              <span className="material-symbols-outlined text-primary">radio</span>
+              Información General
+            </h3>
+            <div className="grid grid-cols-2 gap-y-5 gap-x-10">
+              {[
+                { label: 'Razón Social', value: emisora.razon_social },
+                { label: 'Nombre Emisora', value: emisora.nombre_emisora },
+                { label: 'RIF', value: emisora.rif },
+                { label: 'Frecuencia', value: emisora.frecuencia },
+                { label: 'Categoría', value: emisora.categoria },
+                { label: 'Estado', value: emisora.estado },
+              ].map((item) => (
+                <div key={item.label}>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
+                  <p className="text-sm font-medium text-slate-700">{item.value}</p>
+                </div>
+              ))}
+              <div className="col-span-2">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Dirección</p>
-                <p className="text-sm font-semibold">Av. Principal de Las Mercedes, Edif. Torre Las Mercedes, Piso 4.</p>
+                <p className="text-sm font-medium text-slate-700">{emisora.direccion}</p>
               </div>
             </div>
           </section>
 
-          {/* COBERTURA & UBICACIÓN */}
-          <div className="grid grid-cols-2 gap-8">
-            <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-primary">radar</span>
-                <h3 className="text-lg font-bold font-display">Cobertura</h3>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {['Caracas', 'Los Teques', 'Guarenas', 'Guatire'].map((city) => (
-                  <span key={city} className="px-3 py-1 border-2 border-primary/30 text-primary text-xs font-bold rounded-full">{city}</span>
-                ))}
-              </div>
-            </section>
-            <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-primary">location_on</span>
-                <h3 className="text-lg font-bold font-display">Ubicación</h3>
-              </div>
-              <div className="space-y-4">
-                <div className="flex justify-between border-b border-slate-50 pb-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase">Región</span>
-                  <span className="text-sm font-semibold">Capital</span>
-                </div>
-                <div className="flex justify-between border-b border-slate-50 pb-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase">Estado</span>
-                  <span className="text-sm font-semibold">Miranda</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-xs font-bold text-slate-400 uppercase">Ciudad</span>
-                  <span className="text-sm font-semibold">Caracas</span>
-                </div>
-              </div>
-            </section>
-          </div>
+          {/* COBERTURA */}
+          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
+              <span className="material-symbols-outlined text-primary">broadcast_on_home</span>
+              Cobertura
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {['Caracas - Los Teques', 'Valles del Tuy', 'Guarenas - Guatire', 'Barlovento'].map((c) => (
+                <span key={c} className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-primary text-sm font-semibold">{c}</span>
+              ))}
+            </div>
+          </section>
 
           {/* PAUTAS ASOCIADAS */}
-          <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">list_alt</span>
-                <h3 className="text-lg font-bold font-display">Pautas Asociadas</h3>
-              </div>
-              <button className="text-primary text-xs font-bold hover:underline">Ver todas</button>
-            </div>
+          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
+              <span className="material-symbols-outlined text-primary">campaign</span>
+              Pautas Asociadas
+            </h3>
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
-                    <th className="pb-3">Nro OT</th>
-                    <th className="pb-3">Cliente</th>
-                    <th className="pb-3">Marca</th>
-                    <th className="pb-3 text-center">Estado</th>
-                    <th className="pb-3">Progreso</th>
+                  <tr className="border-b border-slate-100">
+                    <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-2 px-4">Nro OT</th>
+                    <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-2 px-4">Cliente</th>
+                    <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-2 px-4">Marca</th>
+                    <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-2 px-4">Cuñas</th>
+                    <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-2 px-4">Estado</th>
+                    <th className="text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest py-2 px-4">Monto OC</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
-                  <tr className="text-sm">
-                    <td className="py-4 font-bold text-primary">#OT-4522</td>
-                    <td className="py-4 font-semibold">PepsiCo Venezuela</td>
-                    <td className="py-4 font-semibold">Pepsi Black</td>
-                    <td className="py-4 text-center">
-                      <span className="bg-blue-100 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Al Aire</span>
-                    </td>
-                    <td className="py-4 w-32">
-                      <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                        <div className="bg-primary h-full" style={{ width: '65%' }}></div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr className="text-sm">
-                    <td className="py-4 font-bold text-primary">#OT-4589</td>
-                    <td className="py-4 font-semibold">Banco Mercantil</td>
-                    <td className="py-4 font-semibold">Mercantil Móvil</td>
-                    <td className="py-4 text-center">
-                      <span className="bg-yellow-100 text-yellow-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Pendiente</span>
-                    </td>
-                    <td className="py-4 w-32">
-                      <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                        <div className="bg-slate-300 h-full" style={{ width: '10%' }}></div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr className="text-sm">
-                    <td className="py-4 font-bold text-primary">#OT-4601</td>
-                    <td className="py-4 font-semibold">Farmatodo</td>
-                    <td className="py-4 font-semibold">Día de la Madre</td>
-                    <td className="py-4 text-center">
-                      <span className="bg-green-100 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Completada</span>
-                    </td>
-                    <td className="py-4 w-32">
-                      <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                        <div className="bg-accent-green h-full" style={{ width: '100%' }}></div>
-                      </div>
-                    </td>
-                  </tr>
+                <tbody>
+                  {pautasAsociadas.map((p) => (
+                    <tr key={p.numero_OT} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                      <td className="py-3 px-4">
+                        <Link to={`/pautas/${p.numero_OT}`} className="font-bold text-primary hover:underline">{p.numero_OT}</Link>
+                      </td>
+                      <td className="py-3 px-4 text-slate-700">{p.cliente}</td>
+                      <td className="py-3 px-4 text-slate-600">{p.marca}</td>
+                      <td className="py-3 px-4 text-slate-600">{p.cantidad_cuñas}</td>
+                      <td className="py-3 px-4">
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${STATUS_STYLE[p.estado] || 'bg-slate-100 text-slate-500'}`}>{p.estado}</span>
+                      </td>
+                      <td className="py-3 px-4 text-right font-bold text-slate-800">{p.monto_OC}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -172,84 +156,63 @@ export default function DetalleEmisora() {
         {/* RIGHT COLUMN */}
         <div className="col-span-4 space-y-8">
           {/* CONTACTO PRINCIPAL */}
-          <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-2 mb-6">
+          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">person</span>
-              <h3 className="text-lg font-bold font-display">Contacto Principal</h3>
-            </div>
-            <div className="text-center mb-6">
-              <div className="w-20 h-20 rounded-full bg-primary mx-auto mb-3 flex items-center justify-center border-2 border-primary/20 text-white font-bold text-2xl tracking-tighter">CM</div>
-              <h4 className="font-bold text-lg font-display">Carlos Mendoza</h4>
-              <span className="inline-block mt-1 px-3 py-0.5 bg-accent-light/30 text-primary text-[10px] font-black rounded-lg uppercase tracking-widest border border-primary/10">Decisor</span>
-            </div>
+              Contacto Principal
+            </h3>
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-slate-400 text-lg">mail</span>
-                <p className="text-sm font-semibold">c.mendoza@laromantica.com</p>
+              {[
+                { label: 'Nombre', value: `${contacto.primer_nombre} ${contacto.segundo_nombre} ${contacto.primer_apellido}` },
+                { label: 'Departamento', value: contacto.departamento },
+                { label: 'Rol', value: contacto.rol },
+                { label: 'Correo', value: contacto.correo, link: true },
+                { label: 'Fecha de Nacimiento', value: contacto.fecha_nacimiento },
+              ].map((item) => (
+                <div key={item.label} className="flex justify-between py-2 border-b border-slate-50">
+                  <span className="text-xs text-slate-500">{item.label}</span>
+                  {item.link ? (
+                    <a href={`mailto:${item.value}`} className="text-xs font-bold text-primary hover:underline">{item.value}</a>
+                  ) : (
+                    <span className="text-xs font-bold text-slate-700">{item.value}</span>
+                  )}
+                </div>
+              ))}
+              <div className="py-2">
+                <span className="text-xs text-slate-500 block mb-2">Teléfonos</span>
+                <div className="space-y-1">
+                  {contacto.telefonos.map((t, i) => (
+                    <p key={i} className="text-xs font-bold text-slate-700">{t.codigo_area}-{t.cuerpo}</p>
+                  ))}
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-slate-400 text-lg">call</span>
-                <p className="text-sm font-semibold">+58 (412) 555-0123</p>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl mt-4">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Notas de Contacto</p>
-                <p className="text-xs italic text-slate-600">Prefiere llamadas en la mañana. No usa WhatsApp para pautas oficiales.</p>
-              </div>
+              {contacto.anotaciones_especiales && (
+                <div className="py-2 border-t border-slate-50">
+                  <span className="text-xs text-slate-500 block mb-1">Anotaciones</span>
+                  <p className="text-xs text-slate-600 italic">{contacto.anotaciones_especiales}</p>
+                </div>
+              )}
             </div>
           </section>
 
           {/* ESTADÍSTICAS */}
-          <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-2 mb-6">
+          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">analytics</span>
-              <h3 className="text-lg font-bold font-display">Estadísticas</h3>
-            </div>
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cuñas Transmitidas</p>
-                  <p className="text-2xl font-black text-slate-800">4,500</p>
-                </div>
-                <span className="material-symbols-outlined text-accent-green text-3xl">record_voice_over</span>
+              Estadísticas
+            </h3>
+            <div className="space-y-4">
+              <div className="flex justify-between py-2 border-b border-slate-50">
+                <span className="text-xs text-slate-500">Pautas Activas</span>
+                <span className="text-sm font-black text-primary">2</span>
               </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Clientes Activos</p>
-                  <p className="text-2xl font-black text-slate-800">8</p>
-                </div>
-                <span className="material-symbols-outlined text-primary text-3xl">groups</span>
+              <div className="flex justify-between py-2 border-b border-slate-50">
+                <span className="text-xs text-slate-500">Total Cuñas</span>
+                <span className="text-sm font-bold text-slate-800">250</span>
               </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pautas Activas</p>
-                  <p className="text-2xl font-black text-slate-800">5</p>
-                </div>
-                <span className="material-symbols-outlined text-secondary text-3xl">pending_actions</span>
-              </div>
-            </div>
-          </section>
-
-          {/* HISTORIAL */}
-          <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary">history</span>
-              <h3 className="text-lg font-bold font-display">Historial</h3>
-            </div>
-            <div className="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
-              <div className="relative pl-8">
-                <span className="absolute left-0 top-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center border-4 border-white z-10"></span>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">Hoy, 10:45 AM</p>
-                <p className="text-xs font-semibold mt-1">Se actualizó la tarifa de cuña prime-time.</p>
-              </div>
-              <div className="relative pl-8">
-                <span className="absolute left-0 top-1 w-6 h-6 rounded-full bg-slate-300 flex items-center justify-center border-4 border-white z-10"></span>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">Ayer, 3:20 PM</p>
-                <p className="text-xs font-semibold mt-1">Carga masiva de certificados de transmisión.</p>
-              </div>
-              <div className="relative pl-8">
-                <span className="absolute left-0 top-1 w-6 h-6 rounded-full bg-slate-300 flex items-center justify-center border-4 border-white z-10"></span>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">12 May 2024</p>
-                <p className="text-xs font-semibold mt-1">Renovación de alianza comercial anual.</p>
+              <div className="flex justify-between py-2">
+                <span className="text-xs text-slate-500">Facturación Total</span>
+                <span className="text-sm font-black text-primary">$15,170</span>
               </div>
             </div>
           </section>

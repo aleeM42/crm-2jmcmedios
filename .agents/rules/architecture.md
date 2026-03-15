@@ -7,37 +7,73 @@ trigger: always_on
 Este documento sirve como "El Mapa" del proyecto para entender su estructura, tecnologías, convenciones y modelos de datos de un vistazo.
 
 ## Stack Tecnológico
-- **Frontend**: React, Tailwind CSS
+- **Frontend**: React 19 + Vite, Tailwind CSS v4, React Router DOM
 - **Backend**: Node.js, Express
-- **Base de Datos**: PostgreSQL
+- **Base de Datos**: PostgreSQL (Prisma ORM)
+- **Bundler**: Vite 7
+- **Íconos**: Material Symbols Outlined (Google Fonts)
+- **Tipografía**: Montserrat + Inter (Google Fonts)
 
-## Estructura de Carpetas (Silos Estrictos y MVC)
-La arquitectura se basa en el patrón MVC (Modelo-Vista-Controlador), dividida estrictamente en dos repositorios/carpetas principales para mantener la modularización y separar las responsabilidades de UI y servidor:
+## Estructura de Carpetas
 
 ```text
 / (raíz del proyecto)
 ├── frontend/
-├── public/        # Favicon, imágenes estáticas
-└── src/
-    ├── assets/    # CSS global, logos
-    ├── components/# Botones, tarjetas, formularios (reutilizables)
-    ├── pages/     # Vistas completas (Login, Dashboard, Clientes)
-    ├── services/  # Conexión con el Backend (Fetch/Axios)
-    └── App.jsx    # Enrutador principal del frontend       # Componentes React y lógica   
+│   ├── index.html           # Entry point HTML (carga /src/main.jsx)
+│   ├── vite.config.js       # Configuración de Vite + plugins React y Tailwind
+│   ├── package.json
+│   ├── public/              # Favicon, imágenes estáticas (Vortice.png, etc.)
+│   └── src/
+│       ├── main.jsx         # Punto de entrada React (StrictMode + createRoot)
+│       ├── App.jsx          # Enrutador principal (BrowserRouter + rutas)
+│       ├── assets/          # CSS global (index.css con @theme tokens)
+│       ├── components/      # Componentes reutilizables (DashboardLayout, etc.)
+│       ├── pages/           # Vistas completas por módulo (Dashboard, Clientes, etc.)
+│       └── services/        # Conexión con el Backend (Fetch/Axios)
+│
 └── backend/
-    ├── config/          # Configuración general y conexión a la base de datos PostgreSQL
-    ├── model/           # Modelos de bases de datos y consultas (queries aisladas)
-    ├── controller/      # Controladores con la lógica de negocio
-    └── router/          # Implementación y definición de endpoints y rutas de la API
+    ├── prisma.config.ts     # Configuración de Prisma ORM
+    ├── db/                  # Migraciones y esquema de Prisma
+    ├── package.json
+    └── src/
+        ├── server.js        # Entry point del servidor Express
+        ├── config/          # Configuración general y conexión a PostgreSQL
+        ├── model/           # Modelos de datos y consultas (queries aisladas)
+        ├── controller/      # Controladores con lógica de negocio
+        └── router/          # Definición de endpoints y rutas de la API
 ```
 
 ## Convenciones de Código
-- **Silos Estrictos de Base de Datos:** Las consultas (queries) nunca se escriben en componentes de frontend o directamente en el router. Toda gestión a la base de datos pasa exclusivamete por `/backend/model`.
-- **Archivos Pequeños:** Mantener los archivos bajo 600-900 líneas. Si un componente de React, controlador o modelo supera este límite, se debe extraer y dividir en sub-componentes lógicos.
-- **Reducción de Ruido IA (.aiignore):** Carpetas de dependencias (`node_modules`), builds transpilados (`dist`, `build`), y medios estáticos pesados deben estar ignorados para los Agentes y control de versiones a través de archivos como `.claudeignore` y `.gitignore`.
 
-## Esquema de Base de Datos (Modelo ER)
-Resumen de las tablas, entidades y atributos principales extraídos del modelo relacional del CRM.
+### General
+- **Silos Estrictos de Base de Datos:** Las consultas (queries) nunca se escriben en componentes de frontend ni en el router. Toda gestión a la base de datos pasa exclusivamente por `/backend/src/model`.
+- **Archivos Pequeños:** Mantener los archivos bajo 600-900 líneas. Si un componente, controlador o modelo supera este límite, se debe extraer y dividir en sub-componentes lógicos.
+- **Reducción de Ruido IA:** Carpetas `node_modules`, `dist`, `build` y medios pesados están ignorados en `.gitignore`.
+
+### Frontend (React)
+- **Componentes funcionales** con `export default function NombreComponente()`.
+- **Cabecera de archivo** con comentario descriptivo: `// === NombreArchivo.jsx — Descripción ===`.
+- **Imports**: React Router (`Link`, `NavLink`, `useLocation`) para navegación.
+- **Estilo**: Tailwind CSS v4 utilities inline con tokens personalizados del `@theme`.
+- **Nombres de archivos**: PascalCase para componentes (`DetalleCliente.jsx`), camelCase para utilidades.
+
+### Backend (Express)
+- Patrón MVC estricto: Router → Controller → Model.
+- Respuestas JSON con estructura `{ success, data, error }`.
+
+## Design Tokens (Tailwind @theme)
+
+| Token              | Hex       | Uso                    |
+|--------------------|-----------|------------------------|
+| `primary`          | `#16B1B8` | Botones, enlaces, sidebar activo |
+| `secondary`        | `#8DC63F` | Acento verde, gradientes |
+| `accent-light`     | `#A1DEE5` | Fondos suaves, badges  |
+| `accent-green`     | `#8DC63F` | Estados positivos      |
+| `background-main`  | `#F5F7FA` | Fondo general          |
+| `background-light` | `#F5F7FA` | Fondo del layout       |
+| `text-dark`        | `#1F2937` | Texto principal        |
+| `text-muted`       | `#6B7280` | Texto secundario       |
+
 ## Esquema de Base de Datos (Modelo Lógico PostgreSQL)
 El sistema utiliza una base de datos relacional robusta en PostgreSQL, con claves foráneas (FK) estrictas e integridad referencial.
 
