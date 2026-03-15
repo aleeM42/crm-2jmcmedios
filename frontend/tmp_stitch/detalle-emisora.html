@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Radio Station Profile Detail View - CRM 2JMC</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16B1B8",
+                        "secondary": "#8DC63F",
+                        "accent-light": "#A1DEE5",
+                        "accent-medium": "#55CCD3",
+                        "background-light": "#F5F7FA",
+                        "background-dark": "#112021",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Montserrat', sans-serif; }
+        .sidebar-active { border-left: 4px solid #16B1B8; background-color: rgba(22, 177, 184, 0.05); }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex min-h-screen">
+<aside class="w-[240px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-full z-20">
+<div class="p-6">
+<h1 class="text-primary font-black text-xl tracking-tight">CRM 2JMC</h1>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Gestión de Medios</p>
+</div>
+<nav class="flex-1 mt-4">
+<div class="px-3 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">grid_view</span>
+<span class="text-sm font-semibold">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary sidebar-active rounded-r-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">radio</span>
+<span class="text-sm font-bold">Aliados Comerciales</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">campaign</span>
+<span class="text-sm font-semibold">Campañas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">description</span>
+<span class="text-sm font-semibold">Facturación</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="text-sm font-semibold">Configuración</span>
+</a>
+</div>
+</nav>
+<div class="p-6 border-t border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-accent-light flex items-center justify-center text-primary font-bold text-xs">AD</div>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">Admin User</p>
+<p class="text-[10px] text-slate-400 truncate">admin@2jmc.com</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 ml-[240px] p-8">
+<header class="flex justify-between items-start mb-8">
+<div>
+<nav class="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2">
+<span>Aliados Comerciales</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary">La Romántica 88.9</span>
+</nav>
+<div class="flex items-center gap-4">
+<h2 class="text-3xl font-black text-slate-800 dark:text-slate-100">Detalle de Aliado</h2>
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border border-secondary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                        Activa
+                    </span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+                    Eliminar
+                </button>
+<button class="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-lg">edit</span>
+                    Editar
+                </button>
+</div>
+</header>
+<div class="grid grid-cols-12 gap-8">
+<div class="col-span-8 space-y-8">
+<section class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">info</span>
+<h3 class="text-lg font-bold">Información General</h3>
+</div>
+<div class="grid grid-cols-2 gap-y-6 gap-x-12">
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Razón Social</p>
+<p class="text-sm font-semibold">Circuitos Románticos de Venezuela C.A.</p>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nombre Emisora</p>
+<p class="text-sm font-semibold">La Romántica 88.9 FM</p>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">RIF</p>
+<p class="text-sm font-semibold">J-30492834-1</p>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Frecuencia</p>
+<span class="inline-block mt-1 px-3 py-0.5 bg-primary/10 text-primary text-xs font-bold rounded-lg border border-primary/20">88.9 MHz</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Categoría</p>
+<p class="text-sm font-semibold">Música Romántica / Adulto Contemporáneo</p>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Dirección</p>
+<p class="text-sm font-semibold">Av. Principal de Las Mercedes, Edif. Torre Las Mercedes, Piso 4.</p>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-2 gap-8">
+<section class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">radar</span>
+<h3 class="text-lg font-bold">Cobertura</h3>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 border-2 border-primary/30 text-primary text-xs font-bold rounded-full">Caracas</span>
+<span class="px-3 py-1 border-2 border-primary/30 text-primary text-xs font-bold rounded-full">Los Teques</span>
+<span class="px-3 py-1 border-2 border-primary/30 text-primary text-xs font-bold rounded-full">Guarenas</span>
+<span class="px-3 py-1 border-2 border-primary/30 text-primary text-xs font-bold rounded-full">Guatire</span>
+</div>
+</section>
+<section class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">location_on</span>
+<h3 class="text-lg font-bold">Ubicación</h3>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between border-b border-slate-50 dark:border-slate-800 pb-2">
+<span class="text-xs font-bold text-slate-400 uppercase">Región</span>
+<span class="text-sm font-semibold">Capital</span>
+</div>
+<div class="flex justify-between border-b border-slate-50 dark:border-slate-800 pb-2">
+<span class="text-xs font-bold text-slate-400 uppercase">Estado</span>
+<span class="text-sm font-semibold">Miranda</span>
+</div>
+<div class="flex justify-between">
+<span class="text-xs font-bold text-slate-400 uppercase">Ciudad</span>
+<span class="text-sm font-semibold">Caracas</span>
+</div>
+</div>
+</section>
+</div>
+<section class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">list_alt</span>
+<h3 class="text-lg font-bold">Pautas Asociadas</h3>
+</div>
+<button class="text-primary text-xs font-bold hover:underline">Ver todas</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">
+<th class="pb-3">Nro OT</th>
+<th class="pb-3">Cliente</th>
+<th class="pb-3">Marca</th>
+<th class="pb-3 text-center">Estado</th>
+<th class="pb-3">Progreso</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-50 dark:divide-slate-800">
+<tr class="text-sm">
+<td class="py-4 font-bold text-primary">#OT-4522</td>
+<td class="py-4 font-semibold">PepsiCo Venezuela</td>
+<td class="py-4 font-semibold">Pepsi Black</td>
+<td class="py-4 text-center">
+<span class="bg-blue-100 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Al Aire</span>
+</td>
+<td class="py-4 w-32">
+<div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full" style="width: 65%"></div>
+</div>
+</td>
+</tr>
+<tr class="text-sm">
+<td class="py-4 font-bold text-primary">#OT-4589</td>
+<td class="py-4 font-semibold">Banco Mercantil</td>
+<td class="py-4 font-semibold">Mercantil Móvil</td>
+<td class="py-4 text-center">
+<span class="bg-yellow-100 text-yellow-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Pendiente</span>
+</td>
+<td class="py-4 w-32">
+<div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+<div class="bg-slate-300 h-full" style="width: 10%"></div>
+</div>
+</td>
+</tr>
+<tr class="text-sm">
+<td class="py-4 font-bold text-primary">#OT-4601</td>
+<td class="py-4 font-semibold">Farmatodo</td>
+<td class="py-4 font-semibold">Día de la Madre</td>
+<td class="py-4 text-center">
+<span class="bg-green-100 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Completada</span>
+</td>
+<td class="py-4 w-32">
+<div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-full" style="width: 100%"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<div class="col-span-4 space-y-8">
+<section class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">person</span>
+<h3 class="text-lg font-bold">Contacto Principal</h3>
+</div>
+<div class="text-center mb-6">
+<div class="w-20 h-20 rounded-full bg-primary mx-auto mb-3 flex items-center justify-center border-2 border-primary/20 text-white font-bold text-2xl tracking-tighter">
+                            CM
+                        </div>
+<h4 class="font-bold text-lg">Carlos Mendoza</h4>
+<span class="inline-block mt-1 px-3 py-0.5 bg-accent-light/30 text-primary text-[10px] font-black rounded-lg uppercase tracking-widest border border-primary/10">Decisor</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400 text-lg">mail</span>
+<p class="text-sm font-semibold">c.mendoza@laromantica.com</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400 text-lg">call</span>
+<p class="text-sm font-semibold">+58 (412) 555-0123</p>
+</div>
+<div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl mt-4">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Notas de Contacto</p>
+<p class="text-xs italic text-slate-600 dark:text-slate-400">Prefiere llamadas en la mañana. No usa WhatsApp para pautas oficiales.</p>
+</div>
+</div>
+</section>
+<section class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<h3 class="text-lg font-bold">Estadísticas</h3>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cuñas Transmitidas</p>
+<p class="text-2xl font-black text-slate-800 dark:text-slate-100">4,500</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-3xl">record_voice_over</span>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Clientes Activos</p>
+<p class="text-2xl font-black text-slate-800 dark:text-slate-100">8</p>
+</div>
+<span class="material-symbols-outlined text-primary text-3xl">groups</span>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pautas Activas</p>
+<p class="text-2xl font-black text-slate-800 dark:text-slate-100">5</p>
+</div>
+<span class="material-symbols-outlined text-accent-medium text-3xl">pending_actions</span>
+</div>
+</div>
+</section>
+<section class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">history</span>
+<h3 class="text-lg font-bold">Historial</h3>
+</div>
+<div class="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-800">
+<div class="relative pl-8">
+<span class="absolute left-0 top-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center border-4 border-white dark:border-slate-900 z-10"></span>
+<p class="text-[10px] font-bold text-slate-400 uppercase">Hoy, 10:45 AM</p>
+<p class="text-xs font-semibold mt-1">Se actualizó la tarifa de cuña prime-time.</p>
+</div>
+<div class="relative pl-8">
+<span class="absolute left-0 top-1 w-6 h-6 rounded-full bg-slate-300 flex items-center justify-center border-4 border-white dark:border-slate-900 z-10"></span>
+<p class="text-[10px] font-bold text-slate-400 uppercase">Ayer, 3:20 PM</p>
+<p class="text-xs font-semibold mt-1">Carga masiva de certificados de transmisión.</p>
+</div>
+<div class="relative pl-8">
+<span class="absolute left-0 top-1 w-6 h-6 rounded-full bg-slate-300 flex items-center justify-center border-4 border-white dark:border-slate-900 z-10"></span>
+<p class="text-[10px] font-bold text-slate-400 uppercase">12 May 2024</p>
+<p class="text-xs font-semibold mt-1">Renovación de alianza comercial anual.</p>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vendor My Profile Page - CRM 2JMC</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16B1B8",
+                        "secondary": "#8DC63F",
+                        "accent-light": "#A1DEE5",
+                        "accent-mid": "#55CCD3",
+                        "background-light": "#F5F7FA",
+                        "background-dark": "#112021",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"],
+                        "sans": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Montserrat', sans-serif; }
+        .active-nav { border-left: 4px solid #16B1B8; background-color: rgba(22, 177, 184, 0.05); }
+        .progress-ring-circle { transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex min-h-screen">
+<!-- Sidebar -->
+<aside class="w-[240px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-full z-20">
+<div class="p-6">
+<h1 class="text-primary text-xl font-bold tracking-tight">CRM 2JMC</h1>
+<p class="text-slate-400 text-xs font-medium uppercase tracking-widest mt-1">Vendedor</p>
+</div>
+<nav class="flex-1 px-0 flex flex-col gap-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 active-nav text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">person</span>
+<span class="text-sm font-semibold">Mi Perfil</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">group</span>
+<span class="text-sm font-medium">Equipo de Ventas</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">description</span>
+<span class="text-sm font-medium">Pautas</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">handshake</span>
+<span class="text-sm font-medium">Aliados Comerciales</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">monitoring</span>
+<span class="text-sm font-medium">Actividad Comercial</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">account_tree</span>
+<span class="text-sm font-medium">Pipeline</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">groups</span>
+<span class="text-sm font-medium">Clientes</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">pie_chart</span>
+<span class="text-sm font-medium">Reportes</span>
+</a>
+</nav>
+<div class="p-6 border-t border-slate-100 dark:border-slate-800">
+<button class="flex items-center gap-3 text-slate-500 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-[22px]">logout</span>
+<span class="text-sm font-medium">Cerrar Sesión</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-[240px] p-8 min-h-screen">
+<!-- Header -->
+<header class="flex justify-between items-center mb-8">
+<div>
+<h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Mi Perfil</h2>
+<nav class="flex text-xs text-slate-400 mt-1">
+<span class="hover:text-primary cursor-pointer transition-colors">CRM 2JMC</span>
+<span class="mx-2">/</span>
+<span class="text-slate-600 dark:text-slate-300">Perfil del Vendedor</span>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="text-right">
+<p class="text-sm font-bold text-slate-800 dark:text-slate-100">María González</p>
+<p class="text-xs text-slate-500">Representante de Ventas Senior</p>
+</div>
+<div class="relative">
+<div class="size-12 rounded-full border-2 border-white shadow-sm bg-cover bg-center" data-alt="Portrait of Maria Gonzalez, smiling professional woman" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBwh2HOZvwVT3ZUePCh3bJqW437RaWgKC1B20nVkCd5Whn4pDSx-A3KaVZ2WJLKjXFR5bznQ03skL7Cig9WeMPHWo8r1AprAKr4YmBI84edWUEtw0KBKN7nsSg4GZOhrLDTeU6RUB-31Xm2C_V7WQ7YTUdyEv2-x7StgiMejrbpAQGKPQxgzJRix2vRq0XHVN-byM7zFQwGI4gjtOMj6PCKiVgJg4Xx6yOHQ832B_4CILmXpOOvZ46cN7wYE3V_LLSVfSpfhPfOxqI');"></div>
+<div class="absolute bottom-0 right-0 size-3 bg-secondary rounded-full border-2 border-white"></div>
+</div>
+</div>
+</header>
+<!-- KPI Row -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<!-- Meta Mensual Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<div>
+<p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Meta Mensual</p>
+<h3 class="text-2xl font-bold text-slate-800 dark:text-slate-100">$15,000</h3>
+<p class="text-xs text-primary font-medium mt-1">+73% alcanzado</p>
+</div>
+<div class="relative size-16">
+<svg class="size-full" viewbox="0 0 100 100">
+<circle class="text-slate-100 dark:text-slate-800 stroke-current" cx="50" cy="50" fill="transparent" r="40" stroke-width="8"></circle>
+<circle class="text-primary stroke-current progress-ring-circle" cx="50" cy="50" fill="transparent" r="40" stroke-linecap="round" stroke-width="8" style="stroke-dasharray: 251.2; stroke-dashoffset: 67.8;"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-primary">73%</div>
+</div>
+</div>
+<!-- Pautas del Mes Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-4">
+<div class="size-10 rounded-lg bg-accent-light/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">assignment</span>
+</div>
+<div>
+<p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pautas del Mes</p>
+<h3 class="text-2xl font-bold text-slate-800 dark:text-slate-100">8</h3>
+</div>
+</div>
+</div>
+<!-- Visitas Totales Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-4">
+<div class="size-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<div>
+<p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Visitas Totales</p>
+<h3 class="text-2xl font-bold text-slate-800 dark:text-slate-100">24</h3>
+</div>
+</div>
+</div>
+<!-- Gastos del Mes Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-4">
+<div class="size-10 rounded-lg bg-red-50 flex items-center justify-center text-red-400">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Gastos del Mes</p>
+<h3 class="text-2xl font-bold text-slate-800 dark:text-slate-100">$890</h3>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Section -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Data Table (Wider) -->
+<div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+<div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+<h3 class="font-bold text-slate-800 dark:text-slate-100">Mi Cartera de Clientes</h3>
+<button class="text-primary text-sm font-semibold hover:underline">Ver todos</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-slate-50 dark:bg-slate-800/50">
+<tr>
+<th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Empresa</th>
+<th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Contacto principal</th>
+<th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Última Interacción</th>
+<th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Estado</th>
+<th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Acción</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-400 text-xs">AP</div>
+<span class="text-sm font-semibold text-slate-800 dark:text-slate-100">Alimentos Polar</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Juan Pérez</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">25 Oct, 2023</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-secondary/10 text-secondary">Activo</span>
+</td>
+<td class="px-6 py-4">
+<a class="text-primary text-xs font-bold hover:text-accent-mid transition-colors" href="#">Ver Detalle</a>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-400 text-xs">FT</div>
+<span class="text-sm font-semibold text-slate-800 dark:text-slate-100">Farmatodo</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Elena Rivas</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">24 Oct, 2023</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-secondary/10 text-secondary">Activo</span>
+</td>
+<td class="px-6 py-4">
+<a class="text-primary text-xs font-bold hover:text-accent-mid transition-colors" href="#">Ver Detalle</a>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-400 text-xs">TY</div>
+<span class="text-sm font-semibold text-slate-800 dark:text-slate-100">Toyota</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Carlos Sosa</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">22 Oct, 2023</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-400">Inactivo</span>
+</td>
+<td class="px-6 py-4">
+<a class="text-primary text-xs font-bold hover:text-accent-mid transition-colors" href="#">Ver Detalle</a>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-400 text-xs">NT</div>
+<span class="text-sm font-semibold text-slate-800 dark:text-slate-100">Nestlé</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Ana Martínez</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">20 Oct, 2023</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-secondary/10 text-secondary">Activo</span>
+</td>
+<td class="px-6 py-4">
+<a class="text-primary text-xs font-bold hover:text-accent-mid transition-colors" href="#">Ver Detalle</a>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-400 text-xs">BN</div>
+<span class="text-sm font-semibold text-slate-800 dark:text-slate-100">Banesco</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Luis Blanco</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">18 Oct, 2023</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-400">Inactivo</span>
+</td>
+<td class="px-6 py-4">
+<a class="text-primary text-xs font-bold hover:text-accent-mid transition-colors" href="#">Ver Detalle</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Recent Activity (Narrower) -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+<div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800">
+<h3 class="font-bold text-slate-800 dark:text-slate-100">Actividad Reciente</h3>
+</div>
+<div class="p-6">
+<ul class="space-y-6 relative before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-800">
+<!-- Activity Item 1 -->
+<li class="relative pl-8">
+<span class="absolute left-0 top-0 size-6 bg-white dark:bg-slate-900 border-2 border-primary rounded-full flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[14px] text-primary">visibility</span>
+</span>
+<div>
+<p class="text-sm font-semibold text-slate-800 dark:text-slate-100">Visita a Alimentos Polar</p>
+<p class="text-xs text-slate-500 mt-0.5">Hoy, 10:30 AM</p>
+</div>
+</li>
+<!-- Activity Item 2 -->
+<li class="relative pl-8">
+<span class="absolute left-0 top-0 size-6 bg-white dark:bg-slate-900 border-2 border-primary rounded-full flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[14px] text-primary">receipt_long</span>
+</span>
+<div>
+<p class="text-sm font-semibold text-slate-800 dark:text-slate-100">Gasto registrado: Almuerzo cliente</p>
+<p class="text-xs text-slate-500 mt-0.5">Hoy, 02:15 PM</p>
+</div>
+</li>
+<!-- Activity Item 3 -->
+<li class="relative pl-8">
+<span class="absolute left-0 top-0 size-6 bg-white dark:bg-slate-900 border-2 border-primary rounded-full flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[14px] text-primary">call</span>
+</span>
+<div>
+<p class="text-sm font-semibold text-slate-800 dark:text-slate-100">Llamada: Farmatodo</p>
+<p class="text-xs text-slate-500 mt-0.5">Ayer, 11:20 AM</p>
+</div>
+</li>
+<!-- Activity Item 4 -->
+<li class="relative pl-8">
+<span class="absolute left-0 top-0 size-6 bg-white dark:bg-slate-900 border-2 border-primary rounded-full flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[14px] text-primary">edit_note</span>
+</span>
+<div>
+<p class="text-sm font-semibold text-slate-800 dark:text-slate-100">Pauta actualizada: Nestlé</p>
+<p class="text-xs text-slate-500 mt-0.5">25 Oct, 2023</p>
+</div>
+</li>
+<!-- Activity Item 5 -->
+<li class="relative pl-8">
+<span class="absolute left-0 top-0 size-6 bg-white dark:bg-slate-900 border-2 border-primary rounded-full flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+</span>
+<div>
+<p class="text-sm font-semibold text-slate-800 dark:text-slate-100">Cierre de negocio: Toyota</p>
+<p class="text-xs text-slate-500 mt-0.5">24 Oct, 2023</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CRM Campaigns List View - 2JMC Medios</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16B1B8",
+                        "accent-green": "#8DC63F",
+                        "soft-teal": "#A1DEE5",
+                        "mid-teal": "#55CCD3",
+                        "background-light": "#F5F7FA",
+                        "background-dark": "#102122",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"],
+                        "sans": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #F5F7FA;
+        }
+        .sidebar-item-active {
+            border-left: 4px solid #16B1B8;
+            background-color: rgba(22, 177, 184, 0.05);
+            color: #16B1B8;
+        }
+    </style>
+</head>
+<body class="font-display text-slate-900 bg-background-light">
+<div class="flex min-h-screen">
+<!-- LEFT SIDEBAR -->
+<aside class="w-[240px] bg-white border-r border-slate-200 flex flex-col fixed h-full z-20">
+<div class="p-6">
+<h1 class="text-primary font-bold text-xl tracking-tight">CRM 2JMC</h1>
+</div>
+<nav class="flex-1 px-0 py-4 space-y-1">
+<a class="flex items-center px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">person</span>
+<span class="text-sm font-medium">Mi Perfil</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="text-sm font-medium">Equipo de Ventas</span>
+</a>
+<a class="flex items-center px-6 py-3 sidebar-item-active gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">description</span>
+<span class="text-sm font-semibold">Pautas</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">handshake</span>
+<span class="text-sm font-medium">Aliados Comerciales</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">trending_up</span>
+<span class="text-sm font-medium">Actividad Comercial</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">account_tree</span>
+<span class="text-sm font-medium">Pipeline</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">groups</span>
+<span class="text-sm font-medium">Clientes</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">bar_chart</span>
+<span class="text-sm font-medium">Reportes</span>
+</a>
+</nav>
+<div class="p-6 border-t border-slate-100">
+<a class="flex items-center text-slate-500 hover:text-red-500 transition-colors gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span class="text-sm font-medium">Cerrar Sesión</span>
+</a>
+</div>
+</aside>
+<!-- MAIN CONTENT -->
+<main class="flex-1 ml-[240px] p-8 max-w-[1200px] mx-auto w-full">
+<!-- Header -->
+<header class="flex justify-between items-center mb-8">
+<h2 class="text-2xl font-bold text-slate-800">Pautas</h2>
+<div class="flex items-center gap-3">
+<button class="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-semibold transition-all shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                        Agregar Pauta
+                    </button>
+<button class="bg-white border border-slate-200 text-slate-600 p-2.5 rounded-lg hover:bg-slate-50 transition-colors" title="Exportar PDF">
+<span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+</button>
+<button class="bg-white border border-slate-200 text-slate-600 p-2.5 rounded-lg hover:bg-slate-50 transition-colors" title="Exportar Excel">
+<span class="material-symbols-outlined text-[20px]">table_view</span>
+</button>
+</div>
+</header>
+<!-- KPI Cards -->
+<div class="grid grid-cols-4 gap-6 mb-8">
+<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+<p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-2">Pautas Activas</p>
+<p class="text-3xl font-bold text-slate-800">24</p>
+<p class="text-xs text-slate-400 mt-2">Mes actual</p>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent-green">
+<p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-2">En Transmisión</p>
+<p class="text-3xl font-bold text-slate-800">18</p>
+<div class="flex items-center gap-1 mt-2">
+<span class="material-symbols-outlined text-accent-green text-sm">trending_up</span>
+<span class="text-xs text-accent-green font-medium">75% del total</span>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+<p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-2">Cuñas Transmitidas</p>
+<p class="text-3xl font-bold text-slate-800">1,250</p>
+<p class="text-xs text-slate-400 mt-2">Acumulado mensual</p>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+<p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-2">Monto Total OC</p>
+<p class="text-3xl font-bold text-slate-800">$89,400</p>
+<p class="text-xs text-primary font-medium mt-2">8 órdenes pendientes</p>
+</div>
+</div>
+<!-- View Toggle & Filter Bar -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 mb-6 overflow-hidden">
+<div class="flex border-b border-slate-100">
+<button class="px-8 py-4 text-sm font-semibold border-b-2 border-primary text-primary bg-primary/5 transition-colors">Lista</button>
+<button class="px-8 py-4 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-colors">Kanban</button>
+<button class="px-8 py-4 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-colors">Calendario</button>
+</div>
+<div class="p-4 flex flex-wrap gap-4 items-center bg-slate-50/50">
+<div class="relative flex-1 min-w-[240px]">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="Buscar por cliente, marca u OT..." type="text"/>
+</div>
+<select class="bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none min-w-[140px]">
+<option>Estado</option>
+<option>En transmisión</option>
+<option>Programada</option>
+<option>Suspendida</option>
+<option>Finalizada</option>
+</select>
+<select class="bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none min-w-[140px]">
+<option>Cliente</option>
+<option>Alimentos Polar</option>
+<option>Farmatodo</option>
+<option>Empresas PMC</option>
+</select>
+<select class="bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none min-w-[140px]">
+<option>Región</option>
+<option>Gran Caracas</option>
+<option>Occidente</option>
+<option>Oriente</option>
+<option>Centro</option>
+</select>
+<button class="flex items-center gap-2 text-slate-500 text-sm font-medium hover:text-primary transition-colors px-2">
+<span class="material-symbols-outlined text-[20px]">filter_alt</span>
+                        Más filtros
+                    </button>
+</div>
+<!-- Data Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-widest font-bold">
+<th class="px-6 py-4">Nro OT</th>
+<th class="px-6 py-4">Cliente</th>
+<th class="px-6 py-4">Marca</th>
+<th class="px-6 py-4">Emisoras</th>
+<th class="px-6 py-4">Vigencia</th>
+<th class="px-6 py-4">Estado</th>
+<th class="px-6 py-4">Progreso</th>
+<th class="px-6 py-4 text-right">Monto OC</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-slate-500">OT-2024-042</td>
+<td class="px-6 py-4">
+<span class="text-sm font-semibold text-slate-800">Alimentos Polar</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm text-slate-600">Harina PAN</span>
+</td>
+<td class="px-6 py-4">
+<span class="bg-soft-teal/30 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full">12 Emisoras</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-xs text-slate-800">01/05/2024</span>
+<span class="text-[10px] text-slate-400">31/05/2024</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 bg-accent-green/10 text-accent-green px-3 py-1 rounded-full text-[10px] font-bold">
+<span class="size-1.5 rounded-full bg-accent-green"></span>
+                                        EN TRANSMISIÓN
+                                    </span>
+</td>
+<td class="px-6 py-4 w-[140px]">
+<div class="flex flex-col gap-1.5">
+<div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 65%"></div>
+</div>
+<span class="text-[10px] text-slate-400 font-medium">455 / 700 cuñas</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="text-sm font-bold text-slate-800">$12,450.00</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-slate-500">OT-2024-048</td>
+<td class="px-6 py-4">
+<span class="text-sm font-semibold text-slate-800">Farmatodo</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm text-slate-600">Jornada de Salud</span>
+</td>
+<td class="px-6 py-4">
+<span class="bg-soft-teal/30 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full">8 Emisoras</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-xs text-slate-800">15/05/2024</span>
+<span class="text-[10px] text-slate-400">30/05/2024</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-[10px] font-bold">
+<span class="size-1.5 rounded-full bg-amber-600"></span>
+                                        PROGRAMADA
+                                    </span>
+</td>
+<td class="px-6 py-4 w-[140px]">
+<div class="flex flex-col gap-1.5">
+<div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 0%"></div>
+</div>
+<span class="text-[10px] text-slate-400 font-medium">0 / 320 cuñas</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="text-sm font-bold text-slate-800">$4,800.00</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-slate-500">OT-2024-035</td>
+<td class="px-6 py-4">
+<span class="text-sm font-semibold text-slate-800">Empresas PMC</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm text-slate-600">Lanzamiento Corporativo</span>
+</td>
+<td class="px-6 py-4">
+<span class="bg-soft-teal/30 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full">5 Emisoras</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-xs text-slate-800">01/04/2024</span>
+<span class="text-[10px] text-slate-400">30/04/2024</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[10px] font-bold">
+<span class="size-1.5 rounded-full bg-slate-400"></span>
+                                        FINALIZADA
+                                    </span>
+</td>
+<td class="px-6 py-4 w-[140px]">
+<div class="flex flex-col gap-1.5">
+<div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-slate-400" style="width: 100%"></div>
+</div>
+<span class="text-[10px] text-slate-400 font-medium">200 / 200 cuñas</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="text-sm font-bold text-slate-800">$8,900.00</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-slate-500">OT-2024-045</td>
+<td class="px-6 py-4">
+<span class="text-sm font-semibold text-slate-800">Banesco</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm text-slate-600">Puntos de Venta</span>
+</td>
+<td class="px-6 py-4">
+<span class="bg-soft-teal/30 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full">15 Emisoras</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-xs text-slate-800">20/05/2024</span>
+<span class="text-[10px] text-slate-400">20/06/2024</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 bg-red-50 text-red-500 px-3 py-1 rounded-full text-[10px] font-bold">
+<span class="size-1.5 rounded-full bg-red-500"></span>
+                                        SUSPENDIDA
+                                    </span>
+</td>
+<td class="px-6 py-4 w-[140px]">
+<div class="flex flex-col gap-1.5">
+<div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-red-400" style="width: 12%"></div>
+</div>
+<span class="text-[10px] text-slate-400 font-medium">54 / 450 cuñas</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="text-sm font-bold text-slate-800">$18,200.00</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/30">
+<p class="text-xs text-slate-500 font-medium">Mostrando 1 a 4 de 24 pautas</p>
+<div class="flex gap-2">
+<button class="size-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-white hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded-lg bg-primary text-white text-xs font-bold shadow-sm">1</button>
+<button class="size-8 flex items-center justify-center rounded-lg border border-transparent text-slate-500 hover:bg-white text-xs font-bold transition-all">2</button>
+<button class="size-8 flex items-center justify-center rounded-lg border border-transparent text-slate-500 hover:bg-white text-xs font-bold transition-all">3</button>
+<button class="size-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-white hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

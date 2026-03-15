@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hierarchical CRM Client Registration Form</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary: #16B1B8;
+            --secondary-light: #A1DEE5;
+            --accent: #8DC63F;
+            --teal-mid: #55CCD3;
+            --bg-light: #F5F7FA;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, label, .montserrat { font-family: 'Montserrat', sans-serif; }
+        .active-nav {
+            border-left: 4px solid var(--primary);
+            background-color: rgba(22, 177, 184, 0.05);
+            color: var(--primary);
+        }
+        .input-focus {
+            @apply focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-all;
+        }
+        .form-section-title {
+            @apply flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800;
+        }
+        .mini-card {
+            @apply p-4 bg-slate-50 border border-slate-200 rounded-lg relative hover:border-[var(--teal-mid)] transition-colors;
+        }
+        .chip {
+            @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+        }
+        .info-callout {
+            background-color: var(--secondary-light);
+            @apply p-4 rounded-lg flex items-center gap-3 text-slate-800 text-sm font-medium mt-4;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16B1B8",
+                        "secondary-light": "#A1DEE5",
+                        "accent": "#8DC63F",
+                        "teal-mid": "#55CCD3",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#F5F7FA] text-slate-900 min-h-screen flex">
+<aside class="w-[240px] bg-white border-r border-slate-200 flex flex-col fixed h-full z-20">
+<div class="p-6">
+<h1 class="text-xl font-bold text-primary tracking-tight">CRM 2JMC</h1>
+</div>
+<nav class="flex-1 px-0 mt-4">
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">person</span>
+<span class="text-sm font-medium">Mi Perfil</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">group</span>
+<span class="text-sm font-medium">Equipo de Ventas</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">description</span>
+<span class="text-sm font-medium">Pautas</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">handshake</span>
+<span class="text-sm font-medium">Aliados Comerciales</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">monitoring</span>
+<span class="text-sm font-medium">Actividad Comercial</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">account_tree</span>
+<span class="text-sm font-medium">Pipeline</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 active-nav transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">groups</span>
+<span class="text-sm font-semibold">Clientes</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">bar_chart</span>
+<span class="text-sm font-medium">Reportes</span>
+</a>
+</div>
+</nav>
+<div class="p-6 border-t border-slate-100">
+<button class="flex items-center gap-3 text-slate-500 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-[22px]">logout</span>
+<span class="text-sm font-medium">Cerrar Sesión</span>
+</button>
+</div>
+</aside>
+<main class="flex-1 ml-[240px] p-8 max-w-[1200px] mx-auto">
+<header class="flex justify-between items-center mb-8">
+<div>
+<nav class="flex text-[10px] font-bold text-slate-400 mb-1 gap-2 uppercase tracking-[0.1em]">
+<a class="hover:text-primary transition-colors" href="#">Clientes</a>
+<span>/</span>
+<span class="text-slate-600">Agregar Cliente</span>
+</nav>
+<h2 class="text-3xl font-bold text-slate-900 tracking-tight">Agregar Cliente</h2>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-all">
+                    Cancelar
+                </button>
+<button class="px-8 py-2.5 rounded-lg bg-gradient-to-r from-primary to-teal-mid text-white font-semibold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all">
+                    Guardar
+                </button>
+</div>
+</header>
+<form class="space-y-8">
+<section class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+<div class="form-section-title">
+<span class="material-symbols-outlined text-primary">link</span>
+<h3 class="text-lg font-bold">Vinculación</h3>
+</div>
+<div class="space-y-6">
+<div class="flex flex-col gap-3">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">¿Es una sub-empresa de una empresa existente?</label>
+<div class="flex gap-6">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input checked="" class="w-4 h-4 text-primary border-slate-300 focus:ring-primary" name="is_subcompany" type="radio" value="no"/>
+<span class="text-sm font-medium text-slate-700 group-hover:text-primary transition-colors">No</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="w-4 h-4 text-primary border-slate-300 focus:ring-primary" name="is_subcompany" type="radio" value="si"/>
+<span class="text-sm font-medium text-slate-700 group-hover:text-primary transition-colors">Sí</span>
+</label>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Seleccionar Empresa Padre <span class="text-red-500">*</span></label>
+<div class="relative">
+<select class="w-full rounded-lg border-slate-200 text-sm p-3 pr-10 input-focus appearance-none">
+<option value="">Buscar empresa...</option>
+<option value="1">Corporación Ejemplo, S.A.</option>
+<option value="2">Inversiones Globales 2024</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3 text-slate-400 pointer-events-none">search</span>
+</div>
+</div>
+<div class="mini-card bg-slate-50 border-dashed border-slate-300 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">verified</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Empresa Seleccionada</p>
+<p class="text-sm font-bold text-slate-800">Corporación Ejemplo, S.A.</p>
+<p class="text-xs text-slate-500 font-medium">RIF: J-40291834-5</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+<div class="form-section-title">
+<span class="material-symbols-outlined text-primary">corporate_fare</span>
+<h3 class="text-lg font-bold">Datos de la Empresa (Padre)</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tipo <span class="text-red-500">*</span></label>
+<select class="rounded-lg border-slate-200 text-sm p-3 input-focus">
+<option value="empresa">Empresa</option>
+<option value="sub-empresa">Sub Empresa</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nombre <span class="text-red-500">*</span></label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" placeholder="Nombre Comercial" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Razón Social <span class="text-red-500">*</span></label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" placeholder="Nombre Legal Completo" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">RIF Fiscal <span class="text-red-500">*</span></label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" placeholder="J-00000000-0" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5 md:col-span-2">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Dirección <span class="text-red-500">*</span></label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" placeholder="Dirección completa del cliente" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Clasificación <span class="text-red-500">*</span></label>
+<select class="rounded-lg border-slate-200 text-sm p-3 input-focus">
+<option value="directo">Cliente Directo</option>
+<option value="agencia">Agencia</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nombre de Agencia</label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus bg-slate-50" placeholder="Solo si clasificación es Agencia" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sector <span class="text-red-500">*</span></label>
+<select class="rounded-lg border-slate-200 text-sm p-3 input-focus">
+<option value="">Seleccione sector</option>
+<option value="salud">Salud</option>
+<option value="alimentacion">Alimentación</option>
+<option value="telematica">Telemática</option>
+<option value="fabricacion">Fabricación</option>
+<option value="bancario">Bancario</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Estado <span class="text-red-500">*</span></label>
+<select class="rounded-lg border-slate-200 text-sm p-3 input-focus">
+<option value="activo">Activo</option>
+<option value="inactivo">Inactivo</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5 md:col-span-2">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Observaciones</label>
+<textarea class="rounded-lg border-slate-200 text-sm p-3 input-focus" placeholder="Comentarios generales sobre la empresa..." rows="3"></textarea>
+</div>
+</div>
+</section>
+<section class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+<div class="form-section-title">
+<span class="material-symbols-outlined text-accent">account_tree</span>
+<h3 class="text-lg font-bold">Estructura Corporativa</h3>
+</div>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between items-center mb-4">
+<h4 class="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-lg">domain_add</span>
+                                Sub-Empresas
+                            </h4>
+<button class="text-xs font-bold text-primary flex items-center gap-1 hover:underline" type="button">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                                Agregar Sub-Empresa
+                            </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="mini-card group">
+<button class="absolute top-2 right-2 text-slate-400 hover:text-red-500" type="button">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+<p class="text-sm font-bold text-slate-800">Sede Regional Norte</p>
+<p class="text-xs text-slate-500">Razón: Inversiones Norte C.A.</p>
+<p class="text-xs text-slate-500 mt-1 italic">RIF: J-29384812-1</p>
+</div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-4">
+<div>
+<h4 class="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-lg">sell</span>
+                                    GESTIÓN DE MARCAS<span class="text-red-500">*</span>
+</h4>
+<p class="text-xs text-slate-400 font-medium">(mínimo 1 marca requerida)</p>
+</div>
+<button class="text-xs font-bold text-primary flex items-center gap-1 hover:underline" type="button">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                                Agregar Marca
+                            </button>
+</div>
+<div class="flex flex-wrap gap-2 p-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg min-h-[60px]">
+<div class="chip bg-secondary-light/30 text-primary border border-primary/20 gap-2">
+<span>MARCA_INTER_1</span>
+<button class="hover:text-red-600"><span class="material-symbols-outlined text-xs">close</span></button>
+</div>
+<div class="chip bg-secondary-light/30 text-primary border border-primary/20 gap-2">
+<span>MARCA_INTER_2</span>
+<button class="hover:text-red-600"><span class="material-symbols-outlined text-xs">close</span></button>
+</div>
+</div>
+<div class="info-callout">
+<span class="material-symbols-outlined text-primary">info</span>
+<span>Nota: Toda empresa (padre o sub-empresa) debe tener al menos una marca asociada.</span>
+</div>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<section class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+<div class="form-section-title">
+<span class="material-symbols-outlined text-teal-mid">person_add</span>
+<h3 class="text-lg font-bold">Contacto Principal</h3>
+</div>
+<div class="space-y-4">
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Nombre <span class="text-red-500">*</span></label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Segundo Nombre</label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" type="text"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Apellido <span class="text-red-500">*</span></label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Departamento <span class="text-red-500">*</span></label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" placeholder="Mercadeo" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rol <span class="text-red-500">*</span></label>
+<select class="rounded-lg border-slate-200 text-sm p-3 input-focus">
+<option value="decisor">Decisor</option>
+<option value="operativo">Operativo</option>
+<option value="facturacion">Facturación</option>
+<option value="otro">Otro</option>
+</select>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Correo <span class="text-red-500">*</span></label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" placeholder="email@dominio.com" type="email"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tipo</label>
+<div class="chip bg-slate-100 text-slate-600 border border-slate-200 w-fit">Cliente</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fecha de Nacimiento</label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" type="date"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Anotaciones Especiales</label>
+<textarea class="rounded-lg border-slate-200 text-sm p-3 input-focus" placeholder="Preferencias de contacto..." rows="2"></textarea>
+</div>
+</div>
+</section>
+<div class="space-y-8">
+<section class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+<div class="form-section-title">
+<span class="material-symbols-outlined text-primary">call</span>
+<h3 class="text-lg font-bold">Teléfonos</h3>
+</div>
+<div class="space-y-4">
+<div class="flex gap-3 items-end">
+<div class="w-24 flex flex-col gap-1.5">
+<label class="text-[10px] font-bold text-slate-500 uppercase">Cód. Área <span class="text-red-500">*</span></label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" placeholder="0212" type="text"/>
+</div>
+<div class="flex-1 flex flex-col gap-1.5">
+<label class="text-[10px] font-bold text-slate-500 uppercase">Número <span class="text-red-500">*</span></label>
+<input class="rounded-lg border-slate-200 text-sm p-3 input-focus" placeholder="000 0000" type="text"/>
+</div>
+<button class="bg-slate-50 border border-slate-200 p-3 rounded-lg hover:bg-slate-100 text-primary" type="button">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<button class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-xs font-bold text-slate-500 hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-2 mt-4" type="button">
+<span class="material-symbols-outlined text-lg">add_call</span>
+                                Agregar Teléfono
+                            </button>
+</div>
+</section>
+<section class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+<div class="form-section-title">
+<span class="material-symbols-outlined text-accent">assignment_ind</span>
+<h3 class="text-lg font-bold">Asignación</h3>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Vendedor Asignado <span class="text-red-500">*</span></label>
+<select class="rounded-lg border-slate-200 text-sm p-3 input-focus">
+<option value="">Seleccione un vendedor</option>
+<option value="1">Alejandro Pérez</option>
+<option value="2">Mariana Gómez</option>
+<option value="3">Roberto Silva</option>
+</select>
+<p class="text-[10px] text-slate-400 mt-1 italic">El cliente será visible en el pipeline de este usuario.</p>
+</div>
+</section>
+</div>
+</div>
+<div class="flex justify-end gap-4 py-8">
+<button class="px-8 py-3 rounded-lg border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all" type="button">
+                    Cancelar Cambios
+                </button>
+<button class="px-12 py-3 rounded-lg bg-gradient-to-r from-primary to-teal-mid text-white font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all" type="submit">
+                    Guardar Cliente
+                </button>
+</div>
+</form>
+</main>
+
+</body></html>
