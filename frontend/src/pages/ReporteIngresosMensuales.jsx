@@ -2,6 +2,7 @@
 // ReporteIngresosMensuales.jsx — Total Ingresos por Pautas Mensual
 // ==============================================
 import { Link } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 const MESES = [
   { label: 'ENE', monto: 95000, h: 80 },
@@ -46,10 +47,10 @@ export default function ReporteIngresosMensuales() {
             <option>2025</option>
             <option>2024</option>
           </select>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
             <span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF
           </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
             <span className="material-symbols-outlined text-lg">table_view</span>Excel
           </button>
         </div>
@@ -57,21 +58,21 @@ export default function ReporteIngresosMensuales() {
 
       {/* KPI */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
           <div>
             <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Ingreso Acumulado Año</p>
             <h3 className="text-3xl font-bold text-slate-900">$1,450,000</h3>
           </div>
           <div className="p-2 bg-primary/10 rounded-lg"><span className="material-symbols-outlined text-primary">payments</span></div>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
           <div>
             <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Promedio Mensual</p>
             <h3 className="text-3xl font-bold text-slate-900">$120,833</h3>
           </div>
           <div className="p-2 bg-accent-green/10 rounded-lg"><span className="material-symbols-outlined text-accent-green">trending_up</span></div>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
           <div>
             <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Mes con Mayor Ingreso</p>
             <h3 className="text-3xl font-bold text-slate-900">Marzo</h3>
@@ -82,20 +83,29 @@ export default function ReporteIngresosMensuales() {
       </div>
 
       {/* BAR CHART */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Evolución de Ingresos Mensuales</h3>
-        <div className="flex items-end justify-between gap-2 px-4" style={{ height: '200px' }}>
-          {MESES.map(({ h, label }) => (
-            <div key={label} className="flex flex-col items-center justify-end gap-2 group flex-1 h-full">
-              <div className="w-8 bg-gradient-to-t from-primary to-secondary rounded-t-md group-hover:opacity-80 transition-opacity" style={{ height: `${h}px` }}></div>
-              <span className="text-[10px] font-bold text-slate-400">{label}</span>
-            </div>
-          ))}
+        <div style={{ width: '100%', height: 280 }}>
+          <ResponsiveContainer>
+            <BarChart data={MESES} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+              <defs>
+                <linearGradient id="barGradient" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%" stopColor="#16B1B8" />
+                  <stop offset="100%" stopColor="#8DC63F" />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} stroke="#f1f5f9" />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 700 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#6B7280', fontWeight: 600 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+              <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }} formatter={(value) => [`$${value.toLocaleString()}`, 'Ingreso']} cursor={{ fill: '#f1f5f9' }} />
+              <Bar dataKey="monto" fill="url(#barGradient)" radius={[6, 6, 0, 0]} barSize={24} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </section>
 
       {/* TABLE */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100">
           <h3 className="text-lg font-bold font-display text-slate-900">Desglose Mensual</h3>
         </div>

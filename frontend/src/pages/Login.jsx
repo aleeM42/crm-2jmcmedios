@@ -17,7 +17,7 @@ export default function Login() {
         </div>
         <div className="relative z-10 text-center text-white px-12">
           <div className="mb-8 flex justify-center">
-            <div className="p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 shadow-2xl">
+            <div className="p-6 bg-[#F4FAFB]/10 backdrop-blur-md rounded-3xl border border-white/20 shadow-2xl">
               <img
                 src="/Vortice.png"
                 alt="2JMC Medios"
@@ -29,11 +29,11 @@ export default function Login() {
           <p className="text-white/80 text-lg font-light max-w-md mx-auto">Gestión inteligente de medios y comunicación para la era digital.</p>
         </div>
         {/* Decorative Elements */}
-        <div className="absolute top-10 left-10 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-10 left-10 w-32 h-32 bg-[#F4FAFB]/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-64 h-64 bg-[#F4FAFB]/10 rounded-full blur-3xl"></div>
       </div>
       {/* Right Side: Login Form */}
-      <div className="w-full lg:w-1/2 bg-white flex flex-col items-center justify-center p-8 lg:p-24">
+      <div className="w-full lg:w-1/2 bg-[#F4FAFB] flex flex-col items-center justify-center p-8 lg:p-24">
         <div className="w-full max-w-md">
           {/* Mobile Logo (shown only on small screens) */}
           <div className="lg:hidden flex items-center justify-center gap-3 mb-12">
@@ -60,9 +60,6 @@ export default function Login() {
               </div>
               <div className="relative">
                 <input className="w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display" placeholder="••••••••••••" type="password" />
-                <button className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors" type="button">
-                  <span className="material-symbols-outlined text-xl">visibility</span>
-                </button>
               </div>
             </div>
             {/* Remember Me */}

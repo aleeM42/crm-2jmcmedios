@@ -2,6 +2,7 @@
 // ReporteEmisorasActivasRegion.jsx — Emisoras Activas por Región
 // ==============================================
 import { Link } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const REGIONES = [
   { nombre: 'Capital', activas: 10, inactivas: 2, total: 12, pct: 83 },
@@ -29,38 +30,31 @@ export default function ReporteEmisorasActivasRegion() {
           <p className="text-slate-500 text-sm mt-1">Estado operativo de emisoras aliadas por zona geográfica</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
         </div>
       </header>
 
       {/* STACKED BAR CHART */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
-        <h3 className="text-lg font-bold font-display text-slate-900 mb-2">Activas vs. Inactivas</h3>
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-primary"></div><span className="text-xs text-slate-500">Activas</span></div>
-          <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-slate-200"></div><span className="text-xs text-slate-500">Inactivas</span></div>
-        </div>
-        <div className="space-y-4">
-          {REGIONES.map((r) => (
-            <div key={r.nombre} className="flex items-center gap-4">
-              <span className="text-sm font-semibold text-slate-900 w-28 truncate">{r.nombre}</span>
-              <div className="flex-1 h-8 bg-slate-50 rounded-lg overflow-hidden flex">
-                <div className="h-full bg-primary rounded-l-lg flex items-center justify-center" style={{ width: `${(r.activas / MAX_TOTAL) * 100}%` }}>
-                  <span className="text-[10px] font-bold text-white">{r.activas}</span>
-                </div>
-                <div className="h-full bg-slate-200 flex items-center justify-center" style={{ width: `${(r.inactivas / MAX_TOTAL) * 100}%` }}>
-                  <span className="text-[10px] font-bold text-slate-500">{r.inactivas}</span>
-                </div>
-              </div>
-              <span className="text-xs font-bold text-accent-green w-10 text-right">{r.pct}%</span>
-            </div>
-          ))}
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+        <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Activas vs. Inactivas</h3>
+        <div style={{ width: '100%', height: 320 }}>
+          <ResponsiveContainer>
+            <BarChart data={REGIONES} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+              <CartesianGrid vertical={false} stroke="#f1f5f9" />
+              <XAxis dataKey="nombre" tick={{ fontSize: 12, fill: '#1F2937', fontWeight: 600 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#6B7280', fontWeight: 600 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }} cursor={{ fill: '#f8fafc' }} />
+              <Legend wrapperStyle={{ fontSize: '12px', fontWeight: 700 }} />
+              <Bar dataKey="activas" name="Activas" stackId="a" fill="#16B1B8" radius={[0, 0, 0, 0]} barSize={28} />
+              <Bar dataKey="inactivas" name="Inactivas" stackId="a" fill="#e2e8f0" radius={[6, 6, 0, 0]} barSize={28} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </section>
 
       {/* TABLE */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100"><h3 className="text-lg font-bold font-display text-slate-900">Detalle por Región</h3></div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">

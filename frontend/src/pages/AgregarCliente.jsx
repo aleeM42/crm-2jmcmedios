@@ -64,7 +64,7 @@ export default function AgregarCliente() {
 
   return (
     <>
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <nav className="flex text-[10px] font-bold text-slate-400 mb-1 gap-2 uppercase tracking-[0.1em]">
             <Link to="/clientes" className="hover:text-primary transition-colors">Clientes</Link>
@@ -73,15 +73,15 @@ export default function AgregarCliente() {
           </nav>
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-display">Agregar Cliente</h2>
         </div>
-        <div className="flex gap-4">
-          <Link to="/clientes" className="px-6 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-all">Cancelar</Link>
-          <button className="px-8 py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-semibold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all">Guardar</button>
+        <div className="flex gap-4 w-full sm:w-auto">
+          <Link to="/clientes" className="flex-1 sm:flex-initial text-center px-6 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-all">Cancelar</Link>
+          <button className="flex-1 sm:flex-initial px-8 py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-semibold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all">Guardar</button>
         </div>
       </header>
 
       <form className="space-y-8">
         {/* ═══ Vinculación ═══ */}
-        <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+        <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
           <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
             <span className="material-symbols-outlined text-primary">link</span>
             <h3 className="text-lg font-bold font-display">Vinculación</h3>
@@ -127,7 +127,7 @@ export default function AgregarCliente() {
         </section>
 
         {/* ═══ Datos de la Empresa — CLIENTE entity ═══ */}
-        <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+        <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
           <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
             <span className="material-symbols-outlined text-primary">corporate_fare</span>
             <h3 className="text-lg font-bold font-display">Datos de la Empresa</h3>
@@ -204,7 +204,7 @@ export default function AgregarCliente() {
         </section>
 
         {/* ═══ Estructura Corporativa — MARCA_INTER entity ═══ */}
-        <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+        <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
           <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
             <span className="material-symbols-outlined text-accent-green">account_tree</span>
             <h3 className="text-lg font-bold font-display">Gestión de Marcas</h3>
@@ -244,13 +244,18 @@ export default function AgregarCliente() {
         {/* ═══ Contacto Principal + Teléfonos + Asignación ═══ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* --- CONTACTO entity --- */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-            <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
-              <span className="material-symbols-outlined text-secondary">person_add</span>
-              <h3 className="text-lg font-bold font-display">Contacto Principal</h3>
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
+            <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4 text-slate-800">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-secondary">person_add</span>
+                <h3 className="text-lg font-bold font-display">Contacto Principal</h3>
+              </div>
+              <button className="flex items-center gap-1 text-xs font-bold text-primary hover:text-secondary transition-colors" type="button">
+                <span className="material-symbols-outlined text-[18px]">add_circle</span>Agregar Contacto
+              </button>
             </div>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* primer_nombre */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Nombre <span className="text-red-500">*</span></label>
@@ -267,7 +272,7 @@ export default function AgregarCliente() {
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Apellido <span className="text-red-500">*</span></label>
                 <input name="primer_apellido" value={contacto.primer_apellido} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* departamento */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Departamento <span className="text-red-500">*</span></label>
@@ -301,7 +306,7 @@ export default function AgregarCliente() {
 
           <div className="space-y-8">
             {/* --- TELEFONO entity (PK compuesta) --- */}
-            <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+            <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
               <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
                 <span className="material-symbols-outlined text-primary">call</span>
                 <h3 className="text-lg font-bold font-display">Teléfonos</h3>
@@ -329,7 +334,7 @@ export default function AgregarCliente() {
             </section>
 
             {/* Asignación vendedor (relación FK vendedor_id) */}
-            <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+            <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
               <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
                 <span className="material-symbols-outlined text-accent-green">assignment_ind</span>
                 <h3 className="text-lg font-bold font-display">Asignación</h3>
@@ -348,7 +353,7 @@ export default function AgregarCliente() {
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 py-8">
+        <div className="flex flex-col sm:flex-row justify-end gap-4 py-8">
           <Link to="/clientes" className="px-8 py-3 rounded-lg border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all">Cancelar Cambios</Link>
           <button className="px-12 py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all" type="submit">Guardar Cliente</button>
         </div>

@@ -87,7 +87,7 @@ export default function DetalleCliente() {
             {c.estado}
           </div>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <h2 className="text-3xl font-black text-slate-900 font-display">Detalle de Cliente</h2>
           <div className="flex items-center gap-3">
             <button className="px-6 py-2 border border-red-500 text-red-500 hover:bg-red-50 transition-colors rounded-lg text-sm font-bold font-display">Eliminar</button>
@@ -98,21 +98,21 @@ export default function DetalleCliente() {
 
       {/* KPI ROW */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
           <span className="text-slate-400 text-xs font-bold uppercase mb-1 tracking-wide">Pautas Activas</span>
           <div className="flex items-end gap-2">
             <span className="text-4xl font-black text-slate-900 font-display leading-none">5</span>
             <span className="text-primary text-sm font-bold mb-1 material-symbols-outlined">campaign</span>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
           <span className="text-slate-400 text-xs font-bold uppercase mb-1 tracking-wide">Inversión Total</span>
           <div className="flex items-end gap-2">
             <span className="text-4xl font-black text-slate-900 font-display leading-none">$45,000</span>
             <span className="text-accent-green text-sm font-bold mb-1 material-symbols-outlined">payments</span>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
           <span className="text-slate-400 text-xs font-bold uppercase mb-1 tracking-wide">Emisoras con Presencia</span>
           <div className="flex items-end gap-2">
             <span className="text-4xl font-black text-slate-900 font-display leading-none">12</span>
@@ -121,18 +121,18 @@ export default function DetalleCliente() {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* LEFT COLUMN */}
-        <div className="col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-8">
           {/* ═══ INFORMACIÓN GENERAL — CLIENTE entity ═══ */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
               <h3 className="font-bold text-slate-800 font-display flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">info</span>
                 Información General
               </h3>
             </div>
-            <div className="p-6 grid grid-cols-2 gap-x-12 gap-y-6">
+            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Tipo</p>
                 <p className="text-sm font-semibold text-slate-700 capitalize">{c.tipo}</p>
@@ -171,7 +171,7 @@ export default function DetalleCliente() {
           </section>
 
           {/* ═══ SUB-EMPRESAS Y MARCAS — CLIENTE(sub empresa) + MARCA_INTER ═══ */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
               <h3 className="font-bold text-slate-800 font-display flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">corporate_fare</span>
@@ -207,7 +207,7 @@ export default function DetalleCliente() {
           </section>
 
           {/* ═══ PAUTAS ASOCIADAS — PAUTA entity ═══ */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
               <h3 className="font-bold text-slate-800 font-display flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">calendar_month</span>
@@ -250,9 +250,9 @@ export default function DetalleCliente() {
         </div>
 
         {/* RIGHT COLUMN */}
-        <div className="col-span-4 space-y-8">
+        <div className="lg:col-span-4 space-y-8">
           {/* ═══ CONTACTO PRINCIPAL — CONTACTO entity ═══ */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
               <h3 className="font-bold text-slate-800 font-display flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">contact_page</span>
@@ -305,7 +305,7 @@ export default function DetalleCliente() {
           </section>
 
           {/* ═══ CONTACTOS ADICIONALES ═══ */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
               <h3 className="font-bold text-slate-800 font-display flex items-center gap-2 text-sm">
                 Contactos Adicionales
@@ -329,7 +329,7 @@ export default function DetalleCliente() {
           </section>
 
           {/* ═══ OBSERVACIÓN + HISTORIAL ═══ */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-50 bg-slate-50/50">
               <h3 className="font-bold text-slate-800 font-display text-sm">Observación y Actividad</h3>
             </div>

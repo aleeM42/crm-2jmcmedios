@@ -2,6 +2,9 @@
 // ReporteMarcasRegion.jsx — Marcas por Región
 // ==============================================
 import { Link } from 'react-router-dom';
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+
+const RADAR_COLORS = ['#16B1B8', '#8DC63F', '#55CCD3', '#A1DEE5', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 
 const REGIONES = ['Capital', 'Central', 'Oriente', 'Occidente', 'Los Andes'];
 const MARCAS = [
@@ -31,31 +34,32 @@ export default function ReporteMarcasRegion() {
           <p className="text-slate-500 text-sm mt-1">Presencia de marcas publicitarias en cada zona geográfica</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
         </div>
       </header>
 
       {/* CHART */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
-        <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Pautas por Marca (Total)</h3>
-        <div className="space-y-4">
-          {MARCAS.map((m, i) => (
-            <div key={m.nombre} className="flex items-center gap-4">
-              <span className="text-sm font-bold text-slate-400 w-6 text-right">{i + 1}</span>
-              <span className="text-sm font-semibold text-slate-900 w-40 truncate">{m.nombre}</span>
-              <div className="flex-1 h-8 bg-slate-50 rounded-lg overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-end pr-3" style={{ width: `${(m.total / MAX) * 100}%` }}>
-                  <span className="text-[10px] font-bold text-white">{m.total}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+        <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Presencia por Región (Radar)</h3>
+        <div style={{ width: '100%', height: 420 }}>
+          <ResponsiveContainer>
+            <RadarChart data={REGIONES.map(r => { const p = { region: r }; MARCAS.forEach(m => { p[m.nombre] = m[r]; }); return p; })} cx="50%" cy="50%" outerRadius="70%">
+              <PolarGrid stroke="#e2e8f0" />
+              <PolarAngleAxis dataKey="region" tick={{ fontSize: 12, fill: '#1F2937', fontWeight: 600 }} />
+              <PolarRadiusAxis tick={{ fontSize: 10, fill: '#6B7280' }} axisLine={false} />
+              {MARCAS.map((m, i) => (
+                <Radar key={m.nombre} name={m.nombre} dataKey={m.nombre} stroke={RADAR_COLORS[i]} fill={RADAR_COLORS[i]} fillOpacity={0.1} strokeWidth={2} />
+              ))}
+              <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }} />
+              <Legend wrapperStyle={{ fontSize: '11px', fontWeight: 600 }} />
+            </RadarChart>
+          </ResponsiveContainer>
         </div>
       </section>
 
       {/* TABLE */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100"><h3 className="text-lg font-bold font-display text-slate-900">Desglose por Región</h3></div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">

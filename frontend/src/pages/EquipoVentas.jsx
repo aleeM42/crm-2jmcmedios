@@ -25,7 +25,7 @@ export default function EquipoVentas() {
         <div className="flex items-center gap-4">
           <div className="relative">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
-            <input className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all w-64" placeholder="Buscar vendedor..." type="text" />
+            <input className="pl-10 pr-4 py-2.5 bg-[#F4FAFB] border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all w-64" placeholder="Buscar vendedor..." type="text" />
           </div>
           <Link to="/equipo-ventas/agregar" className="px-6 py-2.5 bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm rounded-xl shadow-lg shadow-primary/20 hover:opacity-90 transition-all flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">person_add</span>
@@ -39,7 +39,7 @@ export default function EquipoVentas() {
         {VENDEDORES.map((v) => {
           const initials = `${v.primer_nombre[0]}${v.primer_apellido[0]}`;
           return (
-            <Link key={v.id} to={`/equipo-ventas/${v.id}`} className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 hover:shadow-md transition-shadow group">
+            <Link key={v.id} to={`/equipo-ventas/${v.id}`} className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 hover:shadow-md transition-shadow group">
               <div className="flex items-center gap-4 mb-4">
                 <div className={`w-12 h-12 rounded-full bg-${v.color} flex items-center justify-center text-white font-bold text-sm border-2 border-${v.color}/20`}>
                   {initials}

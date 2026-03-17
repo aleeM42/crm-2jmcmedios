@@ -42,13 +42,13 @@ export default function ReporteClientesEmisora() {
             <option>Éxitos FM 99.9</option>
             <option>Unión Radio 92.1</option>
           </select>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
         </div>
       </header>
 
       {EMISORAS_DATA.map((e) => (
-        <section key={e.emisora} className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+        <section key={e.emisora} className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden mb-6">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold font-display text-slate-900">{e.emisora}</h3>

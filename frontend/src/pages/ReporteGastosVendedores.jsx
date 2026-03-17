@@ -24,11 +24,11 @@ export default function ReporteGastosVendedores() {
           <p className="text-slate-500 text-sm mt-1">Control de gastos operativos asociados a la gestión comercial</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
         </div>
       </header>
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Gastos Totales por Vendedor</h3>
         <div className="space-y-4">
           {VENDEDORES.map((v, i) => (
@@ -44,7 +44,7 @@ export default function ReporteGastosVendedores() {
           ))}
         </div>
       </section>
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100"><h3 className="text-lg font-bold font-display text-slate-900">Detalle de Gastos por Vendedor</h3></div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">

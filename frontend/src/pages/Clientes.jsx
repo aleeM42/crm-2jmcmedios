@@ -70,17 +70,17 @@ const INITIALS_COLORS = ['primary', 'accent-green', 'slate', 'secondary'];
 export default function Clientes() {
   return (
     <>
-      <header className="flex justify-between items-center mb-10">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
         <div>
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-display">Clientes</h2>
           <p className="text-slate-500 text-sm mt-1">Gestión integral de cartera de clientes</p>
         </div>
-        <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <button className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all">
             <span className="material-symbols-outlined text-lg">file_download</span>
             <span className="text-xs font-bold uppercase tracking-wider">Exportar</span>
           </button>
-          <Link to="/clientes/agregar" className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-2">
+          <Link to="/clientes/agregar" className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-2 flex-1 sm:flex-initial justify-center">
             <span className="material-symbols-outlined">add</span>Agregar Cliente
           </Link>
         </div>
@@ -88,7 +88,7 @@ export default function Clientes() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100/50">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100/50">
           <div className="flex justify-between items-start">
             <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Total Clientes</p>
             <span className="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">groups</span>
@@ -96,7 +96,7 @@ export default function Clientes() {
           <h3 className="text-4xl font-bold text-slate-900 mt-4">87</h3>
           <p className="text-[11px] text-slate-400 mt-2"><span className="text-accent-green font-bold">↑ 4%</span> vs mes anterior</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100/50 border-b-4 border-b">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100/50 border-b-4 border-b">
           <div className="flex justify-between items-start">
             <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Activos</p>
             <span className="material-symbols-outlined text-accent-green bg-accent-green/10 p-2 rounded-lg">check_circle</span>
@@ -104,7 +104,7 @@ export default function Clientes() {
           <h3 className="text-4xl font-bold text-slate-900 mt-4">72</h3>
           <p className="text-[11px] text-slate-400 mt-2">82.7% de la cartera total</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100/50">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100/50">
           <div className="flex justify-between items-start">
             <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Inactivos</p>
             <span className="material-symbols-outlined text-slate-400 bg-slate-100 p-2 rounded-lg">block</span>
@@ -112,7 +112,7 @@ export default function Clientes() {
           <h3 className="text-4xl font-bold text-slate-900 mt-4">15</h3>
           <p className="text-[11px] text-slate-400 mt-2">Requieren seguimiento comercial</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100/50 border-b-4 border-b">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100/50 border-b-4 border-b">
           <div className="flex justify-between items-start">
             <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Nuevos Mes</p>
             <span className="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">person_add</span>
@@ -123,8 +123,8 @@ export default function Clientes() {
       </div>
 
       {/* Filter bar — ENUMs del CSV: clasificacion, estado, sector */}
-      <div className="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-wrap items-center gap-4">
-        <div className="relative flex-1 min-w-[300px]">
+      <div className="bg-[#F4FAFB] p-4 rounded-xl shadow-sm mb-6 flex flex-wrap items-center gap-4">
+        <div className="relative flex-1 min-w-0 sm:min-w-[300px]">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
           <input className="w-full pl-10 pr-4 py-2.5 rounded-lg border-slate-200 text-sm focus:ring-primary focus:border-primary transition-all" placeholder="Buscar por nombre, RIF fiscal o razón social..." type="text" />
         </div>
@@ -149,7 +149,7 @@ export default function Clientes() {
       </div>
 
       {/* Table — columnas mapeadas a atributos CLIENTE del CSV */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-slate-100">
+      <div className="bg-[#F4FAFB] rounded-xl shadow-sm overflow-hidden border border-slate-100">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -202,7 +202,7 @@ export default function Clientes() {
             </tbody>
           </table>
         </div>
-        <div className="px-6 py-4 bg-slate-50/30 flex justify-between items-center border-t border-slate-100">
+        <div className="px-6 py-4 bg-slate-50/30 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-slate-100">
           <p className="text-xs text-slate-500">Mostrando <span className="font-bold">1-10</span> de <span className="font-bold">87</span> clientes</p>
           <div className="flex items-center gap-1">
             <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-100 transition-colors"><span className="material-symbols-outlined text-lg">chevron_left</span></button>

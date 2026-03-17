@@ -2,6 +2,7 @@
 // ReporteEmisorasRegion.jsx — Emisoras por Región
 // ==============================================
 import { Link } from 'react-router-dom';
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const REGIONES = [
   { nombre: 'Capital', emisoras: 12, pautas: 145, monto: '$85,000', pct: 100 },
@@ -27,27 +28,29 @@ export default function ReporteEmisorasRegion() {
           <p className="text-slate-500 text-sm mt-1">Distribución geográfica de emisoras aliadas y su actividad</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
         </div>
       </header>
 
       {/* CHART */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Emisoras por Región</h3>
-        <div className="flex items-end justify-between gap-3 px-4" style={{ height: '200px' }}>
-          {REGIONES.map((r) => (
-            <div key={r.nombre} className="flex flex-col items-center justify-end gap-2 group flex-1 h-full">
-              <span className="text-[10px] font-bold text-slate-600">{r.emisoras}</span>
-              <div className="w-10 bg-gradient-to-t from-primary to-secondary rounded-t-md group-hover:opacity-80 transition-opacity" style={{ height: `${r.pct * 1.6}px` }}></div>
-              <span className="text-[10px] font-bold text-slate-400">{r.nombre}</span>
-            </div>
-          ))}
+        <div style={{ width: '100%', height: 340 }}>
+          <ResponsiveContainer>
+            <RadarChart data={REGIONES} cx="50%" cy="50%" outerRadius="70%">
+              <PolarGrid stroke="#e2e8f0" />
+              <PolarAngleAxis dataKey="nombre" tick={{ fontSize: 12, fill: '#1F2937', fontWeight: 600 }} />
+              <PolarRadiusAxis tick={{ fontSize: 10, fill: '#6B7280' }} axisLine={false} allowDecimals={false} />
+              <Radar name="Emisoras" dataKey="emisoras" stroke="#16B1B8" fill="#16B1B8" fillOpacity={0.25} strokeWidth={2} />
+              <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }} formatter={(value) => [`${value} emisoras`, 'Emisoras']} />
+            </RadarChart>
+          </ResponsiveContainer>
         </div>
       </section>
 
       {/* TABLE */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100"><h3 className="text-lg font-bold font-display text-slate-900">Detalle Regional</h3></div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">

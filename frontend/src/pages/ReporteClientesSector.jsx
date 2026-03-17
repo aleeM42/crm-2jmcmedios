@@ -2,6 +2,7 @@
 // ReporteClientesSector.jsx — Clientes por Sector
 // ==============================================
 import { Link } from 'react-router-dom';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 const SECTORES = [
   { nombre: 'Alimentación', clientes: 158, pct: 35, color: '#16B1B8', offset: 0 },
@@ -37,28 +38,32 @@ export default function ReporteClientesSector() {
           <p className="text-slate-500 text-sm mt-1">Distribución de cartera de clientes según industria y sector comercial</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
             <span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF
           </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
             <span className="material-symbols-outlined text-lg">table_view</span>Excel
           </button>
         </div>
       </header>
 
       {/* DONUT + LEGEND */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-2">Distribución de Mercado</h3>
         <p className="text-xs text-slate-400 mb-6">Representación visual por sectores comerciales</p>
         <div className="flex flex-col lg:flex-row items-center justify-around gap-8">
           <div className="relative w-56 h-56">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#f1f5f9" strokeWidth="3"></circle>
-              {SECTORES.map((s) => (
-                <circle key={s.nombre} cx="18" cy="18" fill="transparent" r="15.915" stroke={s.color} strokeDasharray={`${s.pct} ${100 - s.pct}`} strokeDashoffset={`-${s.offset}`} strokeWidth="3.5"></circle>
-              ))}
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <ResponsiveContainer>
+              <PieChart>
+                <Pie data={SECTORES} dataKey="clientes" nameKey="nombre" cx="50%" cy="50%" innerRadius="60%" outerRadius="85%" paddingAngle={2} strokeWidth={0}>
+                  {SECTORES.map((s) => (
+                    <Cell key={s.nombre} fill={s.color} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }} formatter={(value, name) => [`${value} clientes`, name]} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span className="text-3xl font-bold text-slate-900">451</span>
               <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Clientes</span>
             </div>
@@ -78,7 +83,7 @@ export default function ReporteClientesSector() {
       </section>
 
       {/* TABLE */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100">
           <h3 className="text-lg font-bold font-display text-slate-900">Listado por Sector</h3>
         </div>

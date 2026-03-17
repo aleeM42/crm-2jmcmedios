@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 function AgregarAliado() {
   return (
     <>
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <nav className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-2 uppercase tracking-wider">
             <Link to="/aliados-comerciales" className="hover:text-primary transition-colors">Aliados Comerciales</Link>
@@ -15,13 +15,13 @@ function AgregarAliado() {
           </nav>
           <h2 className="text-3xl font-bold text-slate-900 font-display">Agregar Aliado Comercial</h2>
         </div>
-        <div className="flex gap-3">
-          <Link to="/aliados-comerciales" className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all">Cancelar</Link>
-          <button className="px-8 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all">Guardar</button>
+        <div className="flex gap-3 w-full sm:w-auto">
+          <Link to="/aliados-comerciales" className="flex-1 sm:flex-initial text-center px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all">Cancelar</Link>
+          <button className="flex-1 sm:flex-initial px-8 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all">Guardar</button>
         </div>
       </header>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <form className="p-8 space-y-12">
           {/* Section 1: Datos de la Emisora */}
           <section>
@@ -62,12 +62,28 @@ function AgregarAliado() {
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Dirección<span className="text-red-500 ml-0.5">*</span></label>
                 <textarea name="direccion" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Av. Principal de las Mercedes..." rows="2"></textarea>
               </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Región<span className="text-red-500 ml-0.5">*</span></label>
+                <select name="region" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                  <option value="">Seleccione una región</option>
+                  <option>Capital</option>
+                  <option>Central</option>
+                  <option>Los Llanos</option>
+                  <option>Centro Occidental</option>
+                  <option>Zuliana</option>
+                  <option>Los Andes</option>
+                  <option>Nor Oriental</option>
+                  <option>Guayana</option>
+                  <option>Insular</option>
+                  <option>Sur Occidental</option>
+                </select>
+              </div>
             </div>
           </section>
 
           {/* Section 2: Cobertura */}
           <section>
-            <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6 border-b border-slate-100 pb-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">broadcast_on_home</span>
                 <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Cobertura</h3>
@@ -88,9 +104,14 @@ function AgregarAliado() {
 
           {/* Section 3: Contacto de la Emisora */}
           <section>
-            <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
-              <span className="material-symbols-outlined text-primary">person</span>
-              <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Contacto de la Emisora</h3>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6 border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">person</span>
+                <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Contacto de la Emisora</h3>
+              </div>
+              <button className="flex items-center gap-1 text-xs font-bold text-primary hover:text-secondary transition-colors" type="button">
+                <span className="material-symbols-outlined text-[18px]">add_circle</span>Agregar Contacto
+              </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1.5">
@@ -169,7 +190,7 @@ function AgregarAliado() {
           </section>
 
           {/* Action Footer */}
-          <div className="pt-8 flex justify-end gap-4 border-t border-slate-100">
+          <div className="pt-8 flex flex-col sm:flex-row justify-end gap-4 border-t border-slate-100">
             <button className="px-6 py-2.5 text-slate-600 font-bold text-sm hover:underline" type="button">Restaurar formulario</button>
             <button className="px-10 py-2.5 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all" type="submit">Finalizar Registro</button>
           </div>

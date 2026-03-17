@@ -22,32 +22,32 @@ export default function PautasLista() {
   return (
     <>
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-black text-slate-900 font-display">Pautas</h2>
           <p className="text-sm text-slate-400 mt-1">Gestión de órdenes de transmisión</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 bg-white rounded-lg border border-slate-200 p-1 shadow-sm">
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-1 bg-[#F4FAFB] rounded-lg border border-slate-200 p-1 shadow-sm">
             <button className="px-3 py-1.5 rounded-md bg-primary text-white text-xs font-bold">Lista</button>
             <Link to="/pautas/kanban" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Kanban</Link>
             <Link to="/pautas/calendario" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Calendario</Link>
           </div>
-          <Link to="/pautas/agregar" className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+          <Link to="/pautas/agregar" className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 flex-1 sm:flex-initial justify-center">
             <span className="material-symbols-outlined text-[18px]">add</span> Nueva Pauta
           </Link>
         </div>
       </div>
 
       {/* KPI ROW */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Total Pautas', value: '24', sub: 'activas este mes' },
           { label: 'En Transmisión', value: '12', dot: 'bg-primary' },
           { label: 'Monto OC Total', value: '$145K', sub: 'facturado' },
           { label: 'Monto OT Total', value: '$138K', sub: 'comprometido' },
         ].map((kpi) => (
-          <div key={kpi.label} className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+          <div key={kpi.label} className="bg-[#F4FAFB] p-5 rounded-xl shadow-sm border border-slate-100">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{kpi.label}</p>
             <div className="flex items-baseline gap-2">
               <p className="text-3xl font-black text-slate-900 font-display">{kpi.value}</p>
@@ -60,23 +60,23 @@ export default function PautasLista() {
 
       {/* FILTERS */}
       <div className="flex flex-wrap items-center gap-4 mb-6">
-        <div className="relative flex-1 max-w-xs">
+        <div className="relative flex-1 min-w-0 max-w-full sm:max-w-xs">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
-          <input type="text" placeholder="Buscar por OT, cliente, marca..." className="w-full h-10 pl-10 pr-4 bg-white border border-slate-200 rounded-lg text-sm focus:ring-primary focus:border-primary outline-none" />
+          <input type="text" placeholder="Buscar por OT, cliente, marca..." className="w-full h-10 pl-10 pr-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm focus:ring-primary focus:border-primary outline-none" />
         </div>
-        <select className="h-10 px-4 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none">
+        <select className="h-10 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none">
           <option>Estado</option><option>En transmisión</option><option>Programada</option><option>Finalizada</option><option>Cancelada</option>
         </select>
-        <select className="h-10 px-4 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none">
+        <select className="h-10 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none">
           <option>Tipo de compra</option><option>Directo</option><option>Agencia</option>
         </select>
-        <select className="h-10 px-4 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none">
+        <select className="h-10 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none">
           <option>Vendedor</option>
         </select>
       </div>
 
       {/* TABLE */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -121,7 +121,7 @@ export default function PautasLista() {
           </table>
         </div>
 
-        <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="text-xs text-slate-400">Mostrando 1 a 5 de 24 resultados</span>
           <div className="flex gap-1">
             <button className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50"><span className="material-symbols-outlined text-sm">chevron_left</span></button>

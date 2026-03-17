@@ -13,13 +13,13 @@ const VISITAS = [
 function ActividadComercial() {
   return (
     <>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <h2 className="text-2xl font-bold text-slate-800 font-display">Actividad Comercial</h2>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all text-sm font-semibold text-slate-700">
+          <button className="flex items-center gap-2 px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all text-sm font-semibold text-slate-700">
             <span className="material-symbols-outlined text-sm">picture_as_pdf</span>PDF
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all text-sm font-semibold text-slate-700">
+          <button className="flex items-center gap-2 px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all text-sm font-semibold text-slate-700">
             <span className="material-symbols-outlined text-sm">table_view</span>Excel
           </button>
         </div>
@@ -27,11 +27,11 @@ function ActividadComercial() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] p-6 rounded-2xl shadow-sm border border-slate-100">
           <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Visitas del Mes</p>
           <p className="text-3xl font-bold text-slate-900">48</p>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Visitas Efectivas</p>
@@ -40,11 +40,11 @@ function ActividadComercial() {
             <span className="bg-accent-green/10 text-accent-green px-2 py-1 rounded text-xs font-bold">75%</span>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] p-6 rounded-2xl shadow-sm border border-slate-100">
           <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Gastos del Mes</p>
           <p className="text-3xl font-bold text-slate-900">$3,450</p>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] p-6 rounded-2xl shadow-sm border border-slate-100">
           <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Llamadas Registradas</p>
           <p className="text-3xl font-bold text-slate-900">22</p>
         </div>
@@ -60,41 +60,41 @@ function ActividadComercial() {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Fecha</label>
-            <input className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary" type="date" />
+            <input className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary" type="date" />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Vendedor</label>
-            <select className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+            <select className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
               <option>Todos los vendedores</option><option>Carlos Mendoza</option><option>Lucía Fernández</option>
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Cliente</label>
-            <select className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+            <select className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
               <option>Todos los clientes</option><option>Supermercados Rey</option><option>Banco General</option>
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Tipo</label>
-            <select className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+            <select className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
               <option>Cualquiera</option><option>Presencial</option><option>Llamada</option>
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Efectiva</label>
-            <select className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+            <select className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
               <option>Ambos</option><option>Sí</option><option>No</option>
             </select>
           </div>
         </div>
 
         {/* Data Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="p-6 flex justify-between items-center border-b border-slate-100">
+        <div className="bg-[#F4FAFB] rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100">
             <h3 className="text-lg font-bold text-slate-800 font-display">Registro de Visitas</h3>
-            <div className="flex gap-3">
-              <Link to="/actividad-comercial/gastos/agregar" className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-200 transition-all border border-slate-200">Agregar Gasto</Link>
-              <Link to="/actividad-comercial/visita" className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg text-sm font-bold hover:opacity-90 shadow-md transition-all flex items-center gap-2">
+            <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+              <Link to="/actividad-comercial/gastos/agregar" className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-200 transition-all border border-slate-200 text-center flex-1 sm:flex-initial">Agregar Gasto</Link>
+              <Link to="/actividad-comercial/visita" className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg text-sm font-bold hover:opacity-90 shadow-md transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial">
                 <span className="material-symbols-outlined text-base">add</span>Agregar Visita
               </Link>
             </div>
@@ -137,7 +137,7 @@ function ActividadComercial() {
             </table>
           </div>
 
-          <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+          <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
             <span className="text-xs text-slate-500 font-medium">Mostrando 1 a 4 de 48 resultados</span>
             <div className="flex gap-1">
               <button className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50"><span className="material-symbols-outlined text-sm">chevron_left</span></button>

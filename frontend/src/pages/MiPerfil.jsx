@@ -22,7 +22,7 @@ function MiPerfil() {
   return (
     <>
       {/* HEADER */}
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h2 className="text-2xl font-bold text-slate-800 font-display">Mi Perfil</h2>
           <nav className="flex text-xs text-slate-400 mt-1">
@@ -32,7 +32,7 @@ function MiPerfil() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <div className="text-right">
+          <div className="text-right hidden sm:block">
             <p className="text-sm font-bold text-slate-800">María González</p>
             <p className="text-xs text-slate-500">Representante de Ventas Senior</p>
           </div>
@@ -46,7 +46,7 @@ function MiPerfil() {
       {/* KPI CARDS */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Meta Mensual */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
+        <div className="bg-[#F4FAFB] rounded-xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Meta Mensual</p>
             <h3 className="text-2xl font-bold text-slate-800">$15,000</h3>
@@ -61,7 +61,7 @@ function MiPerfil() {
           </div>
         </div>
         {/* Pautas del Mes */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] rounded-xl p-6 shadow-sm border border-slate-100">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-accent-light/30 flex items-center justify-center text-primary">
               <span className="material-symbols-outlined">assignment</span>
@@ -73,7 +73,7 @@ function MiPerfil() {
           </div>
         </div>
         {/* Visitas Totales */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] rounded-xl p-6 shadow-sm border border-slate-100">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-accent-green/10 flex items-center justify-center text-accent-green">
               <span className="material-symbols-outlined">location_on</span>
@@ -85,7 +85,7 @@ function MiPerfil() {
           </div>
         </div>
         {/* Gastos del Mes */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] rounded-xl p-6 shadow-sm border border-slate-100">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-red-400">
               <span className="material-symbols-outlined">payments</span>
@@ -101,8 +101,8 @@ function MiPerfil() {
       {/* BOTTOM SECTION */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Cartera de Clientes */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+        <div className="lg:col-span-2 bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <h3 className="font-bold text-slate-800">Mi Cartera de Clientes</h3>
             <button className="text-primary text-sm font-semibold hover:underline">Ver todos</button>
           </div>
@@ -144,7 +144,7 @@ function MiPerfil() {
         </div>
 
         {/* Actividad Reciente */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="px-6 py-5 border-b border-slate-100">
             <h3 className="font-bold text-slate-800">Actividad Reciente</h3>
           </div>
@@ -152,7 +152,7 @@ function MiPerfil() {
             <ul className="space-y-6 relative before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
               {actividades.map((a) => (
                 <li key={a.icon + a.title} className="relative pl-8">
-                  <span className="absolute left-0 top-0 w-6 h-6 bg-white border-2 border-primary rounded-full flex items-center justify-center z-10">
+                  <span className="absolute left-0 top-0 w-6 h-6 bg-[#F4FAFB] border-2 border-primary rounded-full flex items-center justify-center z-10">
                     <span className="material-symbols-outlined text-[14px] text-primary">{a.icon}</span>
                   </span>
                   <div>

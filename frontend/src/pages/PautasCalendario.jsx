@@ -28,38 +28,32 @@ export default function PautasCalendario() {
   return (
     <>
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-black text-slate-900 font-display">Pautas</h2>
           <p className="text-sm text-slate-400 mt-1">Vista Calendario</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex bg-white rounded-lg border border-slate-200 overflow-hidden">
-            <Link to="/pautas" className="px-3 py-2 text-xs font-bold text-slate-400 hover:bg-slate-50 flex items-center gap-1">
-              <span className="material-symbols-outlined text-[16px]">list</span> Lista
-            </Link>
-            <Link to="/pautas/kanban" className="px-3 py-2 text-xs font-bold text-slate-400 hover:bg-slate-50 flex items-center gap-1">
-              <span className="material-symbols-outlined text-[16px]">view_kanban</span> Kanban
-            </Link>
-            <span className="px-3 py-2 text-xs font-bold text-primary bg-primary/10 flex items-center gap-1 border-b-2 border-primary">
-              <span className="material-symbols-outlined text-[16px]">calendar_month</span> Calendario
-            </span>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-1 bg-[#F4FAFB] rounded-lg border border-slate-200 p-1 shadow-sm">
+            <Link to="/pautas" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Lista</Link>
+            <Link to="/pautas/kanban" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Kanban</Link>
+            <button className="px-3 py-1.5 rounded-md bg-primary text-white text-xs font-bold">Calendario</button>
           </div>
-          <Link to="/pautas/agregar" className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+          <Link to="/pautas/agregar" className="flex items-center justify-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
             <span className="material-symbols-outlined text-[18px]">add</span> Nueva Pauta
           </Link>
         </div>
       </div>
 
       {/* KPI ROW */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Pautas Activas', value: '24', icon: 'campaign', color: 'text-primary' },
           { label: 'En Transmisión', value: '18', icon: 'podcasts', color: 'text-accent-green' },
           { label: 'Cuñas Transmitidas Mes', value: '1,250', icon: 'graphic_eq', color: 'text-secondary' },
           { label: 'Monto Total OC', value: '$89,400', icon: 'payments', color: 'text-primary' },
         ].map((kpi) => (
-          <div key={kpi.label} className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+          <div key={kpi.label} className="bg-[#F4FAFB] p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
             <span className={`material-symbols-outlined text-3xl ${kpi.color}`}>{kpi.icon}</span>
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{kpi.label}</p>
@@ -70,7 +64,7 @@ export default function PautasCalendario() {
       </div>
 
       {/* CALENDAR */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden overflow-x-auto">
         {/* Month Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -86,14 +80,14 @@ export default function PautasCalendario() {
         </div>
 
         {/* Day Names */}
-        <div className="grid grid-cols-7 border-b border-slate-100">
+        <div className="grid grid-cols-7 border-b border-slate-100 min-w-[500px]">
           {DAYS.map((d) => (
             <div key={d} className="py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">{d}</div>
           ))}
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7">
+        <div className="grid grid-cols-7 min-w-[500px]">
           {cells.map((day, i) => (
             <div
               key={i}
@@ -119,7 +113,7 @@ export default function PautasCalendario() {
       </div>
 
       {/* UPCOMING SIDEBAR */}
-      <div className="mt-8 bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+      <div className="mt-8 bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
         <h3 className="text-sm font-bold text-slate-800 font-display mb-4 flex items-center gap-2">
           <span className="material-symbols-outlined text-primary text-lg">upcoming</span>
           Próximas Pautas

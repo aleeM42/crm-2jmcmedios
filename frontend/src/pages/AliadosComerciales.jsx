@@ -21,38 +21,38 @@ const STATUS_DOT = {
 function AliadosComerciales() {
   return (
     <>
-      <header className="flex justify-between items-center mb-10">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
         <div>
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-display">Aliados Comerciales</h2>
           <p className="text-slate-500 text-sm mt-1">Directorio de emisoras y aliados</p>
         </div>
-        <Link to="/aliados-comerciales/agregar" className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-2">
+        <Link to="/aliados-comerciales/agregar" className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
           <span className="material-symbols-outlined">add</span>Agregar Aliado
         </Link>
       </header>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100">
           <p className="text-slate-500 text-sm font-semibold mb-1">Total Emisoras</p>
           <p className="text-3xl font-bold text-slate-800">32</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100">
           <p className="text-slate-500 text-sm font-semibold mb-1">Emisoras Activas</p>
           <div className="flex items-baseline gap-2">
             <p className="text-3xl font-bold text-accent-green">28</p>
             <span className="text-xs font-medium text-accent-green bg-accent-green/10 px-2 py-0.5 rounded-full">87.5%</span>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100">
           <p className="text-slate-500 text-sm font-semibold mb-1">Regiones Cubiertas</p>
           <p className="text-3xl font-bold text-slate-800">8</p>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-wrap items-center gap-4 mb-8">
-        <div className="flex-1 min-w-[300px] relative">
+      <div className="bg-[#F4FAFB] p-4 rounded-xl shadow-sm border border-slate-100 flex flex-wrap items-center gap-4 mb-8">
+        <div className="flex-1 min-w-0 sm:min-w-[300px] relative">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
           <input className="w-full pl-10 pr-4 py-2 bg-background-light border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 placeholder:text-slate-400" placeholder="Buscar emisora o frecuencia..." type="text" />
         </div>
@@ -65,9 +65,9 @@ function AliadosComerciales() {
       </div>
 
       {/* Station Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {EMISORAS.map((e) => (
-          <div key={e.id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow">
+          <div key={e.id} className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-4">
               <h3 className="font-bold text-lg text-slate-800">{e.nombre_emisora}</h3>
               <div className={`h-2.5 w-2.5 rounded-full ${STATUS_DOT[e.estado] || 'bg-slate-300'}`} title={e.estado}></div>
@@ -90,13 +90,13 @@ function AliadosComerciales() {
 
       {/* Pagination */}
       <div className="flex items-center justify-center gap-2">
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"><span className="material-symbols-outlined">chevron_left</span></button>
+        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#F4FAFB] border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"><span className="material-symbols-outlined">chevron_left</span></button>
         <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white font-bold">1</button>
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">2</button>
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">3</button>
+        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#F4FAFB] border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">2</button>
+        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#F4FAFB] border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">3</button>
         <span className="px-2 text-slate-400">...</span>
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">8</button>
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"><span className="material-symbols-outlined">chevron_right</span></button>
+        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#F4FAFB] border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">8</button>
+        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#F4FAFB] border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"><span className="material-symbols-outlined">chevron_right</span></button>
       </div>
     </>
   );

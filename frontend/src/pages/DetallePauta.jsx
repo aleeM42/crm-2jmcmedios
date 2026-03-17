@@ -40,7 +40,7 @@ export default function DetallePauta() {
   return (
     <>
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <nav className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">
             <Link className="hover:text-primary transition-colors" to="/pautas">Pautas</Link>
@@ -52,26 +52,26 @@ export default function DetallePauta() {
             <span className={`px-4 py-1 rounded-full text-xs font-bold ${STATUS_STYLE[pauta.estado]}`}>{pauta.estado}</span>
           </div>
         </div>
-        <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
+        <div className="flex gap-3 w-full sm:w-auto">
+          <button className="px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">edit</span> Editar
           </button>
-          <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
+          <button className="px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">picture_as_pdf</span> PDF
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* LEFT COLUMN */}
-        <div className="col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-8">
           {/* INFORMACIÓN GENERAL */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">info</span>
               Información General
             </h3>
-            <div className="grid grid-cols-2 gap-y-5 gap-x-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-10">
               {[
                 { label: 'Cliente', value: pauta.cliente },
                 { label: 'Marca', value: pauta.marca },
@@ -93,7 +93,7 @@ export default function DetallePauta() {
           </section>
 
           {/* PROGRESO DE CONSUMO */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">donut_large</span>
               Progreso de Consumo
@@ -109,7 +109,7 @@ export default function DetallePauta() {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-slate-50 rounded-lg p-4 text-center">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Cuñas</p>
                 <p className="text-2xl font-black text-slate-900 font-display">{pauta.cantidad_cuñas}</p>
@@ -126,7 +126,7 @@ export default function DetallePauta() {
           </section>
 
           {/* EMISORAS ASOCIADAS */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">radio</span>
               Emisoras Asociadas
@@ -137,7 +137,7 @@ export default function DetallePauta() {
                 { nombre_emisora: 'Éxitos 99.9', frecuencia: '99.9 FM', cuñas: 60, estado: 'Activo' },
                 { nombre_emisora: 'Onda 107.9', frecuencia: '107.9 FM', cuñas: 30, estado: 'Inactivo' },
               ].map((e) => (
-                <div key={e.nombre_emisora} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100">
+                <div key={e.nombre_emisora} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-slate-50 rounded-lg border border-slate-100">
                   <div className="flex items-center gap-4">
                     <span className="material-symbols-outlined text-primary">radio</span>
                     <div>
@@ -156,9 +156,9 @@ export default function DetallePauta() {
         </div>
 
         {/* RIGHT COLUMN */}
-        <div className="col-span-4 space-y-8">
+        <div className="lg:col-span-4 space-y-8">
           {/* VIGENCIA */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">date_range</span>
               Vigencia
@@ -180,7 +180,7 @@ export default function DetallePauta() {
           </section>
 
           {/* MONTOS */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">payments</span>
               Montos

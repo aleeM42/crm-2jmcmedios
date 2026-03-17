@@ -51,7 +51,7 @@ export default function DetalleEmisora() {
   return (
     <>
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <nav className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">
             <Link className="hover:text-primary transition-colors" to="/aliados-comerciales">Aliados Comerciales</Link>
@@ -64,23 +64,23 @@ export default function DetalleEmisora() {
             <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">{emisora.frecuencia}</span>
           </div>
         </div>
-        <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
+        <div className="flex gap-3 w-full sm:w-auto">
+          <button className="px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">edit</span> Editar
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* LEFT COLUMN */}
-        <div className="col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-8">
           {/* INFORMACIÓN GENERAL */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">radio</span>
               Información General
             </h3>
-            <div className="grid grid-cols-2 gap-y-5 gap-x-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-10">
               {[
                 { label: 'Razón Social', value: emisora.razon_social },
                 { label: 'Nombre Emisora', value: emisora.nombre_emisora },
@@ -102,7 +102,7 @@ export default function DetalleEmisora() {
           </section>
 
           {/* COBERTURA */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">broadcast_on_home</span>
               Cobertura
@@ -115,7 +115,7 @@ export default function DetalleEmisora() {
           </section>
 
           {/* PAUTAS ASOCIADAS */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">campaign</span>
               Pautas Asociadas
@@ -154,9 +154,9 @@ export default function DetalleEmisora() {
         </div>
 
         {/* RIGHT COLUMN */}
-        <div className="col-span-4 space-y-8">
+        <div className="lg:col-span-4 space-y-8">
           {/* CONTACTO PRINCIPAL */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">person</span>
               Contacto Principal
@@ -196,7 +196,7 @@ export default function DetalleEmisora() {
           </section>
 
           {/* ESTADÍSTICAS */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">analytics</span>
               Estadísticas

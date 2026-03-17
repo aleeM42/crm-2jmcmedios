@@ -19,9 +19,9 @@ function DashboardLayout() {
   const location = useLocation();
 
   return (
-    <div className="flex min-h-screen bg-background-light text-slate-900 antialiased">
+    <div className="flex min-h-screen bg-[#EBF6F7] text-slate-900 antialiased">
       {/* ===================== SIDEBAR ===================== */}
-      <aside className="w-[240px] bg-white border-r border-slate-200 flex flex-col fixed h-full z-10">
+      <aside className="w-[240px] bg-[#F4FAFB] border-r border-[#E0F0F2] flex flex-col fixed h-full z-10">
         <div className="p-6">
           <h1 className="text-primary text-xl font-bold leading-tight tracking-tight font-display">CRM 2JMC</h1>
           <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mt-1">Directora Comercial</p>
@@ -35,7 +35,7 @@ function DashboardLayout() {
               className={({ isActive }) =>
                 isActive || location.pathname.startsWith(to + '/')
                   ? 'flex items-center gap-3 px-3 py-2.5 bg-primary/10 text-primary border-l-4 border-primary rounded-r-lg transition-colors'
-                  : 'flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors border-l-4 border-transparent'
+                  : 'flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-[#E0F0F2] rounded-lg transition-colors border-l-4 border-transparent'
               }
             >
               <span className="material-symbols-outlined text-[22px]">{icon}</span>
@@ -44,7 +44,7 @@ function DashboardLayout() {
           ))}
         </nav>
 
-        <div className="p-4 mt-auto border-t border-slate-100">
+        <div className="p-4 mt-auto border-t border-[#E0F0F2]">
           <NavLink
             to="/login"
             className="flex items-center gap-3 w-full px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"

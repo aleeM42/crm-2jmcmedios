@@ -2,6 +2,9 @@
 // ReporteEfectividadVendedores.jsx — Ranking de Vendedores por Efectividad
 // ==============================================
 import { Link } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+
+const CHART_COLORS = { efectivas: '#16B1B8', noEfectivas: '#e2e8f0' };
 
 const VENDEDORES = [
   { nombre: 'Carlos Jaramillo', visitas: 48, efectivas: 42, pct: 87.5, meta: '$45,000', cumplido: '$42,300' },
@@ -27,38 +30,35 @@ export default function ReporteEfectividadVendedores() {
           <p className="text-slate-500 text-sm mt-1">Comparativa de cierre de ventas y cumplimiento de objetivos</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
             <span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF
           </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
             <span className="material-symbols-outlined text-lg">table_view</span>Excel
           </button>
         </div>
       </header>
 
       {/* CHART */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Efectividad de Visitas (%)</h3>
-        <div className="space-y-5">
-          {VENDEDORES.map((v, i) => (
-            <div key={v.nombre} className="flex items-center gap-4">
-              <span className="text-sm font-bold text-slate-400 w-6 text-right">{i + 1}</span>
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-primary font-bold text-xs">{v.nombre.split(' ').map(w => w[0]).join('').slice(0, 2)}</span>
-              </div>
-              <span className="text-sm font-semibold text-slate-900 w-44 truncate">{v.nombre}</span>
-              <div className="flex-1 h-8 bg-slate-50 rounded-lg overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-primary to-accent-green rounded-lg flex items-center justify-end pr-3 transition-all" style={{ width: `${(v.pct / MAX_PCT) * 100}%` }}>
-                  <span className="text-[10px] font-bold text-white">{v.pct}%</span>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div style={{ width: '100%', height: 280 }}>
+          <ResponsiveContainer>
+            <BarChart data={VENDEDORES.map((v) => ({ ...v, efectivasPct: parseFloat(v.pct), noEfectivasPct: parseFloat((100 - v.pct).toFixed(1)) }))} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+              <CartesianGrid horizontal={false} stroke="#f1f5f9" />
+              <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11, fill: '#6B7280', fontWeight: 600 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
+              <YAxis dataKey="nombre" type="category" width={140} tick={{ fontSize: 12, fill: '#1F2937', fontWeight: 600 }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }} formatter={(value) => [`${value}%`]} cursor={{ fill: '#f8fafc' }} />
+              <Legend wrapperStyle={{ fontSize: '12px', fontWeight: 700 }} />
+              <Bar dataKey="efectivasPct" name="Efectivas" stackId="a" fill={CHART_COLORS.efectivas} radius={[0, 0, 0, 0]} barSize={22} />
+              <Bar dataKey="noEfectivasPct" name="No Efectivas" stackId="a" fill={CHART_COLORS.noEfectivas} radius={[0, 6, 6, 0]} barSize={22} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </section>
 
       {/* TABLE */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100">
           <h3 className="text-lg font-bold font-display text-slate-900">Listado Completo</h3>
           <p className="text-xs text-slate-400 mt-1">Mostrando {VENDEDORES.length} de 12 vendedores</p>

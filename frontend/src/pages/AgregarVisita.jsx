@@ -1,13 +1,15 @@
 // ==============================================
 // AgregarVisita.jsx — Formulario para Agregar Visita
 // ==============================================
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function AgregarVisita() {
+  const [tipoVisitado, setTipoVisitado] = useState('');
   return (
     <>
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <nav className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">
             <Link className="hover:text-primary transition-colors" to="/actividad-comercial">Actividad Comercial</Link>
@@ -16,22 +18,22 @@ export default function AgregarVisita() {
           </nav>
           <h2 className="text-3xl font-black text-slate-900 font-display">Registrar Visita</h2>
         </div>
-        <div className="flex gap-3">
-          <Link to="/actividad-comercial" className="px-6 py-2.5 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 transition-colors">Cancelar</Link>
-          <button className="px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">Guardar Visita</button>
+        <div className="flex gap-3 w-full sm:w-auto">
+          <Link to="/actividad-comercial" className="flex-1 sm:flex-initial text-center px-6 py-2.5 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 transition-colors">Cancelar</Link>
+          <button className="flex-1 sm:flex-initial px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">Guardar Visita</button>
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* LEFT COLUMN */}
-        <div className="col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-8">
           {/* DATOS DE LA VISITA */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">location_on</span>
               Datos de la Visita
             </h3>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Vendedor</label>
                 <select name="vendedor_id" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
@@ -41,12 +43,39 @@ export default function AgregarVisita() {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cliente</label>
-                <select name="cliente_id" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                  <option>Seleccionar cliente...</option>
-                  <option>Alimentos Polar</option>
-                  <option>PepsiCo Venezuela</option>
-                </select>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Visitado<span className="text-red-500 ml-0.5">*</span></label>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 p-3 px-6 rounded-lg border border-slate-200 cursor-pointer hover:border-primary transition-colors">
+                    <input type="radio" name="tipo_visitado" value="cliente" checked={tipoVisitado === 'cliente'} onChange={(e) => setTipoVisitado(e.target.value)} className="text-primary focus:ring-primary" />
+                    <span className="text-sm font-medium text-slate-700">Cliente</span>
+                  </label>
+                  <label className="flex items-center gap-2 p-3 px-6 rounded-lg border border-slate-200 cursor-pointer hover:border-primary transition-colors">
+                    <input type="radio" name="tipo_visitado" value="aliado" checked={tipoVisitado === 'aliado'} onChange={(e) => setTipoVisitado(e.target.value)} className="text-primary focus:ring-primary" />
+                    <span className="text-sm font-medium text-slate-700">Aliado Comercial</span>
+                  </label>
+                </div>
+              </div>
+              <div>
+                {tipoVisitado === 'cliente' && (
+                  <>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cliente<span className="text-red-500 ml-0.5">*</span></label>
+                    <select name="cliente_id" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                      <option>Seleccionar cliente...</option>
+                      <option>Alimentos Polar</option>
+                      <option>PepsiCo Venezuela</option>
+                    </select>
+                  </>
+                )}
+                {tipoVisitado === 'aliado' && (
+                  <>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Aliado Comercial<span className="text-red-500 ml-0.5">*</span></label>
+                    <select name="aliado_id" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                      <option>Seleccionar aliado...</option>
+                      <option>La Romántica 88.9</option>
+                      <option>Éxitos 99.9</option>
+                    </select>
+                  </>
+                )}
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Fecha<span className="text-red-500 ml-0.5">*</span></label>
@@ -76,12 +105,12 @@ export default function AgregarVisita() {
           </section>
 
           {/* RESULTADO */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">fact_check</span>
               Resultado de la Visita
             </h3>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">¿Fue efectiva?<span className="text-red-500 ml-0.5">*</span></label>
                 <div className="flex items-center gap-4">
@@ -104,9 +133,9 @@ export default function AgregarVisita() {
         </div>
 
         {/* RIGHT COLUMN */}
-        <div className="col-span-4 space-y-8">
+        <div className="lg:col-span-4 space-y-8">
           {/* GASTOS ASOCIADOS */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">receipt_long</span>
               Gastos Asociados
@@ -119,10 +148,11 @@ export default function AgregarVisita() {
               <select name="gasto_categoria" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                 <option value="">Categoría del gasto...</option>
                 <option value="transporte">Transporte</option>
-                <option value="alimentación">Alimentación</option>
+                <option value="alimentacion">Alimentación</option>
                 <option value="peaje">Peaje</option>
                 <option value="estacionamiento">Estacionamiento</option>
                 <option value="regalos">Regalos</option>
+                <option value="atencion">Atención</option>
                 <option value="otros">Otros</option>
               </select>
               <button className="w-full py-2.5 flex items-center justify-center gap-2 border border-dashed border-slate-200 hover:border-primary text-slate-400 hover:text-primary rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors">
@@ -133,7 +163,7 @@ export default function AgregarVisita() {
           </section>
 
           {/* ARCHIVOS */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">attach_file</span>
               Archivos Adjuntos

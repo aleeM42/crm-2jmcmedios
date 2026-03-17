@@ -54,7 +54,7 @@ export default function DetalleVendedor() {
   return (
     <>
       {/* HEADER */}
-      <div className="flex justify-between items-start mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4 mb-8">
         <div>
           <nav className="flex text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">
             <Link to="/equipo-ventas" className="hover:text-primary transition-colors">Equipo de Ventas</Link>
@@ -63,7 +63,7 @@ export default function DetalleVendedor() {
           </nav>
           <h2 className="text-3xl font-bold text-slate-800 font-display">Detalle de Vendedor</h2>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 w-full sm:w-auto">
           <button className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-sm transition-all flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">edit</span>Editar
           </button>
@@ -74,7 +74,7 @@ export default function DetalleVendedor() {
       </div>
 
       {/* PROFILE HEADER */}
-      <div className="bg-white rounded-xl p-8 mb-8 shadow-sm border border-slate-100 flex items-center gap-8">
+      <div className="bg-[#F4FAFB] rounded-xl p-8 mb-8 shadow-sm border border-slate-100 flex flex-col sm:flex-row items-center gap-8">
         <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-white text-3xl font-bold border-4 border-primary/20">
           {initials}
         </div>
@@ -88,7 +88,7 @@ export default function DetalleVendedor() {
               {v.estado}
             </span>
           </div>
-          <div className="flex gap-6 text-sm text-slate-500">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 text-sm text-slate-500">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-lg">mail</span>{v.correo}
             </div>
@@ -101,9 +101,9 @@ export default function DetalleVendedor() {
       </div>
 
       {/* KPI ROW */}
-      <div className="grid grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Meta */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
             <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Meta</p>
             <h4 className="text-2xl font-bold text-slate-800">${v.meta.toLocaleString()}</h4>
@@ -118,7 +118,7 @@ export default function DetalleVendedor() {
         </div>
 
         {/* Pautas Cerradas */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100">
           <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Pautas Cerradas</p>
           <div className="flex items-end gap-2">
             <h4 className="text-2xl font-bold text-slate-800">8</h4>
@@ -127,7 +127,7 @@ export default function DetalleVendedor() {
         </div>
 
         {/* Visitas del Mes */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100">
           <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Visitas del Mes</p>
           <div className="flex items-center justify-between">
             <h4 className="text-2xl font-bold text-slate-800">24</h4>
@@ -139,7 +139,7 @@ export default function DetalleVendedor() {
         </div>
 
         {/* Gastos del Mes */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+        <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100">
           <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Gastos del Mes</p>
           <h4 className="text-2xl font-bold text-slate-800">$890</h4>
           <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
@@ -149,11 +149,11 @@ export default function DetalleVendedor() {
       </div>
 
       {/* TWO COLUMNS LAYOUT */}
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* LEFT COLUMN */}
-        <div className="col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-8">
           {/* Clientes Asignados — Entidad CLIENTE */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="p-6 border-b border-slate-50 flex justify-between items-center">
               <h5 className="font-bold text-slate-800 flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">groups</span>Clientes Asignados
@@ -187,7 +187,7 @@ export default function DetalleVendedor() {
           </div>
 
           {/* Histórico de Pautas — Entidad PAUTA */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="p-6 border-b border-slate-50 flex justify-between items-center">
               <h5 className="font-bold text-slate-800 flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">history_edu</span>Histórico de Pautas
@@ -228,9 +228,9 @@ export default function DetalleVendedor() {
         </div>
 
         {/* RIGHT COLUMN */}
-        <div className="col-span-4 space-y-8">
+        <div className="lg:col-span-4 space-y-8">
           {/* Información del Vendedor — USUARIO + VENDEDOR */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h5 className="font-bold text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-50 pb-4">
               <span className="material-symbols-outlined text-primary">info</span>Información del Vendedor
             </h5>
@@ -252,7 +252,7 @@ export default function DetalleVendedor() {
           </div>
 
           {/* Actividad Reciente */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h5 className="font-bold text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-50 pb-4">
               <span className="material-symbols-outlined text-primary">history</span>Actividad Reciente
             </h5>
@@ -274,7 +274,7 @@ export default function DetalleVendedor() {
           </div>
 
           {/* Resumen de Gastos — Entidad GASTO VISITA */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h5 className="font-bold text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-50 pb-4">
               <span className="material-symbols-outlined text-primary">pie_chart</span>Resumen de Gastos
             </h5>

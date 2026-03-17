@@ -62,7 +62,7 @@ export default function AgregarVendedor() {
   return (
     <>
       {/* HEADER */}
-      <header className="flex items-center justify-between mb-10">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
         <div>
           <nav className="flex items-center text-[11px] font-semibold text-slate-400 mb-2 uppercase tracking-[0.1em]">
             <Link to="/equipo-ventas" className="hover:text-primary transition-colors">Equipo de Ventas</Link>
@@ -71,18 +71,18 @@ export default function AgregarVendedor() {
           </nav>
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-display">Agregar Vendedor</h2>
         </div>
-        <div className="flex items-center gap-4">
-          <Link to="/equipo-ventas" className="px-6 py-2.5 rounded-full border border-slate-300 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-all">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <Link to="/equipo-ventas" className="flex-1 sm:flex-initial text-center px-6 py-2.5 rounded-full border border-slate-300 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-all">
             Cancelar
           </Link>
-          <button onClick={handleSubmit} className="px-8 py-2.5 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">
+          <button onClick={handleSubmit} className="flex-1 sm:flex-initial px-8 py-2.5 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">
             Guardar
           </button>
         </div>
       </header>
 
       {/* FORM CARD */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-[#F4FAFB] rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <form onSubmit={handleSubmit} onReset={handleReset} className="p-10">
           <div className="space-y-12">
             {/* ════════════════════════════════
@@ -177,7 +177,7 @@ export default function AgregarVendedor() {
                     name="tipo"
                     value={formData.tipo}
                     onChange={handleChange}
-                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white"
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
                     required
                   >
                     <option value="vendedor">Vendedor</option>
@@ -194,7 +194,7 @@ export default function AgregarVendedor() {
                     name="rol"
                     value={formData.rol}
                     onChange={handleChange}
-                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white"
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
                     required
                   >
                     <option value="invitado">Invitado</option>
@@ -214,7 +214,7 @@ export default function AgregarVendedor() {
                     name="estado"
                     value={formData.estado}
                     onChange={handleChange}
-                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white"
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
                     required
                   >
                     <option value="activo">Activo</option>
@@ -309,7 +309,7 @@ export default function AgregarVendedor() {
                     name="nombre_usuario"
                     value={formData.nombre_usuario}
                     onChange={handleChange}
-                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white"
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
                     placeholder="Ej: mgonzalez2jmc"
                     type="text"
                     required
@@ -326,14 +326,12 @@ export default function AgregarVendedor() {
                       name="contraseña"
                       value={formData.contraseña}
                       onChange={handleChange}
-                      className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-white"
+                      className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
                       placeholder="••••••••"
                       type="password"
                       required
                     />
-                    <button className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" type="button">
-                      <span className="material-symbols-outlined text-[20px]">visibility</span>
-                    </button>
+
                   </div>
                 </div>
               </div>
@@ -341,7 +339,7 @@ export default function AgregarVendedor() {
           </div>
 
           {/* FOOTER */}
-          <div className="mt-12 pt-8 border-t border-slate-100 flex items-center justify-between">
+          <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <p className="text-[12px] text-slate-400 font-medium">
               <span className="text-red-500 font-bold">*</span> Campos obligatorios para el registro en el sistema
             </p>
@@ -358,21 +356,21 @@ export default function AgregarVendedor() {
 
       {/* INFO CARDS */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-6 bg-white/60 border border-slate-200 rounded-2xl flex items-start gap-4">
+        <div className="p-6 bg-[#F4FAFB]/60 border border-slate-200 rounded-2xl flex items-start gap-4">
           <div className="text-accent-green"><span className="material-symbols-outlined">shield_person</span></div>
           <div>
             <h4 className="text-xs font-bold text-slate-700 uppercase tracking-tight mb-1">Privacidad</h4>
             <p className="text-[11px] text-slate-500 leading-relaxed">Los datos personales están protegidos bajo las políticas de seguridad de la empresa.</p>
           </div>
         </div>
-        <div className="p-6 bg-white/60 border border-slate-200 rounded-2xl flex items-start gap-4">
+        <div className="p-6 bg-[#F4FAFB]/60 border border-slate-200 rounded-2xl flex items-start gap-4">
           <div className="text-primary"><span className="material-symbols-outlined">info</span></div>
           <div>
             <h4 className="text-xs font-bold text-slate-700 uppercase tracking-tight mb-1">Asignación</h4>
             <p className="text-[11px] text-slate-500 leading-relaxed">Al guardar, el usuario recibirá un correo de bienvenida con sus accesos.</p>
           </div>
         </div>
-        <div className="p-6 bg-white/60 border border-slate-200 rounded-2xl flex items-start gap-4">
+        <div className="p-6 bg-[#F4FAFB]/60 border border-slate-200 rounded-2xl flex items-start gap-4">
           <div className="text-secondary"><span className="material-symbols-outlined">monitoring</span></div>
           <div>
             <h4 className="text-xs font-bold text-slate-700 uppercase tracking-tight mb-1">Metas</h4>

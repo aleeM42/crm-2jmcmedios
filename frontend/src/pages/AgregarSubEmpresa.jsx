@@ -63,7 +63,7 @@ export default function AgregarSubEmpresa() {
   return (
     <>
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <nav className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">
             <Link className="hover:text-primary transition-colors" to="/clientes">Clientes</Link>
@@ -74,20 +74,20 @@ export default function AgregarSubEmpresa() {
           </nav>
           <h2 className="text-3xl font-black text-slate-900 font-display">Agregar Sub-Empresa</h2>
         </div>
-        <div className="flex gap-3">
-          <Link to={`/clientes/${clienteId || ''}`} className="px-6 py-2.5 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 transition-colors">Cancelar</Link>
-          <button className="px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">Guardar Sub-Empresa</button>
+        <div className="flex gap-3 w-full sm:w-auto">
+          <Link to={`/clientes/${clienteId || ''}`} className="flex-1 sm:flex-initial text-center px-6 py-2.5 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 transition-colors">Cancelar</Link>
+          <button className="flex-1 sm:flex-initial px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">Guardar Sub-Empresa</button>
         </div>
       </div>
 
       <form className="max-w-3xl space-y-8">
         {/* ═══ DATOS SUB-EMPRESA — CLIENTE entity ═══ */}
-        <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+        <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
           <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
             <span className="material-symbols-outlined text-primary">business</span>
             Datos de la Sub-Empresa
           </h3>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {/* nombre */}
             <div>
               <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Nombre <span className="text-red-500">*</span></label>
@@ -146,12 +146,12 @@ export default function AgregarSubEmpresa() {
         </section>
 
         {/* ═══ CONTACTO PRINCIPAL — CONTACTO entity ═══ */}
-        <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+        <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
           <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
             <span className="material-symbols-outlined text-primary">contact_phone</span>
             Contacto Principal
           </h3>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {/* primer_nombre */}
             <div>
               <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Primer Nombre <span className="text-red-500">*</span></label>
@@ -216,7 +216,7 @@ export default function AgregarSubEmpresa() {
         </section>
 
         {/* ═══ MARCAS — MARCA_INTER entity ═══ */}
-        <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+        <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
           <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
             <span className="material-symbols-outlined text-primary">loyalty</span>
             Marcas Asociadas <span className="text-red-500">*</span>

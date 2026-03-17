@@ -6,9 +6,9 @@ const COLUMNS = [
   {
     title: 'Contacto Inicial', color: 'accent-light', count: 5,
     cards: [
-      { name: 'TechNova Solutions', contact: 'Ana Martínez', amount: '$12,500', date: '12 Oct', seller: 'JP', sellerName: 'Juan Pérez', sellerColor: 'primary' },
-      { name: 'Alimentos del Sur', contact: 'Roberto Gómez', amount: '$3,200', date: '14 Oct', seller: 'MG', sellerName: 'María García', sellerColor: 'secondary' },
-      { name: 'Moda Urbana S.A.', contact: 'Elena Ruiz', amount: '$7,800', date: '15 Oct', seller: 'JP', sellerName: 'Juan Pérez', sellerColor: 'primary' },
+      { name: 'TechNova Solutions', contact: 'Ana Martínez', date: '12 Oct', seller: 'JP', sellerName: 'Juan Pérez', sellerColor: 'primary' },
+      { name: 'Alimentos del Sur', contact: 'Roberto Gómez', date: '14 Oct', seller: 'MG', sellerName: 'María García', sellerColor: 'secondary' },
+      { name: 'Moda Urbana S.A.', contact: 'Elena Ruiz', date: '15 Oct', seller: 'JP', sellerName: 'Juan Pérez', sellerColor: 'primary' },
     ],
   },
   {
@@ -30,29 +30,29 @@ const COLUMNS = [
 function Pipeline() {
   return (
     <>
-      <header className="flex items-center justify-between mb-6">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <h2 className="text-2xl font-bold text-slate-800 font-display">Pipeline de Ventas</h2>
-        <div className="flex items-center gap-4">
-          <select className="bg-white border-none rounded-lg px-4 py-2 pr-10 text-sm font-medium text-slate-600 shadow-sm ring-1 ring-slate-200 focus:ring-2 focus:ring-primary outline-none cursor-pointer">
+        <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto">
+          <select className="bg-[#F4FAFB] border-none rounded-lg px-4 py-2 pr-10 text-sm font-medium text-slate-600 shadow-sm ring-1 ring-slate-200 focus:ring-2 focus:ring-primary outline-none cursor-pointer flex-1 sm:flex-initial">
             <option>Filtrar por Vendedor</option><option>Juan Pérez</option><option>María García</option><option>Carlos Ruiz</option>
           </select>
-          <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all shadow-sm">
+          <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-sm flex-1 sm:flex-initial">
             <span className="material-symbols-outlined text-lg">add</span>Nuevo Lead
           </button>
         </div>
       </header>
 
       {/* KPI BAR */}
-      <div className="grid grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+        <div className="bg-[#F4FAFB] p-5 rounded-xl shadow-sm border border-slate-100 flex flex-col">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Leads</span>
           <span className="text-3xl font-bold text-slate-800">12</span>
         </div>
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+        <div className="bg-[#F4FAFB] p-5 rounded-xl shadow-sm border border-slate-100 flex flex-col">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Valor Estimado Total</span>
           <span className="text-3xl font-bold text-slate-800">$45,000</span>
         </div>
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+        <div className="bg-[#F4FAFB] p-5 rounded-xl shadow-sm border border-slate-100 flex flex-col">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Tasa de Conversión</span>
           <span className="text-3xl font-bold text-slate-800">33%</span>
         </div>
@@ -71,7 +71,7 @@ function Pipeline() {
             </div>
             <div className="flex-1 flex flex-col gap-3">
               {col.cards.map((card) => (
-                <div key={card.name} className={`bg-white p-4 rounded-xl shadow-sm border-l-4 border-${col.color} hover:shadow-md transition-shadow group relative`}>
+                <div key={card.name} className={`bg-[#F4FAFB] p-4 rounded-xl shadow-sm border-l-4 border-${col.color} hover:shadow-md transition-shadow group relative`}>
                   <div className="absolute right-3 top-3 flex items-center gap-1">
                     {card.won && <span className="material-symbols-outlined text-accent-green text-lg">check_circle</span>}
                     <span className="material-symbols-outlined text-slate-300 text-[18px] group-hover:text-slate-400">drag_indicator</span>

@@ -254,7 +254,7 @@ Create table GASTOS_VISITAS (
 	
     -- Constraints
     CONSTRAINT fk_gasto_visita FOREIGN KEY (fk_visita) REFERENCES VISITAS(id) ON DELETE CASCADE,
-	CONSTRAINT check_GV_categoria CHECK (categoria IN ('transporte','alimentacion','peaje','estacionamiento','regalos','otros'))
+	CONSTRAINT check_GV_categoria CHECK (categoria IN ('transporte','alimentacion','peaje','estacionamiento','regalos','atencion','otros'))
 );
 
 create table GASTOS_MARKETING (
@@ -277,7 +277,8 @@ create table GASTOS_MARKETING (
 );
 
 create table PAUTAS(
-	numero_OT SERIAL PRIMARY KEY,
+	id SERIAL PRIMARY KEY,
+    numero_OT VARCHAR(20) NOT NULL,
 	fecha_emision DATE NOT NULL,
 	marca VARCHAR(20) NOT NULL,
 	coordinadora VARCHAR(20) NOT NULL,

@@ -2,6 +2,7 @@
 // ReporteTopEmisorasCunas.jsx — Top Emisoras por Cuñas
 // ==============================================
 import { Link } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 const EMISORAS = [
   { nombre: 'Éxitos FM 99.9', cunas: 245, clientes: 18, monto: '$28,500', pct: 100 },
@@ -30,31 +31,35 @@ export default function ReporteTopEmisorasCunas() {
           <p className="text-slate-500 text-sm mt-1">Ranking de emisoras con mayor volumen de cuñas transmitidas</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold"><span className="material-symbols-outlined text-lg">table_view</span>Excel</button>
         </div>
       </header>
 
       {/* CHART */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Top 10 Emisoras</h3>
-        <div className="space-y-4">
-          {EMISORAS.map((e, i) => (
-            <div key={e.nombre} className="flex items-center gap-4">
-              <span className="text-sm font-bold text-slate-400 w-6 text-right">{i + 1}</span>
-              <span className="text-sm font-semibold text-slate-900 w-48 truncate">{e.nombre}</span>
-              <div className="flex-1 h-8 bg-slate-50 rounded-lg overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-end pr-3" style={{ width: `${e.pct}%` }}>
-                  <span className="text-[10px] font-bold text-white">{e.cunas} cuñas</span>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div style={{ width: '100%', height: 420 }}>
+          <ResponsiveContainer>
+            <BarChart data={EMISORAS} margin={{ top: 5, right: 20, left: 0, bottom: 70 }}>
+              <defs>
+                <linearGradient id="emisoraGradient" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%" stopColor="#16B1B8" />
+                  <stop offset="100%" stopColor="#8DC63F" />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} stroke="#f1f5f9" />
+              <XAxis dataKey="nombre" tick={{ fontSize: 11, fill: '#1F2937', fontWeight: 600, angle: -40, textAnchor: 'end' }} axisLine={false} tickLine={false} interval={0} />
+              <YAxis tick={{ fontSize: 11, fill: '#6B7280', fontWeight: 600 }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }} formatter={(value) => [`${value} cuñas`, 'Cuñas']} cursor={{ fill: '#f1f5f9' }} />
+              <Bar dataKey="cunas" fill="url(#emisoraGradient)" radius={[6, 6, 0, 0]} barSize={28} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </section>
 
       {/* TABLE */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100"><h3 className="text-lg font-bold font-display text-slate-900">Detalle por Emisora</h3></div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">

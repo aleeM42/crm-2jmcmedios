@@ -2,6 +2,7 @@
 // ReportePautasFiltro.jsx — Pautas por Región, Marca, Cliente
 // ==============================================
 import { Link } from 'react-router-dom';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 const DISTRIBUCIONES = [
   { nombre: 'Capital', pautas: 35, color: '#16B1B8', offset: 0 },
@@ -43,17 +44,17 @@ export default function ReportePautasFiltro() {
           <p className="text-slate-500 text-sm mt-1">Búsqueda avanzada de pautas por fecha, categoría o estado</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
             <span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF
           </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
             <span className="material-symbols-outlined text-lg">table_view</span>Excel
           </button>
         </div>
       </header>
 
       {/* FILTERS */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-8 flex flex-wrap items-center gap-4">
+      <div className="bg-[#F4FAFB] p-4 rounded-xl shadow-sm border border-slate-100 mb-8 flex flex-wrap items-center gap-4">
         <select className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
           <option>Región: Todas</option>
           <option>Capital</option>
@@ -85,17 +86,21 @@ export default function ReportePautasFiltro() {
       </div>
 
       {/* DONUT */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Distribución de Pautas</h3>
         <div className="flex flex-col lg:flex-row items-center justify-around gap-8">
           <div className="relative w-48 h-48">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#f1f5f9" strokeWidth="3"></circle>
-              {DISTRIBUCIONES.map((d) => (
-                <circle key={d.nombre} cx="18" cy="18" fill="transparent" r="15.915" stroke={d.color} strokeDasharray={`${d.pautas} ${100 - d.pautas}`} strokeDashoffset={`-${d.offset}`} strokeWidth="3.5"></circle>
-              ))}
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <ResponsiveContainer>
+              <PieChart>
+                <Pie data={DISTRIBUCIONES} dataKey="pautas" nameKey="nombre" cx="50%" cy="50%" innerRadius="60%" outerRadius="85%" paddingAngle={2} strokeWidth={0}>
+                  {DISTRIBUCIONES.map((d) => (
+                    <Cell key={d.nombre} fill={d.color} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }} formatter={(value, name) => [`${value}%`, name]} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span className="text-3xl font-bold text-slate-900">100%</span>
               <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Regiones</span>
             </div>
@@ -115,7 +120,7 @@ export default function ReportePautasFiltro() {
       </section>
 
       {/* TABLE */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100">
           <h3 className="text-lg font-bold font-display text-slate-900">Listado Filtrado</h3>
         </div>

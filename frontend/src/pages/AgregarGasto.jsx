@@ -7,31 +7,31 @@ export default function AgregarGasto() {
   return (
     <>
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <nav className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">
             <Link className="hover:text-primary transition-colors" to="/actividad-comercial/gastos">Gastos</Link>
             <span className="material-symbols-outlined text-[14px]">chevron_right</span>
             <span className="text-slate-600">Nuevo Gasto</span>
           </nav>
-          <h2 className="text-3xl font-black text-slate-900 font-display">Registrar Gasto</h2>
+          <h2 className="text-3xl font-black text-slate-900 font-display">Registrar Gasto de Marketing</h2>
         </div>
-        <div className="flex gap-3">
-          <Link to="/actividad-comercial/gastos" className="px-6 py-2.5 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 transition-colors">Cancelar</Link>
-          <button className="px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">Guardar Gasto</button>
+        <div className="flex gap-3 w-full sm:w-auto">
+          <Link to="/actividad-comercial/gastos" className="flex-1 sm:flex-initial text-center px-6 py-2.5 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 transition-colors">Cancelar</Link>
+          <button className="flex-1 sm:flex-initial px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">Guardar Gasto</button>
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* MAIN FORM */}
-        <div className="col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-8">
           {/* DATOS DEL GASTO */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">receipt_long</span>
               Datos del Gasto
             </h3>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Vendedor</label>
                 <select name="vendedor_id" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
@@ -42,15 +42,13 @@ export default function AgregarGasto() {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Categoría<span className="text-red-500 ml-0.5">*</span></label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tipo de Gasto<span className="text-red-500 ml-0.5">*</span></label>
                 <select name="categoria" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                  <option value="">Seleccionar categoría...</option>
-                  <option value="transporte">Transporte</option>
-                  <option value="alimentación">Alimentación</option>
-                  <option value="peaje">Peaje</option>
-                  <option value="estacionamiento">Estacionamiento</option>
-                  <option value="regalos">Regalos</option>
-                  <option value="otros">Otros</option>
+                  <option value="">Seleccionar tipo...</option>
+                  <option value="campaña">Campaña</option>
+                  <option value="remota">Remota</option>
+                  <option value="regalosCorporativos">Regalos Coroporativos</option>
+
                 </select>
               </div>
               <div>
@@ -69,7 +67,7 @@ export default function AgregarGasto() {
           </section>
 
           {/* VISITA RELACIONADA */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">link</span>
               Visita Relacionada (Opcional)
@@ -86,10 +84,10 @@ export default function AgregarGasto() {
         </div>
 
         {/* SIDEBAR */}
-        <div className="col-span-4 space-y-8">
+        <div className="lg:col-span-4 space-y-8">
 
           {/* RESUMEN */}
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">summarize</span>
               Resumen

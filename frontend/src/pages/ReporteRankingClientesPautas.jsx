@@ -2,6 +2,13 @@
 // ReporteRankingClientesPautas.jsx — Ranking de Clientes por Pautas Contratadas
 // ==============================================
 import { Link } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+
+const COLOR_MAP = {
+  primary: '#16B1B8',
+  secondary: '#8DC63F',
+  'accent-green': '#8DC63F',
+};
 
 const TOP_CLIENTES = [
   { nombre: 'Alimentos Polar', pautas: 24, monto: '$48,000', region: 'Capital', color: 'primary' },
@@ -47,39 +54,40 @@ export default function ReporteRankingClientesPautas() {
           <p className="text-slate-500 text-sm mt-1">Visualización de clientes con mayor volumen de pautas publicitarias</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
             <span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF
           </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
             <span className="material-symbols-outlined text-lg">table_view</span>Excel
           </button>
         </div>
       </header>
 
       {/* TOP 10 CHART */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Top 10 Clientes</h3>
-        <div className="space-y-4">
-          {TOP_CLIENTES.map((c, i) => (
-            <div key={c.nombre} className="flex items-center gap-4">
-              <span className="text-sm font-bold text-slate-400 w-6 text-right">{i + 1}</span>
-              <span className="text-sm font-semibold text-slate-900 w-40 truncate">{c.nombre}</span>
-              <div className="flex-1 h-8 bg-slate-50 rounded-lg overflow-hidden">
-                <div
-                  className={`h-full bg-gradient-to-r from-${c.color} to-${c.color}/60 rounded-lg flex items-center justify-end pr-3 transition-all`}
-                  style={{ width: `${(c.pautas / MAX_PAUTAS) * 100}%` }}
-                >
-                  <span className="text-[10px] font-bold text-white">{c.pautas} pautas</span>
-                </div>
-              </div>
-              <span className="text-sm font-bold text-slate-700 w-20 text-right">{c.monto}</span>
-            </div>
-          ))}
+        <div style={{ width: '100%', height: 420 }}>
+          <ResponsiveContainer>
+            <BarChart data={TOP_CLIENTES} margin={{ top: 5, right: 20, left: 0, bottom: 60 }}>
+              <XAxis dataKey="nombre" tick={{ fontSize: 11, fill: '#1F2937', fontWeight: 600, angle: -35, textAnchor: 'end' }} axisLine={false} tickLine={false} interval={0} />
+              <YAxis tick={{ fontSize: 11, fill: '#6B7280', fontWeight: 600 }} axisLine={false} tickLine={false} />
+              <Tooltip
+                contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }}
+                formatter={(value) => [`${value} pautas`, 'Pautas']}
+                cursor={{ fill: '#f1f5f9' }}
+              />
+              <Bar dataKey="pautas" radius={[6, 6, 0, 0]} barSize={28}>
+                {TOP_CLIENTES.map((entry, index) => (
+                  <Cell key={index} fill={COLOR_MAP[entry.color] || '#16B1B8'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </section>
 
       {/* TABLE */}
-      <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
           <h3 className="text-lg font-bold font-display text-slate-900">Listado Completo</h3>
           <div className="flex items-center gap-3">

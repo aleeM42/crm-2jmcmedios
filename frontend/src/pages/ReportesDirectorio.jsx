@@ -14,7 +14,7 @@ const CATEGORIES = [
       { name: 'Regiones por Cliente', desc: 'Análisis geográfico de la presencia de clientes en el territorio nacional.', to: '/reportes/regiones-cliente', icon: 'map' },
       { name: 'Ingresos Mensuales', desc: 'Seguimiento histórico de facturación y proyecciones mensuales.', to: '/reportes/ingresos-mensuales', icon: 'payments' },
       { name: 'Pautas por Filtro', desc: 'Búsqueda avanzada de pautas por fecha, categoría o estado.', to: '/reportes/pautas-filtro', icon: 'filter_alt' },
-      { name: 'Gastos por Cliente', desc: 'Detalle de inversión publicitaria desglosado por cada cuenta.', to: '/reportes/gastos-cliente', icon: 'receipt_long' },
+      { name: 'Gastos en inversión de atención comercial', desc: 'Detalle de inversión publicitaria desglosado por cada cuenta.', to: '/reportes/gastos-cliente', icon: 'receipt_long' },
     ],
   },
   {
@@ -45,16 +45,16 @@ const CATEGORIES = [
 export default function ReportesDirectorio() {
   return (
     <>
-      <header className="flex justify-between items-center mb-10">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
         <div>
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-display">Reportes</h2>
           <p className="text-slate-500 text-sm mt-1">Centro de inteligencia comercial y análisis de datos</p>
         </div>
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all">
+          {/*<button className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all">
             <span className="material-symbols-outlined text-lg">file_download</span>
             <span className="text-xs font-bold uppercase tracking-wider">Exportar Todo</span>
-          </button>
+          </button>*/}
         </div>
       </header>
 
@@ -72,7 +72,7 @@ export default function ReportesDirectorio() {
               <Link
                 key={r.to}
                 to={r.to}
-                className="group bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary/30 transition-all"
+                className="group bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary/30 transition-all"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className={`p-2 bg-${cat.color}/10 rounded-lg group-hover:bg-${cat.color}/20 transition-colors`}>

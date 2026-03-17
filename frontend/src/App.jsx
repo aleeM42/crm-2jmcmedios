@@ -46,6 +46,7 @@ import ReporteMarcasRegion from './pages/ReporteMarcasRegion';
 import ReporteClientesEmisora from './pages/ReporteClientesEmisora';
 import ReporteEmisorasActivasRegion from './pages/ReporteEmisorasActivasRegion';
 import ReporteTopEmisorasClientes from './pages/ReporteTopEmisorasClientes';
+import AgregarLead from './pages/AgregarLead';
 
 export default function App() {
   return (
@@ -77,13 +78,14 @@ export default function App() {
           <Route path="/aliados-comerciales/:id" element={<DetalleEmisora />} />
 
           {/* Actividad Comercial */}
-          <Route path="/actividad-comercial"                element={<ActividadComercial />} />
-          <Route path="/actividad-comercial/visita"         element={<AgregarVisita />} />
-          <Route path="/actividad-comercial/gastos"         element={<GastosLista />} />
+          <Route path="/actividad-comercial" element={<ActividadComercial />} />
+          <Route path="/actividad-comercial/visita" element={<AgregarVisita />} />
+          <Route path="/actividad-comercial/gastos" element={<GastosLista />} />
           <Route path="/actividad-comercial/gastos/agregar" element={<AgregarGasto />} />
 
           {/* Pipeline */}
           <Route path="/pipeline" element={<Pipeline />} />
+          <Route path="/pipeline/agregar" element={<AgregarLead />} />
 
           {/* Clientes */}
           <Route path="/clientes" element={<Clientes />} />
