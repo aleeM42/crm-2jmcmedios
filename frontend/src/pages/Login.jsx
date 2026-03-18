@@ -1,8 +1,34 @@
 // ==============================================
-// Login.jsx — Pantalla de Inicio de Sesión
+// Login.jsx — Pantalla de Inicio de Sesión (conectada al backend)
 // ==============================================
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../services/auth.service.js';
 
 export default function Login() {
+  const navigate = useNavigate();
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const result = await login(identifier, password);
+      if (result.success) {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setError(err.data?.error || err.message || 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex h-screen w-full">
       {/* Left Side: Gradient & Brand Visual */}
@@ -44,12 +70,29 @@ export default function Login() {
             <h1 className="text-text-dark text-3xl font-bold font-display mb-2">Iniciar Sesión</h1>
             <p className="text-text-muted font-light">Bienvenido de nuevo al CRM de 2JMC Medios.</p>
           </div>
-          <form className="space-y-6">
+
+          {/* Error Alert */}
+          {error && (
+            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
+              <span className="material-symbols-outlined text-red-500">error</span>
+              <p className="text-sm text-red-600 font-medium">{error}</p>
+            </div>
+          )}
+
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {/* User Input */}
             <div>
               <label className="block text-text-dark text-sm font-semibold mb-2 font-display">Usuario</label>
               <div className="relative">
-                <input className="w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display" placeholder="Nombre de usuario o correo" type="text" />
+                <input
+                  className="w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display"
+                  placeholder="Nombre de usuario o correo"
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  required
+                  autoComplete="username"
+                />
               </div>
             </div>
             {/* Password Input */}
@@ -59,7 +102,15 @@ export default function Login() {
                 <a className="text-xs text-primary font-medium hover:underline" href="#">¿Olvidó su contraseña?</a>
               </div>
               <div className="relative">
-                <input className="w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display" placeholder="••••••••••••" type="password" />
+                <input
+                  className="w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display"
+                  placeholder="••••••••••••"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                />
               </div>
             </div>
             {/* Remember Me */}
@@ -68,9 +119,22 @@ export default function Login() {
               <label className="ml-2 text-sm text-text-muted cursor-pointer" htmlFor="remember">Mantener sesión iniciada</label>
             </div>
             {/* Submit Button */}
-            <button className="w-full h-14 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 group" type="submit">
-              <span>Ingresar</span>
-              <span className="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">login</span>
+            <button
+              className="w-full h-14 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="material-symbols-outlined text-xl animate-spin">progress_activity</span>
+                  <span>Ingresando...</span>
+                </>
+              ) : (
+                <>
+                  <span>Ingresar</span>
+                  <span className="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">login</span>
+                </>
+              )}
             </button>
           </form>
           {/* Footer Text */}

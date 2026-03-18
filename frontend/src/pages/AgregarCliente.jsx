@@ -1,53 +1,86 @@
 // ==============================================
-// AgregarCliente.jsx — Formulario Agregar Cliente
+// AgregarCliente.jsx — Formulario Agregar Cliente (conectado al backend)
 // Campos mapeados 1:1 con entidades CLIENTE, CONTACTO, TELEFONO, MARCA_INTER del CSV ER
 // ==============================================
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { crearCliente, getEmpresas, getLugares, getVendedores } from '../services/cliente.service.js';
 
 export default function AgregarCliente() {
+  const navigate = useNavigate();
+
   // --- CLIENTE (DB fields) ---
   const [cliente, setCliente] = useState({
     nombre: '',
     razon_social: '',
-    tipo: 'empresa',           // ENUM: empresa | sub empresa
+    tipo: 'Empresa',
     direccion: '',
     rif_fiscal: '',
-    clasificacion: '',         // ENUM: Agencia | Cliente Directo
-    sector: '',                // ENUM: Salud | Alimentación | Telemática | Fabricación | Bancario
-    estado: 'Activo',          // ENUM: Activo | Inactivo
-    nombre_agencia: '',        // NOT NULL si clasificacion === 'Agencia'
+    clasificacion: '',
+    sector: '',
+    estado: 'Activo',
+    nombre_agencia: '',
     observacion: '',
+    fk_lugar: '',
+    fk_vendedor: '',
   });
 
   // --- CONTACTO principal (DB fields) ---
   const [contacto, setContacto] = useState({
-    primer_nombre: '',
-    segundo_nombre: '',
-    primer_apellido: '',
+    pri_nombre: '',
+    seg_nombre: '',
+    pri_apellido: '',
     departamento: '',
     correo: '',
-    fecha_nacimiento: '',
-    anotaciones_especiales: '',
+    fecha_nac: '',
+    anotac_especiales: '',
     rol: '',
-    tipo: 'cliente',           // ENUM: emisora | cliente
+    tipo: 'cliente',
   });
 
-  // --- TELEFONOS (PK compuesta: codigo_area + cuerpo) ---
-  const [telefonos, setTelefonos] = useState([{ codigo_area: '', cuerpo: '' }]);
+  // --- TELEFONOS (PK compuesta: codigo_area + numero) ---
+  const [telefonos, setTelefonos] = useState([{ codigo_area: '', numero: '' }]);
 
   // --- MARCAS_INTER ---
-  const [marcas, setMarcas] = useState([{ nombre: '', observaciones: '' }]);
+  const [marcas, setMarcas] = useState([]);
   const [nuevaMarca, setNuevaMarca] = useState('');
 
-  // --- Vinculación sub-empresa ---
+  // --- Sub-empresa vinculación ---
   const [isSubEmpresa, setIsSubEmpresa] = useState(false);
-  const [empresaPadreId, setEmpresaPadreId] = useState('');
+
+  // --- Lookups ---
+  const [empresas, setEmpresas] = useState([]);
+  const [lugares, setLugares] = useState([]);
+  const [vendedores, setVendedores] = useState([]);
+
+  // --- UI State ---
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // Cargar lookups
+  useEffect(() => {
+    const loadLookups = async () => {
+      try {
+        const [empRes, lugRes, venRes] = await Promise.all([
+          getEmpresas().catch(() => ({ success: false })),
+          getLugares({ tipo: 'estado' }).catch(() => ({ success: false })),
+          getVendedores().catch(() => ({ success: false })),
+        ]);
+        if (empRes.success) setEmpresas(empRes.data);
+        if (lugRes.success) setLugares(lugRes.data);
+        if (venRes.success) setVendedores(venRes.data || []);
+      } catch {
+        // Silently handle — lookups may fail if endpoints don't exist yet
+      }
+    };
+    loadLookups();
+  }, []);
 
   const handleCliente = (e) => setCliente({ ...cliente, [e.target.name]: e.target.value });
   const handleContacto = (e) => setContacto({ ...contacto, [e.target.name]: e.target.value });
 
-  const addTelefono = () => setTelefonos([...telefonos, { codigo_area: '', cuerpo: '' }]);
+  const addTelefono = () => setTelefonos([...telefonos, { codigo_area: '', numero: '' }]);
   const removeTelefono = (i) => setTelefonos(telefonos.filter((_, idx) => idx !== i));
   const handleTelefono = (i, field, val) => {
     const copy = [...telefonos];
@@ -62,6 +95,37 @@ export default function AgregarCliente() {
   };
   const removeMarca = (i) => setMarcas(marcas.filter((_, idx) => idx !== i));
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      const payload = {
+        cliente: {
+          ...cliente,
+          fk_cliente_padre: isSubEmpresa ? (cliente.fk_cliente_padre || null) : null,
+          nombre_agencia: cliente.clasificacion === 'Agencia' ? cliente.nombre_agencia : null,
+          fk_lugar: parseInt(cliente.fk_lugar, 10) || null,
+        },
+        contacto: contacto.pri_nombre ? contacto : null,
+        telefonos: telefonos.filter(t => t.codigo_area && t.numero),
+        marcas: marcas.filter(m => m.nombre),
+      };
+
+      const result = await crearCliente(payload);
+      if (result.success) {
+        setSuccess('Cliente creado exitosamente');
+        setTimeout(() => navigate('/clientes'), 1500);
+      }
+    } catch (err) {
+      setError(err.data?.error || err.message || 'Error al crear cliente');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -75,11 +139,31 @@ export default function AgregarCliente() {
         </div>
         <div className="flex gap-4 w-full sm:w-auto">
           <Link to="/clientes" className="flex-1 sm:flex-initial text-center px-6 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-all">Cancelar</Link>
-          <button className="flex-1 sm:flex-initial px-8 py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-semibold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all">Guardar</button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="flex-1 sm:flex-initial px-8 py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-semibold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all disabled:opacity-60"
+          >
+            {loading ? 'Guardando...' : 'Guardar'}
+          </button>
         </div>
       </header>
 
-      <form className="space-y-8">
+      {/* Messages */}
+      {error && (
+        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
+          <span className="material-symbols-outlined text-red-500">error</span>
+          <p className="text-sm text-red-600 font-medium">{error}</p>
+        </div>
+      )}
+      {success && (
+        <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 flex items-center gap-3">
+          <span className="material-symbols-outlined text-green-500">check_circle</span>
+          <p className="text-sm text-green-600 font-medium">{success}</p>
+        </div>
+      )}
+
+      <form className="space-y-8" onSubmit={handleSubmit}>
         {/* ═══ Vinculación ═══ */}
         <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
           <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
@@ -91,36 +175,24 @@ export default function AgregarCliente() {
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">¿Es una sub-empresa de una empresa existente?</label>
               <div className="flex gap-6">
                 <label className="flex items-center gap-2 cursor-pointer group">
-                  <input className="w-4 h-4 text-primary border-slate-300 focus:ring-primary" checked={!isSubEmpresa} onChange={() => { setIsSubEmpresa(false); setCliente({ ...cliente, tipo: 'empresa' }); }} type="radio" name="is_sub_empresa" value="no" />
+                  <input className="w-4 h-4 text-primary border-slate-300 focus:ring-primary" checked={!isSubEmpresa} onChange={() => { setIsSubEmpresa(false); setCliente({ ...cliente, tipo: 'Empresa' }); }} type="radio" name="is_sub_empresa" value="no" />
                   <span className="text-sm font-medium text-slate-700 group-hover:text-primary transition-colors">No</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer group">
-                  <input className="w-4 h-4 text-primary border-slate-300 focus:ring-primary" checked={isSubEmpresa} onChange={() => { setIsSubEmpresa(true); setCliente({ ...cliente, tipo: 'sub empresa' }); }} type="radio" name="is_sub_empresa" value="si" />
+                  <input className="w-4 h-4 text-primary border-slate-300 focus:ring-primary" checked={isSubEmpresa} onChange={() => { setIsSubEmpresa(true); setCliente({ ...cliente, tipo: 'Subempresa' }); }} type="radio" name="is_sub_empresa" value="si" />
                   <span className="text-sm font-medium text-slate-700 group-hover:text-primary transition-colors">Sí</span>
                 </label>
               </div>
             </div>
             {isSubEmpresa && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Seleccionar Empresa Padre <span className="text-red-500">*</span></label>
-                  <select name="empresa_padre_id" value={empresaPadreId} onChange={(e) => setEmpresaPadreId(e.target.value)} className="w-full rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
-                    <option value="">Buscar empresa...</option>
-                    <option value="c1">Alimentos Polar C.A.</option>
-                    <option value="c2">Farmatodo C.A.</option>
-                  </select>
-                </div>
-                {empresaPadreId && (
-                  <div className="p-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-primary">verified</span>
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Empresa Seleccionada</p>
-                      <p className="text-sm font-bold text-slate-800">{empresaPadreId === 'c1' ? 'Alimentos Polar C.A.' : 'Farmatodo C.A.'}</p>
-                    </div>
-                  </div>
-                )}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Seleccionar Empresa Padre <span className="text-red-500">*</span></label>
+                <select name="fk_cliente_padre" value={cliente.fk_cliente_padre || ''} onChange={handleCliente} className="w-full rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
+                  <option value="">Buscar empresa...</option>
+                  {empresas.map(emp => (
+                    <option key={emp.id} value={emp.id}>{emp.razon_social}</option>
+                  ))}
+                </select>
               </div>
             )}
           </div>
@@ -133,61 +205,56 @@ export default function AgregarCliente() {
             <h3 className="text-lg font-bold font-display">Datos de la Empresa</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-            {/* tipo — ENUM */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tipo <span className="text-red-500">*</span></label>
-              <select name="tipo" value={cliente.tipo} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
-                <option value="empresa">Empresa</option>
-                <option value="sub empresa">Sub Empresa</option>
-              </select>
-            </div>
-            {/* nombre */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nombre <span className="text-red-500">*</span></label>
-              <input name="nombre" value={cliente.nombre} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Comercial" type="text" />
+              <input name="nombre" value={cliente.nombre} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Comercial" type="text" required />
             </div>
-            {/* razon_social */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Razón Social <span className="text-red-500">*</span></label>
-              <input name="razon_social" value={cliente.razon_social} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Legal Completo" type="text" />
+              <input name="razon_social" value={cliente.razon_social} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Legal Completo" type="text" required />
             </div>
-            {/* rif_fiscal */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">RIF Fiscal <span className="text-red-500">*</span></label>
-              <input name="rif_fiscal" value={cliente.rif_fiscal} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="J-00000000-0" type="text" />
+              <input name="rif_fiscal" value={cliente.rif_fiscal} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="J-00000000-0" type="text" required />
             </div>
-            {/* direccion */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Ubicación (Estado) <span className="text-red-500">*</span></label>
+              <select name="fk_lugar" value={cliente.fk_lugar} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
+                <option value="">Seleccione estado</option>
+                {lugares.map(l => (
+                  <option key={l.id} value={l.id}>{l.nombre}</option>
+                ))}
+              </select>
+            </div>
             <div className="flex flex-col gap-1.5 md:col-span-2">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Dirección <span className="text-red-500">*</span></label>
-              <input name="direccion" value={cliente.direccion} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Dirección completa del cliente" type="text" />
+              <input name="direccion" value={cliente.direccion} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Dirección completa del cliente" type="text" required />
             </div>
-            {/* clasificacion — ENUM */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Clasificación <span className="text-red-500">*</span></label>
-              <select name="clasificacion" value={cliente.clasificacion} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
+              <select name="clasificacion" value={cliente.clasificacion} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
                 <option value="">Seleccione</option>
-                <option value="Cliente Directo">Cliente Directo</option>
+                <option value="Cliente directo">Cliente Directo</option>
                 <option value="Agencia">Agencia</option>
               </select>
             </div>
-            {/* nombre_agencia — condicional */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nombre de Agencia {cliente.clasificacion === 'Agencia' && <span className="text-red-500">*</span>}</label>
               <input name="nombre_agencia" value={cliente.nombre_agencia} onChange={handleCliente} disabled={cliente.clasificacion !== 'Agencia'} className={`rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary ${cliente.clasificacion !== 'Agencia' ? 'bg-slate-50 opacity-60' : ''}`} placeholder="Solo si clasificación es Agencia" type="text" />
             </div>
-            {/* sector — ENUM */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sector <span className="text-red-500">*</span></label>
-              <select name="sector" value={cliente.sector} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
+              <select name="sector" value={cliente.sector} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
                 <option value="">Seleccione sector</option>
                 <option value="Salud">Salud</option>
-                <option value="Alimentación">Alimentación</option>
-                <option value="Telemática">Telemática</option>
-                <option value="Fabricación">Fabricación</option>
+                <option value="Alimentacion">Alimentación</option>
+                <option value="Telematica">Telemática</option>
+                <option value="Fabricacion">Fabricación</option>
                 <option value="Bancario">Bancario</option>
+                <option value="Aerolinea">Aerolínea</option>
+                <option value="Otro">Otro</option>
               </select>
             </div>
-            {/* estado — ENUM */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Estado <span className="text-red-500">*</span></label>
               <select name="estado" value={cliente.estado} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
@@ -195,7 +262,6 @@ export default function AgregarCliente() {
                 <option value="Inactivo">Inactivo</option>
               </select>
             </div>
-            {/* observacion */}
             <div className="flex flex-col gap-1.5 md:col-span-2">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Observación</label>
               <textarea name="observacion" value={cliente.observacion} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Comentarios generales sobre la empresa..." rows="3"></textarea>
@@ -203,22 +269,15 @@ export default function AgregarCliente() {
           </div>
         </section>
 
-        {/* ═══ Estructura Corporativa — MARCA_INTER entity ═══ */}
+        {/* ═══ Gestión de Marcas — MARCA_INTER entity ═══ */}
         <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
           <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
             <span className="material-symbols-outlined text-accent-green">account_tree</span>
             <h3 className="text-lg font-bold font-display">Gestión de Marcas</h3>
           </div>
           <div className="space-y-4">
-            <div className="flex justify-between items-end mb-2">
-              <div>
-                <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-2">
-                  <span className="material-symbols-outlined text-slate-400 text-lg">sell</span>Marcas Asociadas <span className="text-red-500">*</span>
-                </h4>
-                <p className="text-xs text-slate-400 font-medium">(mínimo 1 marca requerida)</p>
-              </div>
-            </div>
             <div className="flex flex-wrap gap-2 p-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg min-h-[60px]">
+              {marcas.length === 0 && <span className="text-xs text-slate-400 italic">Agregue al menos una marca</span>}
               {marcas.map((m, i) => (
                 <span key={i} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-accent-light/30 text-primary border border-primary/20 gap-2">
                   {m.nombre}
@@ -229,14 +288,10 @@ export default function AgregarCliente() {
               ))}
             </div>
             <div className="flex gap-3">
-              <input type="text" name="marca_nombre" value={nuevaMarca} onChange={(e) => setNuevaMarca(e.target.value)} placeholder="Nombre de la marca" className="flex-1 rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addMarca())} />
+              <input type="text" value={nuevaMarca} onChange={(e) => setNuevaMarca(e.target.value)} placeholder="Nombre de la marca" className="flex-1 rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addMarca())} />
               <button type="button" onClick={addMarca} className="px-4 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-xs font-bold flex items-center gap-1">
                 <span className="material-symbols-outlined text-sm">add_circle</span>Agregar
               </button>
-            </div>
-            <div className="bg-accent-light p-4 rounded-lg flex items-center gap-3 text-slate-800 text-sm font-medium mt-2">
-              <span className="material-symbols-outlined text-primary">info</span>
-              <span>Nota: Toda empresa (padre o sub-empresa) debe tener al menos una marca asociada.</span>
             </div>
           </div>
         </section>
@@ -245,67 +300,52 @@ export default function AgregarCliente() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* --- CONTACTO entity --- */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
-            <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4 text-slate-800">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-secondary">person_add</span>
-                <h3 className="text-lg font-bold font-display">Contacto Principal</h3>
-              </div>
-              <button className="flex items-center gap-1 text-xs font-bold text-primary hover:text-secondary transition-colors" type="button">
-                <span className="material-symbols-outlined text-[18px]">add_circle</span>Agregar Contacto
-              </button>
+            <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
+              <span className="material-symbols-outlined text-secondary">person_add</span>
+              <h3 className="text-lg font-bold font-display">Contacto Principal</h3>
             </div>
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* primer_nombre */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Nombre <span className="text-red-500">*</span></label>
-                  <input name="primer_nombre" value={contacto.primer_nombre} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                  <input name="pri_nombre" value={contacto.pri_nombre} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
                 </div>
-                {/* segundo_nombre */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Segundo Nombre</label>
-                  <input name="segundo_nombre" value={contacto.segundo_nombre} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                  <input name="seg_nombre" value={contacto.seg_nombre} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
                 </div>
               </div>
-              {/* primer_apellido */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Apellido <span className="text-red-500">*</span></label>
-                <input name="primer_apellido" value={contacto.primer_apellido} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                <input name="pri_apellido" value={contacto.pri_apellido} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* departamento */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Departamento <span className="text-red-500">*</span></label>
                   <input name="departamento" value={contacto.departamento} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Mercadeo" type="text" />
                 </div>
-                {/* rol */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rol <span className="text-red-500">*</span></label>
                   <input name="rol" value={contacto.rol} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Decisor, Operativo..." type="text" />
                 </div>
               </div>
-              {/* correo */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Correo <span className="text-red-500">*</span></label>
                 <input name="correo" value={contacto.correo} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="email@dominio.com" type="email" />
               </div>
-              {/* fecha_nacimiento */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fecha de Nacimiento</label>
-                <input name="fecha_nacimiento" value={contacto.fecha_nacimiento} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
+                <input name="fecha_nac" value={contacto.fecha_nac} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
               </div>
-              {/* anotaciones_especiales */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Anotaciones Especiales</label>
-                <textarea name="anotaciones_especiales" value={contacto.anotaciones_especiales} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Preferencias de contacto..." rows="2"></textarea>
+                <textarea name="anotac_especiales" value={contacto.anotac_especiales} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Preferencias de contacto..." rows="2"></textarea>
               </div>
-              {/* tipo (hidden — siempre 'cliente') */}
-              <input type="hidden" name="tipo" value="cliente" />
             </div>
           </section>
 
           <div className="space-y-8">
-            {/* --- TELEFONO entity (PK compuesta) --- */}
+            {/* --- TELEFONO entity --- */}
             <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
               <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
                 <span className="material-symbols-outlined text-primary">call</span>
@@ -316,11 +356,11 @@ export default function AgregarCliente() {
                   <div key={i} className="flex gap-3 items-end">
                     <div className="w-24 flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-500 uppercase">Cód. Área <span className="text-red-500">*</span></label>
-                      <input name="codigo_area" value={tel.codigo_area} onChange={(e) => handleTelefono(i, 'codigo_area', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0212" type="tel" />
+                      <input value={tel.codigo_area} onChange={(e) => handleTelefono(i, 'codigo_area', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0212" type="tel" />
                     </div>
                     <div className="flex-1 flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-500 uppercase">Número <span className="text-red-500">*</span></label>
-                      <input name="cuerpo" value={tel.cuerpo} onChange={(e) => handleTelefono(i, 'cuerpo', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="000 0000" type="tel" />
+                      <input value={tel.numero} onChange={(e) => handleTelefono(i, 'numero', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="000 0000" type="tel" />
                     </div>
                     <button type="button" onClick={() => removeTelefono(i)} className="bg-slate-50 border border-slate-200 p-3 rounded-lg hover:bg-slate-100 text-primary">
                       <span className="material-symbols-outlined">delete</span>
@@ -333,7 +373,7 @@ export default function AgregarCliente() {
               </div>
             </section>
 
-            {/* Asignación vendedor (relación FK vendedor_id) */}
+            {/* Asignación vendedor */}
             <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
               <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
                 <span className="material-symbols-outlined text-accent-green">assignment_ind</span>
@@ -341,11 +381,13 @@ export default function AgregarCliente() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Vendedor Asignado <span className="text-red-500">*</span></label>
-                <select name="vendedor_id" className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
+                <select name="fk_vendedor" value={cliente.fk_vendedor} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
                   <option value="">Seleccione un vendedor</option>
-                  <option value="v1">Alejandro Pérez</option>
-                  <option value="v2">Mariana Gómez</option>
-                  <option value="v3">Roberto Silva</option>
+                  {vendedores.map(v => (
+                    <option key={v.usuario_id || v.id} value={v.usuario_id || v.id}>
+                      {v.primer_nombre || v.nombre} {v.primer_apellido || v.apellido}
+                    </option>
+                  ))}
                 </select>
                 <p className="text-[10px] text-slate-400 mt-1 italic">El cliente será visible en el pipeline de este usuario.</p>
               </div>
@@ -355,7 +397,13 @@ export default function AgregarCliente() {
 
         <div className="flex flex-col sm:flex-row justify-end gap-4 py-8">
           <Link to="/clientes" className="px-8 py-3 rounded-lg border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all">Cancelar Cambios</Link>
-          <button className="px-12 py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all" type="submit">Guardar Cliente</button>
+          <button
+            className="px-12 py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all disabled:opacity-60"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? 'Guardando...' : 'Guardar Cliente'}
+          </button>
         </div>
       </form>
     </>

@@ -1,61 +1,67 @@
 // ==============================================
-// model/contacto.model.js — SQL puro para CONTACTO
+// model/contacto.model.js — SQL para CONTACTOS (alineado a init.sql)
 // ==============================================
 
 import pool from '../config/db.js';
 
-export const findAll = async () => {
-  const query = `SELECT * FROM contactos ORDER BY created_at DESC`;
-  const result = await pool.query(query);
-  return result.rows;
-};
-
-export const findById = async (id) => {
-  const query = `SELECT * FROM contactos WHERE id = $1`;
-  const result = await pool.query(query, [id]);
-  return result.rows[0];
-};
-
+/**
+ * Contactos de un cliente, con teléfonos.
+ */
 export const findByClienteId = async (clienteId) => {
-  const query = `SELECT * FROM contactos WHERE cliente_id = $1 ORDER BY es_principal DESC`;
+  const query = `
+    SELECT ct.id, ct.pri_nombre, ct.seg_nombre, ct.pri_apellido,
+           ct.departamento, ct.correo, ct.rol, ct.tipo,
+           ct.anotac_especiales, ct.fecha_nac, ct.fk_cliente
+    FROM CONTACTOS ct
+    WHERE ct.fk_cliente = $1
+    ORDER BY ct.id
+  `;
   const result = await pool.query(query, [clienteId]);
   return result.rows;
 };
 
-export const create = async (data) => {
-  const { clienteId, nombre, apellido, email, telefono, cargo, esPrincipal } = data;
+/**
+ * Un contacto por ID.
+ */
+export const findById = async (id) => {
   const query = `
-    INSERT INTO contactos (cliente_id, nombre, apellido, email, telefono, cargo, es_principal)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING *
+    SELECT id, pri_nombre, seg_nombre, pri_apellido,
+           departamento, correo, rol, tipo,
+           anotac_especiales, fecha_nac, fk_cliente
+    FROM CONTACTOS
+    WHERE id = $1
   `;
-  const values = [clienteId, nombre, apellido, email, telefono, cargo, esPrincipal || false];
-  const result = await pool.query(query, values);
-  return result.rows[0];
-};
-
-export const update = async (id, data) => {
-  const { nombre, apellido, email, telefono, cargo, esPrincipal } = data;
-  const query = `
-    UPDATE contactos 
-    SET nombre = COALESCE($1, nombre),
-        apellido = COALESCE($2, apellido),
-        email = COALESCE($3, email),
-        telefono = COALESCE($4, telefono),
-        cargo = COALESCE($5, cargo),
-        es_principal = COALESCE($6, es_principal),
-        updated_at = CURRENT_TIMESTAMP
-    WHERE id = $7
-    RETURNING *
-  `;
-  const values = [nombre, apellido, email, telefono, cargo, esPrincipal, id];
-  const result = await pool.query(query, values);
-  return result.rows[0];
-};
-
-export const remove = async (id) => {
-  // Hard delete para contactos
-  const query = `DELETE FROM contactos WHERE id = $1 RETURNING *`;
   const result = await pool.query(query, [id]);
+  return result.rows[0];
+};
+
+/**
+ * Inserta un contacto. Usado dentro de una transacción.
+ * @param {object} data - campos de CONTACTOS
+ * @param {object} client - pg client de transacción
+ */
+export const create = async (data, client) => {
+  const dbClient = client || pool;
+  const query = `
+    INSERT INTO CONTACTOS (
+      pri_nombre, seg_nombre, pri_apellido,
+      departamento, correo, rol, tipo,
+      anotac_especiales, fecha_nac, fk_cliente
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    RETURNING *
+  `;
+  const values = [
+    data.pri_nombre,
+    data.seg_nombre || null,
+    data.pri_apellido,
+    data.departamento,
+    data.correo,
+    data.rol,
+    data.tipo || 'cliente',
+    data.anotac_especiales || null,
+    data.fecha_nac || null,
+    data.fk_cliente,
+  ];
+  const result = await dbClient.query(query, values);
   return result.rows[0];
 };

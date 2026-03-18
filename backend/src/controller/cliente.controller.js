@@ -2,53 +2,152 @@
 // controller/cliente.controller.js — Lógica de negocio CLIENTE
 // ==============================================
 
+import pool from '../config/db.js';
 import * as ClienteModel from '../model/cliente.model.js';
+import * as ContactoModel from '../model/contacto.model.js';
+import * as MarcaModel from '../model/marca.model.js';
+import * as TelefonoModel from '../model/telefono.model.js';
 
-export const getAll = async (req, res) => {
+/**
+ * GET /api/clientes
+ * Query params: sector, estado, clasificacion, search, page, limit
+ * Retorna lista paginada + KPIs.
+ */
+export const getAll = async (req, res, next) => {
   try {
-    const clientes = await ClienteModel.findAll();
-    res.json(clientes);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener clientes', detalle: error.message });
+    const filters = {
+      sector: req.query.sector,
+      estado: req.query.estado,
+      clasificacion: req.query.clasificacion,
+      search: req.query.search,
+      page: req.query.page,
+      limit: req.query.limit,
+    };
+
+    const [result, kpis] = await Promise.all([
+      ClienteModel.findAll(filters),
+      ClienteModel.countByEstado(),
+    ]);
+
+    return res.json({
+      success: true,
+      data: {
+        clientes: result.clientes,
+        pagination: {
+          total: result.total,
+          page: result.page,
+          limit: result.limit,
+          totalPages: Math.ceil(result.total / result.limit),
+        },
+        kpis: {
+          total: parseInt(kpis.total, 10),
+          activos: parseInt(kpis.activos, 10),
+          inactivos: parseInt(kpis.inactivos, 10),
+        },
+      },
+    });
+  } catch (err) {
+    next(err);
   }
 };
 
-export const getById = async (req, res) => {
+/**
+ * GET /api/clientes/:id
+ * Detalle completo: cliente + sub-empresas + marcas + contactos + teléfonos.
+ */
+export const getById = async (req, res, next) => {
   try {
     const cliente = await ClienteModel.findById(req.params.id);
-    if (!cliente) return res.status(404).json({ error: 'Cliente no encontrado' });
-    res.json(cliente);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener cliente', detalle: error.message });
+
+    if (!cliente) {
+      return res.status(404).json({
+        success: false,
+        error: 'Cliente no encontrado',
+      });
+    }
+
+    return res.json({ success: true, data: cliente });
+  } catch (err) {
+    next(err);
   }
 };
 
-export const create = async (req, res) => {
+/**
+ * GET /api/clientes/empresas
+ * Lista empresas disponibles para select de sub-empresas.
+ */
+export const getEmpresas = async (req, res, next) => {
   try {
-    const { razonSocial } = req.body;
-    if (!razonSocial) return res.status(400).json({ error: 'razonSocial es obligatorio' });
-
-    const cliente = await ClienteModel.create(req.body);
-    res.status(201).json(cliente);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al crear cliente', detalle: error.message });
+    const empresas = await ClienteModel.findEmpresas();
+    return res.json({ success: true, data: empresas });
+  } catch (err) {
+    next(err);
   }
 };
 
-export const update = async (req, res) => {
-  try {
-    const cliente = await ClienteModel.update(req.params.id, req.body);
-    res.json(cliente);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar cliente', detalle: error.message });
-  }
-};
+/**
+ * POST /api/clientes
+ * Transacción atómica: CLIENTE → MARCAS → CONTACTO → TELEFONOS
+ *
+ * Body esperado:
+ * {
+ *   cliente: { nombre, razon_social, tipo, direccion, rif_fiscal, ... },
+ *   contacto: { pri_nombre, pri_apellido, departamento, correo, rol, tipo },
+ *   telefonos: [{ codigo_area, numero }],
+ *   marcas: [{ nombre, observaciones? }]
+ * }
+ */
+export const create = async (req, res, next) => {
+  const client = await pool.connect();
 
-export const remove = async (req, res) => {
   try {
-    await ClienteModel.remove(req.params.id);
-    res.json({ message: 'Cliente desactivado correctamente' });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar cliente', detalle: error.message });
+    await client.query('BEGIN');
+
+    const { cliente, contacto, telefonos, marcas } = req.body;
+
+    // 1. Crear cliente
+    const newCliente = await ClienteModel.create(cliente, client);
+
+    // 2. Crear marcas asociadas
+    let newMarcas = [];
+    if (marcas && marcas.length > 0) {
+      newMarcas = await MarcaModel.createBatch(newCliente.id, marcas, client);
+    }
+
+    // 3. Crear contacto principal
+    let newContacto = null;
+    let newTelefonos = [];
+    if (contacto && contacto.pri_nombre) {
+      contacto.fk_cliente = newCliente.id;
+      newContacto = await ContactoModel.create(contacto, client);
+
+      // 4. Crear teléfonos del contacto
+      if (telefonos && telefonos.length > 0 && newContacto) {
+        newTelefonos = await TelefonoModel.createBatch(
+          newContacto.id,
+          req.user.id, // usuario autenticado
+          telefonos,
+          client
+        );
+      }
+    }
+
+    await client.query('COMMIT');
+
+    return res.status(201).json({
+      success: true,
+      data: {
+        ...newCliente,
+        marcas: newMarcas,
+        contacto: newContacto
+          ? { ...newContacto, telefonos: newTelefonos }
+          : null,
+      },
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    next(err);
+  } finally {
+    client.release();
   }
 };

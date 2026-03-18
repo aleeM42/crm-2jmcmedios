@@ -3,8 +3,9 @@
 // ==============================================
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-// Layout
+// Layout & Auth
 import DashboardLayout from './components/DashboardLayout';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Pages
 import Login from './pages/Login';
@@ -55,8 +56,8 @@ export default function App() {
         {/* ===================== PUBLIC ===================== */}
         <Route path="/login" element={<Login />} />
 
-        {/* ===================== DASHBOARD (con sidebar) ===================== */}
-        <Route element={<DashboardLayout />}>
+        {/* ===================== DASHBOARD (protegido + sidebar) ===================== */}
+        <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/mi-perfil" element={<MiPerfil />} />
 

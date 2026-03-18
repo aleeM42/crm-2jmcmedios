@@ -1,9 +1,10 @@
 // ==============================================
-// AgregarVendedor.jsx — Formulario Nuevo Vendedor
-// Entidades: USUARIO + VENDEDOR + TELEFONO (CSV)
+// AgregarVendedor.jsx — Formulario Nuevo Vendedor (conectado al backend)
+// Entidades: USUARIO + VENDEDOR (CSV)
 // ==============================================
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { crearVendedor, getDirectores } from '../services/vendedor.service.js';
 
 const INITIAL_FORM = {
   // --- USUARIO ---
@@ -11,21 +12,31 @@ const INITIAL_FORM = {
   primer_apellido: '',
   correo: '',
   nombre_usuario: '',
-  contraseña: '',
-  rol: 'vendedor',
-  estado: 'activo',
+  password: '',
+  rol: 'Vendedor',
+  estado: 'Activo',
   // --- VENDEDOR ---
-  tipo: 'vendedor',
+  tipo: 'Vendedor',
   meta: '',
+  fk_vendedor_jefe: '',
   // --- TELEFONOS ---
-  telefonos: [{ codigo_area: '', cuerpo: '' }],
+  telefonos: [{ codigo_area: '', numero: '' }],
 };
 
 export default function AgregarVendedor() {
   const [formData, setFormData] = useState(INITIAL_FORM);
+  const [directores, setDirectores] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
-  /* ── helpers ── */
+  useEffect(() => {
+    getDirectores()
+      .then(res => { if (res.success) setDirectores(res.data); })
+      .catch(() => {});
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -42,7 +53,7 @@ export default function AgregarVendedor() {
   const addTelefono = () =>
     setFormData((prev) => ({
       ...prev,
-      telefonos: [...prev.telefonos, { codigo_area: '', cuerpo: '' }],
+      telefonos: [...prev.telefonos, { codigo_area: '', numero: '' }],
     }));
 
   const removeTelefono = (index) =>
@@ -51,10 +62,41 @@ export default function AgregarVendedor() {
       telefonos: prev.telefonos.filter((_, i) => i !== index),
     }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: enviar formData al backend
-    console.log('submit', formData);
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      const payload = {
+        usuario: {
+          primer_nombre: formData.primer_nombre,
+          primer_apellido: formData.primer_apellido,
+          correo: formData.correo,
+          nombre_usuario: formData.nombre_usuario,
+          password: formData.password,
+          rol: formData.rol,
+          estado: formData.estado,
+        },
+        vendedor: {
+          meta: parseInt(formData.meta, 10) || 0,
+          tipo: formData.tipo,
+          fk_vendedor_jefe: formData.fk_vendedor_jefe || null,
+        },
+        telefonos: formData.telefonos.filter(t => t.codigo_area && t.numero),
+      };
+
+      const result = await crearVendedor(payload);
+      if (result.success) {
+        setSuccess('Vendedor registrado exitosamente');
+        setTimeout(() => navigate('/equipo-ventas'), 1500);
+      }
+    } catch (err) {
+      setError(err.data?.error || err.data?.detalle || err.message || 'Error al registrar vendedor');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleReset = () => setFormData(INITIAL_FORM);
@@ -75,19 +117,31 @@ export default function AgregarVendedor() {
           <Link to="/equipo-ventas" className="flex-1 sm:flex-initial text-center px-6 py-2.5 rounded-full border border-slate-300 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-all">
             Cancelar
           </Link>
-          <button onClick={handleSubmit} className="flex-1 sm:flex-initial px-8 py-2.5 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">
-            Guardar
+          <button onClick={handleSubmit} disabled={loading} className="flex-1 sm:flex-initial px-8 py-2.5 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all disabled:opacity-60">
+            {loading ? 'Guardando...' : 'Guardar'}
           </button>
         </div>
       </header>
+
+      {/* Messages */}
+      {error && (
+        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
+          <span className="material-symbols-outlined text-red-500">error</span>
+          <p className="text-sm text-red-600 font-medium">{error}</p>
+        </div>
+      )}
+      {success && (
+        <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 flex items-center gap-3">
+          <span className="material-symbols-outlined text-green-500">check_circle</span>
+          <p className="text-sm text-green-600 font-medium">{success}</p>
+        </div>
+      )}
 
       {/* FORM CARD */}
       <div className="bg-[#F4FAFB] rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <form onSubmit={handleSubmit} onReset={handleReset} className="p-10">
           <div className="space-y-12">
-            {/* ════════════════════════════════
-                SECCIÓN 1 — Datos Personales (USUARIO + VENDEDOR)
-               ════════════════════════════════ */}
+            {/* SECCIÓN 1 — Datos Personales */}
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
@@ -100,133 +154,89 @@ export default function AgregarVendedor() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
-                {/* primer_nombre */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
                     Primer Nombre<span className="text-red-500 ml-1">*</span>
                   </label>
-                  <input
-                    name="primer_nombre"
-                    value={formData.primer_nombre}
-                    onChange={handleChange}
+                  <input name="primer_nombre" value={formData.primer_nombre} onChange={handleChange}
                     className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm"
-                    placeholder="Ej: María"
-                    type="text"
-                    required
-                  />
+                    placeholder="Ej: María" type="text" required />
                 </div>
-
-                {/* primer_apellido */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
                     Primer Apellido<span className="text-red-500 ml-1">*</span>
                   </label>
-                  <input
-                    name="primer_apellido"
-                    value={formData.primer_apellido}
-                    onChange={handleChange}
+                  <input name="primer_apellido" value={formData.primer_apellido} onChange={handleChange}
                     className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm"
-                    placeholder="Ej: González"
-                    type="text"
-                    required
-                  />
+                    placeholder="Ej: González" type="text" required />
                 </div>
-
-                {/* correo */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
                     Correo<span className="text-red-500 ml-1">*</span>
                   </label>
-                  <input
-                    name="correo"
-                    value={formData.correo}
-                    onChange={handleChange}
+                  <input name="correo" value={formData.correo} onChange={handleChange}
                     className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm"
-                    placeholder="vendedor@2jmcmedios.com"
-                    type="email"
-                    required
-                  />
+                    placeholder="vendedor@2jmcmedios.com" type="email" required />
                 </div>
-
-                {/* meta */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
                     Meta Mensual ($)<span className="text-red-500 ml-1">*</span>
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
-                    <input
-                      name="meta"
-                      value={formData.meta}
-                      onChange={handleChange}
+                    <input name="meta" value={formData.meta} onChange={handleChange}
                       className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary pl-9 pr-4 py-3 text-sm"
-                      placeholder="0.00"
-                      step="0.01"
-                      type="number"
-                      required
-                    />
+                      placeholder="0" step="1" type="number" required />
                   </div>
                 </div>
-
-                {/* tipo (VENDEDOR entity) */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
                     Tipo<span className="text-red-500 ml-1">*</span>
                   </label>
-                  <select
-                    name="tipo"
-                    value={formData.tipo}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
-                    required
-                  >
-                    <option value="vendedor">Vendedor</option>
-                    <option value="director">Director</option>
+                  <select name="tipo" value={formData.tipo} onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]" required>
+                    <option value="Vendedor">Vendedor</option>
+                    <option value="Director">Director</option>
                   </select>
                 </div>
-
-                {/* rol (USUARIO entity) */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
                     Rol<span className="text-red-500 ml-1">*</span>
                   </label>
-                  <select
-                    name="rol"
-                    value={formData.rol}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
-                    required
-                  >
-                    <option value="invitado">Invitado</option>
-                    <option value="gestor_pautas">Gestor de Pautas</option>
-                    <option value="vendedor">Vendedor</option>
-                    <option value="director">Director</option>
-                    <option value="admin">Admin</option>
+                  <select name="rol" value={formData.rol} onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]" required>
+                    <option value="Vendedor">Vendedor</option>
+                    <option value="Director">Director</option>
+                    <option value="Gestor de Pautas">Gestor de Pautas</option>
+                    <option value="Invitado">Invitado</option>
                   </select>
                 </div>
-
-                {/* estado (USUARIO entity) */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
                     Estado<span className="text-red-500 ml-1">*</span>
                   </label>
-                  <select
-                    name="estado"
-                    value={formData.estado}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
-                    required
-                  >
-                    <option value="activo">Activo</option>
-                    <option value="suspendido">Suspendido</option>
+                  <select name="estado" value={formData.estado} onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]" required>
+                    <option value="Activo">Activo</option>
+                    <option value="Suspendido">Suspendido</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
+                    Director Jefe
+                  </label>
+                  <select name="fk_vendedor_jefe" value={formData.fk_vendedor_jefe} onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]">
+                    <option value="">Sin jefe asignado</option>
+                    {directores.map(d => (
+                      <option key={d.id} value={d.id}>{d.primer_nombre} {d.primer_apellido}</option>
+                    ))}
                   </select>
                 </div>
               </div>
             </section>
 
-            {/* ════════════════════════════════
-                SECCIÓN 2 — Teléfonos (TELEFONO)
-               ════════════════════════════════ */}
+            {/* SECCIÓN 2 — Teléfonos */}
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 rounded-xl bg-accent-green/10 text-accent-green flex items-center justify-center">
@@ -234,7 +244,7 @@ export default function AgregarVendedor() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-800">Teléfonos</h3>
-                  <p className="text-xs text-slate-400 font-medium italic">Entidad: Teléfono</p>
+                  <p className="text-xs text-slate-400 font-medium italic">Contacto directo del vendedor</p>
                 </div>
               </div>
 
@@ -245,30 +255,19 @@ export default function AgregarVendedor() {
                       <label className="block text-[11px] font-bold text-slate-500 uppercase">
                         Cód. Área<span className="text-red-500 ml-1">*</span>
                       </label>
-                      <input
-                        name="codigo_area"
-                        value={tel.codigo_area}
+                      <input name="codigo_area" value={tel.codigo_area}
                         onChange={(e) => handleTelChange(idx, 'codigo_area', e.target.value)}
                         className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm text-center"
-                        maxLength="4"
-                        placeholder="0412"
-                        type="text"
-                        required
-                      />
+                        maxLength="4" placeholder="0412" type="text" />
                     </div>
                     <div className="flex-1 space-y-2">
                       <label className="block text-[11px] font-bold text-slate-500 uppercase">
-                        Cuerpo<span className="text-red-500 ml-1">*</span>
+                        Número<span className="text-red-500 ml-1">*</span>
                       </label>
-                      <input
-                        name="cuerpo"
-                        value={tel.cuerpo}
-                        onChange={(e) => handleTelChange(idx, 'cuerpo', e.target.value)}
+                      <input name="numero" value={tel.numero}
+                        onChange={(e) => handleTelChange(idx, 'numero', e.target.value)}
                         className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm"
-                        placeholder="1234567"
-                        type="text"
-                        required
-                      />
+                        placeholder="1234567" type="text" />
                     </div>
                     {formData.telefonos.length > 1 && (
                       <button className="p-3 text-slate-300 hover:text-red-400 transition-colors" type="button" onClick={() => removeTelefono(idx)}>
@@ -278,16 +277,12 @@ export default function AgregarVendedor() {
                   </div>
                 ))}
               </div>
-
               <button className="mt-6 flex items-center text-primary font-bold text-sm hover:text-secondary transition-all" type="button" onClick={addTelefono}>
-                <span className="material-symbols-outlined mr-1">add_circle</span>
-                Agregar Teléfono
+                <span className="material-symbols-outlined mr-1">add_circle</span>Agregar Teléfono
               </button>
             </section>
 
-            {/* ════════════════════════════════
-                SECCIÓN 3 — Credenciales (USUARIO)
-               ════════════════════════════════ */}
+            {/* SECCIÓN 3 — Credenciales */}
             <section className="bg-slate-50/50 -mx-10 px-10 py-10 border-t border-slate-100">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center">
@@ -300,39 +295,21 @@ export default function AgregarVendedor() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {/* nombre_usuario */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
                     Nombre de Usuario<span className="text-red-500 ml-1">*</span>
                   </label>
-                  <input
-                    name="nombre_usuario"
-                    value={formData.nombre_usuario}
-                    onChange={handleChange}
+                  <input name="nombre_usuario" value={formData.nombre_usuario} onChange={handleChange}
                     className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
-                    placeholder="Ej: mgonzalez2jmc"
-                    type="text"
-                    required
-                  />
+                    placeholder="Ej: mgonzalez2jmc" type="text" required />
                 </div>
-
-                {/* contraseña */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
                     Contraseña<span className="text-red-500 ml-1">*</span>
                   </label>
-                  <div className="relative">
-                    <input
-                      name="contraseña"
-                      value={formData.contraseña}
-                      onChange={handleChange}
-                      className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
-                      placeholder="••••••••"
-                      type="password"
-                      required
-                    />
-
-                  </div>
+                  <input name="password" value={formData.password} onChange={handleChange}
+                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
+                    placeholder="••••••••" type="password" required />
                 </div>
               </div>
             </section>
@@ -345,9 +322,9 @@ export default function AgregarVendedor() {
             </p>
             <div className="flex gap-4">
               <button className="px-6 py-2 text-sm font-semibold text-slate-400 hover:text-slate-600 transition-colors" type="reset">Limpiar</button>
-              <button className="px-10 py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/25 hover:bg-secondary transition-all flex items-center" type="submit">
+              <button className="px-10 py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/25 hover:bg-secondary transition-all flex items-center disabled:opacity-60" type="submit" disabled={loading}>
                 <span className="material-symbols-outlined mr-2">save_as</span>
-                Finalizar Registro
+                {loading ? 'Registrando...' : 'Finalizar Registro'}
               </button>
             </div>
           </div>
@@ -367,7 +344,7 @@ export default function AgregarVendedor() {
           <div className="text-primary"><span className="material-symbols-outlined">info</span></div>
           <div>
             <h4 className="text-xs font-bold text-slate-700 uppercase tracking-tight mb-1">Asignación</h4>
-            <p className="text-[11px] text-slate-500 leading-relaxed">Al guardar, el usuario recibirá un correo de bienvenida con sus accesos.</p>
+            <p className="text-[11px] text-slate-500 leading-relaxed">La contraseña se encripta automáticamente con bcrypt antes de guardarse.</p>
           </div>
         </div>
         <div className="p-6 bg-[#F4FAFB]/60 border border-slate-200 rounded-2xl flex items-start gap-4">

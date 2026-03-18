@@ -5,33 +5,69 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+
+// ---- Middlewares propios ----
+import errorHandler from './middleware/errorHandler.js';
 
 // ---- Importar Routers ----
+import authRouter     from './router/auth.router.js';
 import clienteRouter  from './router/cliente.router.js';
 import contactoRouter from './router/contacto.router.js';
 import vendedorRouter from './router/vendedor.router.js';
 import visitaRouter   from './router/visita.router.js';
+import lugarRouter    from './router/lugar.router.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// ---- Middlewares ----
+// ---- Seguridad HTTP Headers ----
+app.use(helmet());
+
+// ---- CORS ----
 app.use(cors({
   origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
   credentials: true,
 }));
-app.use(express.json());
+
+// ---- Body Parser ----
+app.use(express.json({ limit: '1mb' }));
+
+// ---- Rate Limiting Global ----
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 200,                  // 200 requests por ventana
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Demasiadas solicitudes. Intente más tarde.' },
+});
+app.use(globalLimiter);
+
+// ---- Rate Limiting Estricto para Login ----
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 10,                   // 10 intentos de login por ventana
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Demasiados intentos de login. Espere 15 minutos.' },
+});
 
 // ---- Rutas API ----
+app.use('/api/auth',       loginLimiter, authRouter);
 app.use('/api/clientes',   clienteRouter);
 app.use('/api/contactos',  contactoRouter);
 app.use('/api/vendedores', vendedorRouter);
 app.use('/api/visitas',    visitaRouter);
+app.use('/api/lugares',    lugarRouter);
 
 // ---- Health Check ----
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// ---- Manejador Global de Errores (SIEMPRE al final) ----
+app.use(errorHandler);
 
 // ---- Start Server ----
 app.listen(PORT, () => {
