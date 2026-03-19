@@ -59,7 +59,13 @@ Create Table LUGAR(
 	fk_lugar INTEGER,
 
     -- Constraints
-	CONSTRAINT fk_lugar_padre FOREIGN KEY (fk_lugar) references LUGAR(id)
+	CONSTRAINT fk_lugar_padre FOREIGN KEY (fk_lugar) references LUGAR(id),
+    CONSTRAINT chk_tipo CHECK (tipo IN ('Region', 'Ciudad', 'Estado')),
+    CONSTRAINT chk_jerarquia_nulos CHECK (
+    (tipo = 'Region' AND fk_lugar IS NULL) 
+    OR 
+    (tipo IN ('Estado', 'Ciudad') AND fk_lugar IS NOT NULL)),
+    CONSTRAINT chk_no_autociclo_lugar CHECK (id != fk_lugar)
 );
 
 Create Table COBERTURA(
@@ -172,6 +178,7 @@ CREATE TABLE TELEFONOS (
     fk_contacto INTEGER NOT NULL, 
     
     -- Constraints
+    CONSTRAINT pk_telefono PRIMARY KEY (codigo_area, numero),
     CONSTRAINT fk_usuario_tel FOREIGN KEY (fk_usuario) REFERENCES USUARIOS(id) ON DELETE CASCADE,
     CONSTRAINT fk_contacto_tel FOREIGN KEY (fk_contacto) REFERENCES CONTACTOS(id) ON DELETE CASCADE
 );
@@ -190,6 +197,9 @@ create table ALIADOS_COMERCIALES(
     fk_cobertura INTEGER NOT NULL, 
 
 	-- Constraints
+    CONSTRAINT fk_lugar_ac FOREIGN KEY (fk_lugar) REFERENCES LUGAR(id),
+    CONSTRAINT fk_region_ac FOREIGN KEY (fk_region) REFERENCES LUGAR(id),
+    CONSTRAINT fk_cobertura_ac FOREIGN KEY (fk_cobertura) REFERENCES COBERTURA(id),
 	CONSTRAINT check_AC_categoria CHECK (categoria IN ('latinos' ,'exitos urbanos recientes'  ,'exitos latinos recientes' ,'exitos juveniles' ,'exitos recientes ','baladas en ingles' ,'baladas en español ','bachata' ,'salsa' ,'merengue' ,'regueton' ,'pop baladas en ingles ','pop baladas en español','tropical' ,'multitarget ','musica' ,'entretenimiento ','información' ,'venezolanas' ,'retro' )),
 	CONSTRAINT check_AC_estado CHECK (estado IN ('activo','inactivo','cerrado')) 	
 );
@@ -301,13 +311,13 @@ create table PAUTAS(
     CONSTRAINT fk_vend FOREIGN KEY (fk_vendedor) references VENDEDORES(usuario_id),
 	CONSTRAINT fk_client FOREIGN KEY (fk_cliente) references CLIENTE(id), 
 	CONSTRAINT check_tipo_compra CHECK (tipo_compra IN('en vivo', 'rotativa')),
-    CONSTRAINT check_tipo_pauta CHECK (tipo_compra = 'rotativa' AND programa 
-    IS NOT NULL  AND presentadora IS NOT NULL OR 
+    CONSTRAINT check_tipo_pauta CHECK ((tipo_compra = 'rotativa' AND programa 
+    IS NOT NULL  AND presentadora IS NOT NULL) OR 
     (tipo_compra = 'en vivo' AND presentadora IS NULL AND programa IS NULL)),
 	CONSTRAINT check_estado CHECK(estado IN ('programada','en transmision','suspendida','finalizada'))
 );
 
-create table CUÑA(
+create table CUNAS (
 	id SERIAL PRIMARY KEY,
 	duracion varchar(5) NOT NULL,
 	cortina VARCHAR(20) NOT NULL,
@@ -315,7 +325,7 @@ create table CUÑA(
 	fk_pauta INTEGER NOT NULL,
 
     -- Constraints
-	CONSTRAINT fk_pau FOREIGN KEY (fk_pauta) references PAUTAS(numero_OT)
+	CONSTRAINT fk_pau FOREIGN KEY (fk_pauta) references PAUTAS(id)
 );
 
 CREATE TABLE HISTORICO_NEGOCIACIONES (
@@ -327,7 +337,7 @@ CREATE TABLE HISTORICO_NEGOCIACIONES (
     fk_pauta INTEGER NOT NULL,             
     
     -- Constraints
-    CONSTRAINT fk_pauta_historico FOREIGN KEY (fk_pauta) REFERENCES PAUTAS (numero_ot) ON DELETE CASCADE
+    CONSTRAINT fk_pauta_historico FOREIGN KEY (fk_pauta) REFERENCES PAUTAS (id) ON DELETE CASCADE
 );
 
 CREATE TABLE DETALLE_PAUTA (
@@ -337,7 +347,7 @@ CREATE TABLE DETALLE_PAUTA (
     cantidad_emisoras INTEGER NOT NULL,          
 
     --Constraints
-    CONSTRAINT fk_pauta_detalle FOREIGN KEY (fk_pauta) REFERENCES PAUTAS(numero_ot) ON DELETE CASCADE,
+    CONSTRAINT fk_pauta_detalle FOREIGN KEY (fk_pauta) REFERENCES PAUTAS(id) ON DELETE CASCADE,
     CONSTRAINT fk_aliado_detalle FOREIGN KEY (fk_aliado) REFERENCES ALIADOS_COMERCIALES(id),
 	CONSTRAINT pauta_aliado_unique UNIQUE (fk_pauta, fk_aliado)
 );
