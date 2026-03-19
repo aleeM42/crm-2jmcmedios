@@ -69,7 +69,7 @@ export default function AgregarCliente() {
         ]);
         if (empRes.success) setEmpresas(empRes.data);
         if (lugRes.success) setLugares(lugRes.data);
-        if (venRes.success) setVendedores(venRes.data || []);
+        if (venRes.success) setVendedores(venRes.data?.vendedores || []);
       } catch {
         // Silently handle — lookups may fail if endpoints don't exist yet
       }
@@ -77,14 +77,41 @@ export default function AgregarCliente() {
     loadLookups();
   }, []);
 
-  const handleCliente = (e) => setCliente({ ...cliente, [e.target.name]: e.target.value });
+  const handleCliente = (e) => {
+    let { name, value } = e.target;
+    if (name === 'rif_fiscal') {
+      let raw = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (raw.length > 0) {
+        let firstChar = raw[0];
+        if (['J', 'G', 'V', 'P'].includes(firstChar)) {
+          const digits = raw.slice(1).replace(/\D/g, '').slice(0, 9);
+          value = firstChar + digits;
+        } else {
+          value = ''; // Fuerza a que el primer caracter sea J, G, V o P
+        }
+      } else {
+        value = '';
+      }
+    }
+    setCliente({ ...cliente, [name]: value });
+  };
   const handleContacto = (e) => setContacto({ ...contacto, [e.target.name]: e.target.value });
 
   const addTelefono = () => setTelefonos([...telefonos, { codigo_area: '', numero: '' }]);
   const removeTelefono = (i) => setTelefonos(telefonos.filter((_, idx) => idx !== i));
   const handleTelefono = (i, field, val) => {
+    // Solo permitir números
+    let numericVal = val.replace(/\D/g, '');
+    
+    // Aplicar límites
+    if (field === 'codigo_area') {
+      numericVal = numericVal.slice(0, 4);
+    } else if (field === 'numero') {
+      numericVal = numericVal.slice(0, 7);
+    }
+
     const copy = [...telefonos];
-    copy[i][field] = val;
+    copy[i][field] = numericVal;
     setTelefonos(copy);
   };
 
@@ -215,7 +242,7 @@ export default function AgregarCliente() {
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">RIF Fiscal <span className="text-red-500">*</span></label>
-              <input name="rif_fiscal" value={cliente.rif_fiscal} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="J-00000000-0" type="text" required />
+              <input name="rif_fiscal" value={cliente.rif_fiscal} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="J123456789" type="text" maxLength="10" required />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Ubicación (Estado) <span className="text-red-500">*</span></label>
@@ -356,11 +383,11 @@ export default function AgregarCliente() {
                   <div key={i} className="flex gap-3 items-end">
                     <div className="w-24 flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-500 uppercase">Cód. Área <span className="text-red-500">*</span></label>
-                      <input value={tel.codigo_area} onChange={(e) => handleTelefono(i, 'codigo_area', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0212" type="tel" />
+                      <input value={tel.codigo_area} onChange={(e) => handleTelefono(i, 'codigo_area', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0212" type="tel" maxLength="4" />
                     </div>
                     <div className="flex-1 flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-500 uppercase">Número <span className="text-red-500">*</span></label>
-                      <input value={tel.numero} onChange={(e) => handleTelefono(i, 'numero', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="000 0000" type="tel" />
+                      <input value={tel.numero} onChange={(e) => handleTelefono(i, 'numero', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0000000" type="tel" maxLength="7" />
                     </div>
                     <button type="button" onClick={() => removeTelefono(i)} className="bg-slate-50 border border-slate-200 p-3 rounded-lg hover:bg-slate-100 text-primary">
                       <span className="material-symbols-outlined">delete</span>
