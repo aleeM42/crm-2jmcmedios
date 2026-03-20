@@ -9,6 +9,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -20,7 +21,12 @@ export default function Login() {
     try {
       const result = await login(identifier, password);
       if (result.success) {
-        navigate('/dashboard');
+        const userRole = result.data?.user?.rol;
+        if (userRole === 'Gestor de Pautas') {
+          navigate('/pautas');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (err) {
       setError(err.data?.error || err.message || 'Error al iniciar sesión');
@@ -103,14 +109,24 @@ export default function Login() {
               </div>
               <div className="relative">
                 <input
-                  className="w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display"
+                  className="w-full h-14 pl-4 pr-12 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display"
                   placeholder="••••••••••••"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors flex items-center justify-center p-1"
+                  tabIndex="-1"
+                >
+                  <span className="material-symbols-outlined select-none text-xl">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
               </div>
             </div>
             {/* Remember Me */}

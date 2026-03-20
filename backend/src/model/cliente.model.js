@@ -8,7 +8,7 @@ import pool from '../config/db.js';
  * Lista de clientes con filtros opcionales, paginación, y JOINs.
  * @param {object} filters - { sector, estado, clasificacion, search, page, limit }
  */
-export const findAll = async (filters = {}) => {
+export const findAll = async (filters = {}, vendedorId = null) => {
   const { sector, estado, clasificacion, search, page = 1, limit = 20 } = filters;
   const offset = (page - 1) * limit;
 
@@ -36,6 +36,10 @@ export const findAll = async (filters = {}) => {
     )`;
     params.push(`%${search}%`);
     paramIndex++;
+  }
+  if (vendedorId) {
+    where += ` AND c.fk_vendedor = $${paramIndex++}`;
+    params.push(vendedorId);
   }
 
   // Query principal con JOINs
@@ -142,6 +146,39 @@ export const findById = async (id) => {
     telefonos = telResult.rows;
   }
 
+  // KPIs
+  const kpisQuery = `
+    SELECT
+      (SELECT COUNT(*) FROM PAUTAS WHERE fk_cliente = $1 AND estado NOT IN ('finalizada', 'suspendida')) AS pautas_activas,
+      (SELECT SUM(hn.monto_negociacion) FROM HISTORICO_NEGOCIACIONES hn JOIN PAUTAS p ON hn.fk_pauta = p.id WHERE p.fk_cliente = $1) AS monto_total,
+      (SELECT MAX(v.fecha) FROM VISITAS v JOIN CONTACTOS c ON v.fk_contacto = c.id WHERE c.fk_cliente = $1) AS ultima_visita,
+      (SELECT COUNT(DISTINCT dp.fk_aliado) FROM DETALLE_PAUTA dp JOIN PAUTAS p ON dp.fk_pauta = p.id WHERE p.fk_cliente = $1) AS emisoras_presencia
+  `;
+  const kpisResult = await pool.query(kpisQuery, [id]);
+
+  // Pautas asociadas
+  const pautasQuery = `
+    SELECT id, numero_ot, fecha_inicio, fecha_fin, marca, monto_ot, estado
+    FROM PAUTAS
+    WHERE fk_cliente = $1
+    ORDER BY fecha_inicio DESC
+  `;
+  const pautasResult = await pool.query(pautasQuery, [id]);
+
+  // Historial de Visitas (Actividad)
+  const visitasQuery = `
+    SELECT v.id, v.fecha, v.hora, v.objetivo_visita, v.efectiva, v.tipo, v.detalle, v.lugar,
+           c.pri_nombre AS contacto_nombre, c.pri_apellido AS contacto_apellido,
+           u.primer_nombre AS vendedor_nombre, u.primer_apellido AS vendedor_apellido
+    FROM VISITAS v
+    JOIN CONTACTOS c ON v.fk_contacto = c.id
+    JOIN VENDEDORES ven ON v.fk_vendedor = ven.usuario_id
+    JOIN USUARIOS u ON ven.usuario_id = u.id
+    WHERE c.fk_cliente = $1
+    ORDER BY v.fecha DESC, v.hora DESC
+  `;
+  const visitasResult = await pool.query(visitasQuery, [id]);
+
   // Ensamblar respuesta
   const marcasByCliente = {};
   for (const m of marcasResult.rows) {
@@ -157,6 +194,9 @@ export const findById = async (id) => {
 
   return {
     ...cliente,
+    kpis: kpisResult.rows[0],
+    pautas: pautasResult.rows,
+    visitas: visitasResult.rows,
     marcas: marcasByCliente[id] || [],
     sub_empresas: subEmpresasResult.rows.map(se => ({
       ...se,
@@ -206,15 +246,22 @@ export const create = async (data, client) => {
 /**
  * KPIs: conteos por estado para la página de clientes.
  */
-export const countByEstado = async () => {
+export const countByEstado = async (vendedorId = null) => {
+  let where = '';
+  const params = [];
+  if (vendedorId) {
+    where = 'WHERE fk_vendedor = $1';
+    params.push(vendedorId);
+  }
   const query = `
     SELECT 
       COUNT(*) AS total,
       COUNT(*) FILTER (WHERE estado = 'Activo') AS activos,
       COUNT(*) FILTER (WHERE estado = 'Inactivo') AS inactivos
     FROM CLIENTE
+    ${where}
   `;
-  const result = await pool.query(query);
+  const result = await pool.query(query, params);
   return result.rows[0];
 };
 

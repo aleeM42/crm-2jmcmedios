@@ -3,6 +3,7 @@
 // ==============================================
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { getCurrentUser } from '../services/auth.service';
+import { Toaster } from 'sonner';
 
 const NAV_ITEMS = [
   { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
@@ -34,6 +35,7 @@ function DashboardLayout() {
 
   return (
     <div className="flex min-h-screen bg-[#EBF6F7] text-slate-900 antialiased">
+      <Toaster position="top-right" richColors toastOptions={{ className: 'font-display' }} />
       {/* ===================== SIDEBAR ===================== */}
       <aside className="w-[240px] bg-[#F4FAFB] border-r border-[#E0F0F2] flex flex-col fixed h-full z-10">
         <div className="p-6">

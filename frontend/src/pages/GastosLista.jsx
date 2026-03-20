@@ -59,7 +59,7 @@ export default function GastosLista() {
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
           <input type="text" placeholder="Buscar gasto..." className="w-full h-10 pl-10 pr-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
         </div>
-        <select className="h-10 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+        <select className="h-10 pr-10 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
           <option>Todas las categorías</option>
           <option>Transporte</option>
           <option>Alimentación</option>
@@ -68,7 +68,7 @@ export default function GastosLista() {
           <option>Regalos</option>
           <option>Otros</option>
         </select>
-        <select className="h-10 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+        <select className="h-10 pr-10 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
           <option>Todos los vendedores</option>
           <option>Carlos Pérez</option>
           <option>María González</option>

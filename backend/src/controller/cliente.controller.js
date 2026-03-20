@@ -24,9 +24,12 @@ export const getAll = async (req, res, next) => {
       limit: req.query.limit,
     };
 
+    // RBAC: vendedor solo ve sus clientes
+    const vendedorId = req.user.rol === 'Vendedor' ? req.user.id : null;
+
     const [result, kpis] = await Promise.all([
-      ClienteModel.findAll(filters),
-      ClienteModel.countByEstado(),
+      ClienteModel.findAll(filters, vendedorId),
+      ClienteModel.countByEstado(vendedorId),
     ]);
 
     return res.json({
@@ -103,7 +106,7 @@ export const create = async (req, res, next) => {
   try {
     await client.query('BEGIN');
 
-    const { cliente, contacto, telefonos, marcas } = req.body;
+    const { cliente, contacto, contactos, telefonos, marcas } = req.body;
 
     // 1. Crear cliente
     const newCliente = await ClienteModel.create(cliente, client);
@@ -114,21 +117,32 @@ export const create = async (req, res, next) => {
       newMarcas = await MarcaModel.createBatch(newCliente.id, marcas, client);
     }
 
-    // 3. Crear contacto principal
-    let newContacto = null;
+    // 3. Crear contactos
+    let insertedContactos = [];
     let newTelefonos = [];
-    if (contacto && contacto.pri_nombre) {
-      contacto.fk_cliente = newCliente.id;
-      newContacto = await ContactoModel.create(contacto, client);
+    
+    // Soportar tanto "contactos" (array) como "contacto" (objeto) para compatibilidad
+    const reqContactos = contactos && Array.isArray(contactos) ? contactos : (contacto ? [contacto] : []);
 
-      // 4. Crear teléfonos del contacto
-      if (telefonos && telefonos.length > 0 && newContacto) {
-        newTelefonos = await TelefonoModel.createBatch(
-          newContacto.id,
-          req.user.id, // usuario autenticado
-          telefonos,
-          client
-        );
+    for (let i = 0; i < reqContactos.length; i++) {
+      const cData = reqContactos[i];
+      if (cData.pri_nombre) {
+        cData.fk_cliente = newCliente.id;
+        const insertedC = await ContactoModel.create(cData, client);
+
+        // 4. Crear teléfonos asociados al contacto principal (el primero)
+        if (i === 0 && telefonos && telefonos.length > 0) {
+          newTelefonos = await TelefonoModel.createBatch(
+            insertedC.id,
+            req.user.id, // usuario autenticado
+            telefonos,
+            client
+          );
+          insertedC.telefonos = newTelefonos;
+        } else {
+          insertedC.telefonos = [];
+        }
+        insertedContactos.push(insertedC);
       }
     }
 
@@ -139,9 +153,7 @@ export const create = async (req, res, next) => {
       data: {
         ...newCliente,
         marcas: newMarcas,
-        contacto: newContacto
-          ? { ...newContacto, telefonos: newTelefonos }
-          : null,
+        contactos: insertedContactos,
       },
     });
   } catch (err) {

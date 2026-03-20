@@ -18,6 +18,12 @@ import contactoRouter from './router/contacto.router.js';
 import vendedorRouter from './router/vendedor.router.js';
 import visitaRouter   from './router/visita.router.js';
 import lugarRouter    from './router/lugar.router.js';
+import gastoRouter    from './router/gasto.router.js';
+import perfilRouter     from './router/perfil.router.js';
+import dashboardRouter  from './router/dashboard.router.js';
+import pautaRouter      from './router/pauta.router.js';
+import aliadoRouter     from './router/aliado.router.js';
+import notificacionRouter from './router/notificacion.router.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -60,6 +66,12 @@ app.use('/api/contactos',  contactoRouter);
 app.use('/api/vendedores', vendedorRouter);
 app.use('/api/visitas',    visitaRouter);
 app.use('/api/lugares',    lugarRouter);
+app.use('/api/gastos',     gastoRouter);
+app.use('/api/perfil',     perfilRouter);
+app.use('/api/dashboard',  dashboardRouter);
+app.use('/api/pautas',     pautaRouter);
+app.use('/api/aliados',    aliadoRouter);
+app.use('/api/notificaciones', notificacionRouter);
 
 // ---- Health Check ----
 app.get('/api/health', (req, res) => {
@@ -70,6 +82,25 @@ app.get('/api/health', (req, res) => {
 app.use(errorHandler);
 
 // ---- Start Server ----
-app.listen(PORT, () => {
-  console.log(`🚀 CRM 2jmcMedios API corriendo en http://localhost:${PORT}`);
-});
+import pool from './config/db.js';
+
+const startServer = async () => {
+  try {
+    console.log('[DEBUG] ⏳ Intentando conectar a la base de datos PostgreSQL...');
+    await pool.query('SELECT 1');
+    console.log('[DEBUG] ✅ Conexión a PostgreSQL confirmada.');
+
+    app.listen(PORT, () => {
+      console.log(`🚀 CRM 2jmcMedios API corriendo en http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error('\n======================================================');
+    console.error('❌ [FATAL ERROR] Fallo al iniciar el servidor o conectar a BD:');
+    console.error('Mensaje de error:', err.message);
+    console.error('Stack trace:', err.stack);
+    console.error('======================================================\n');
+    process.exit(1);
+  }
+};
+
+startServer();

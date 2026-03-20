@@ -37,3 +37,23 @@ INSERT INTO USUARIOS (
   'Administrador',
   'Activo'
 ) ON CONFLICT (correo) DO NOTHING;
+
+-- 4. Insertar usuario Yossuel Marcano
+-- Password: Yossuel.crm26 (bcrypt hash)
+INSERT INTO USUARIOS (
+  primer_nombre,
+  primer_apellido,
+  correo,
+  nombre_usuario,
+  password_hash,
+  rol,
+  estado
+) VALUES (
+  'Yossuel',
+  'Marcano',
+  '2jmcpautaii@gmail.com',
+  'yossuel',
+  '$2b$10$jfA3jJzjpVggVfL5EkJ/Oehsfvd.rYb3cCRn5fOuVf9d8QYK909wm',
+  'Gestor de Pautas',
+  'Activo'
+) ON CONFLICT (correo) DO NOTHING;

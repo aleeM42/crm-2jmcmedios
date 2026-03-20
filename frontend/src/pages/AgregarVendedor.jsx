@@ -29,12 +29,13 @@ export default function AgregarVendedor() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     getDirectores()
       .then(res => { if (res.success) setDirectores(res.data); })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const handleChange = (e) => {
@@ -149,7 +150,7 @@ export default function AgregarVendedor() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-800">Datos Personales</h3>
-                  <p className="text-xs text-slate-400 font-medium italic">Entidades: Usuario + Vendedor</p>
+
                 </div>
               </div>
 
@@ -180,7 +181,7 @@ export default function AgregarVendedor() {
                 </div>
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
-                    Meta Mensual ($)<span className="text-red-500 ml-1">*</span>
+                    Meta Anual ($)<span className="text-red-500 ml-1">*</span>
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
@@ -290,7 +291,6 @@ export default function AgregarVendedor() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-800">Credenciales de Acceso</h3>
-                  <p className="text-xs text-slate-400 font-medium italic">Entidad: Usuario</p>
                 </div>
               </div>
 
@@ -307,9 +307,21 @@ export default function AgregarVendedor() {
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
                     Contraseña<span className="text-red-500 ml-1">*</span>
                   </label>
-                  <input name="password" value={formData.password} onChange={handleChange}
-                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]"
-                    placeholder="••••••••" type="password" required />
+                  <div className="relative">
+                    <input name="password" value={formData.password} onChange={handleChange}
+                      className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary pl-4 pr-12 py-3 text-sm bg-[#F4FAFB]"
+                      placeholder="••••••••" type={showPassword ? "text" : "password"} required />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors flex items-center justify-center p-1"
+                      tabIndex="-1"
+                    >
+                      <span className="material-symbols-outlined select-none text-[20px]">
+                        {showPassword ? 'visibility_off' : 'visibility'}
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </section>
@@ -345,13 +357,6 @@ export default function AgregarVendedor() {
           <div>
             <h4 className="text-xs font-bold text-slate-700 uppercase tracking-tight mb-1">Asignación</h4>
             <p className="text-[11px] text-slate-500 leading-relaxed">La contraseña se encripta automáticamente con bcrypt antes de guardarse.</p>
-          </div>
-        </div>
-        <div className="p-6 bg-[#F4FAFB]/60 border border-slate-200 rounded-2xl flex items-start gap-4">
-          <div className="text-secondary"><span className="material-symbols-outlined">monitoring</span></div>
-          <div>
-            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-tight mb-1">Metas</h4>
-            <p className="text-[11px] text-slate-500 leading-relaxed">Las metas configuradas se utilizarán para el cálculo de comisiones mensuales.</p>
           </div>
         </div>
       </div>

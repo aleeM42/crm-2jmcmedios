@@ -1,28 +1,82 @@
 // ==============================================
-// Dashboard.jsx — Panel General (Directora Comercial)
+// Dashboard.jsx — Panel General 
 // ==============================================
 import {
   PieChart, Pie, Cell,
   BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer
 } from 'recharts';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getCurrentUser } from '../services/auth.service.js';
+import api from '../services/api.js';
+import { toast } from 'sonner';
 
-const PIPELINE_DATA = [
-  { name: 'Contacto Inicial', value: 40, color: '#A1DEE5' },
-  { name: 'Por Firmar', value: 35, color: '#55CCD3' },
-  { name: 'Negociado', value: 25, color: '#8DC63F' },
-];
-
-const INGRESOS_DATA = [
-  { label: 'ENE', value: 72 },
-  { label: 'FEB', value: 108 },
-  { label: 'MAR', value: 99 },
-  { label: 'ABR', value: 135 },
-  { label: 'MAY', value: 162 },
-  { label: 'JUN', value: 153 },
-];
+const ESTADO_COLORS = {
+  'programada': '#A1DEE5',
+  'en transmision': '#16B1B8',
+  'suspendida': '#F59E0B',
+  'finalizada': '#8DC63F',
+};
 
 function Dashboard() {
+  const navigate = useNavigate();
+  const [metricas, setMetricas] = useState({
+    totalClientes: 0,
+    totalVentas: 0,
+    pautasEnTransmision: 0,
+    totalEmisoras: 0,
+    variacionVentas: null,
+    pipeline: [],
+    ingresosMensuales: [],
+    topClientes: [],
+  });
+
+  const [usuarioLocal, setUsuarioLocal] = useState({ nombre: '', rol: '', inicial: 'A' });
+
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (user?.rol === 'Gestor de Pautas') {
+      navigate('/pautas', { replace: true });
+      return;
+    }
+
+    if (user) {
+      setUsuarioLocal({
+        nombre: `${user.primer_nombre || ''} ${user.primer_apellido || ''}`.trim() || user.nombre_usuario || 'Usuario',
+        rol: user.rol || 'Rol no definido',
+        inicial: user.primer_nombre ? user.primer_nombre.charAt(0).toUpperCase() : (user.nombre_usuario ? user.nombre_usuario.charAt(0).toUpperCase() : 'U')
+      });
+    }
+
+    api.get('/dashboard/resumen')
+      .then((res) => { if (res.success) setMetricas(res.data); })
+      .catch(() => { });
+
+    // Cargar notificaciones
+    api.get('/notificaciones')
+      .then((res) => {
+        if (res.success && res.data) {
+          const notifs = res.data;
+          notifs.forEach((notif, idx) => {
+            setTimeout(() => {
+              if (notif.tipo === 'CUMPLEAÑOS') {
+                toast.success(notif.titulo, { description: notif.mensaje, icon: '🎂' });
+              } else if (notif.tipo === 'INACTIVO' || notif.tipo === 'SIN_VISITAS') {
+                toast.warning(notif.titulo, { description: notif.mensaje });
+              } else if (notif.tipo === 'PAUTA_VENCIMIENTO') {
+                toast.error(notif.titulo, { description: notif.mensaje });
+              } else {
+                toast.info(notif.titulo, { description: notif.mensaje });
+              }
+            }, idx * 1000); // 1s staggered
+          });
+        }
+      })
+      .catch(() => {});
+
+  }, [navigate]);
+
   return (
     <>
       {/* HEADER */}
@@ -34,15 +88,14 @@ function Dashboard() {
         <div className="flex items-center gap-6">
           <button className="relative p-2 text-slate-400 hover:text-primary transition-colors">
             <span className="material-symbols-outlined text-[28px]">notifications</span>
-            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-background-light"></span>
           </button>
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold text-slate-900">Adriana Méndez</p>
-              <p className="text-xs text-slate-500">Directora Comercial</p>
+              <p className="text-sm font-bold text-slate-900">{usuarioLocal.nombre}</p>
+              <p className="text-xs text-slate-500">{usuarioLocal.rol}</p>
             </div>
             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center border-2 border-primary/20 flex-shrink-0">
-              <span className="text-white font-bold text-sm">A</span>
+              <span className="text-white font-bold text-sm">{usuarioLocal.inicial}</span>
             </div>
           </div>
         </div>
@@ -53,11 +106,13 @@ function Dashboard() {
         <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500 mb-1">Ingresos Totales</p>
-            <h3 className="text-2xl font-bold text-slate-900">$125,400</h3>
-            <div className="flex items-center gap-1 mt-2 text-primary">
-              <span className="material-symbols-outlined text-sm">trending_up</span>
-              <span className="text-xs font-bold">12.5% vs mes anterior</span>
-            </div>
+            <h3 className="text-2xl font-bold text-slate-900">${metricas.totalVentas.toLocaleString()}</h3>
+            {metricas.variacionVentas !== null && (
+              <div className={`flex items-center gap-1 mt-2 ${metricas.variacionVentas >= 0 ? 'text-primary' : 'text-red-500'}`}>
+                <span className="material-symbols-outlined text-sm">{metricas.variacionVentas >= 0 ? 'trending_up' : 'trending_down'}</span>
+                <span className="text-xs font-bold">{metricas.variacionVentas}% vs mes anterior</span>
+              </div>
+            )}
           </div>
           <div className="p-2 bg-primary/10 rounded-lg">
             <span className="material-symbols-outlined text-primary">payments</span>
@@ -66,10 +121,10 @@ function Dashboard() {
         <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500 mb-1">Clientes Activos</p>
-            <h3 className="text-2xl font-bold text-slate-900">87</h3>
+            <h3 className="text-2xl font-bold text-slate-900">{metricas.totalClientes}</h3>
             <div className="flex items-center gap-1 mt-2 text-accent-green">
-              <span className="material-symbols-outlined text-sm">person_add</span>
-              <span className="text-xs font-bold">+5 este mes</span>
+              <span className="material-symbols-outlined text-sm">group</span>
+              <span className="text-xs font-bold">Registrados</span>
             </div>
           </div>
           <div className="p-2 bg-accent-green/10 rounded-lg">
@@ -79,7 +134,7 @@ function Dashboard() {
         <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500 mb-1">Pautas en Transmisión</p>
-            <h3 className="text-2xl font-bold text-slate-900">24</h3>
+            <h3 className="text-2xl font-bold text-slate-900">{metricas.pautasEnTransmision}</h3>
             <div className="flex items-center gap-1 mt-2 text-secondary">
               <span className="material-symbols-outlined text-sm">radio</span>
               <span className="text-xs font-bold">En vivo ahora</span>
@@ -92,7 +147,7 @@ function Dashboard() {
         <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500 mb-1">Emisoras Activas</p>
-            <h3 className="text-2xl font-bold text-slate-900">32</h3>
+            <h3 className="text-2xl font-bold text-slate-900">{metricas.totalEmisoras}</h3>
             <div className="flex items-center gap-1 mt-2 text-slate-400">
               <span className="material-symbols-outlined text-sm">location_on</span>
               <span className="text-xs font-bold">Cobertura Nacional</span>
@@ -117,35 +172,35 @@ function Dashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={PIPELINE_DATA}
+                    data={metricas.pipeline}
                     innerRadius={65}
                     outerRadius={85}
                     paddingAngle={3}
                     dataKey="value"
                     stroke="none"
                   >
-                    {PIPELINE_DATA.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    {metricas.pipeline.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={ESTADO_COLORS[entry.name] || '#94a3b8'} />
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value) => `${value}%`}
+                    formatter={(value) => `${value}`}
                     contentStyle={{ borderRadius: '0.5rem', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   />
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-3xl font-bold text-slate-900">100%</span>
-                <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Distribución</span>
+                <span className="text-3xl font-bold text-slate-900">{metricas.pipeline.reduce((s, i) => s + i.value, 0)}</span>
+                <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Total</span>
               </div>
             </div>
             <div className="space-y-4">
-              {PIPELINE_DATA.map((item) => (
+              {metricas.pipeline.map((item) => (
                 <div key={item.name} className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: ESTADO_COLORS[item.name] || '#94a3b8' }}></div>
                   <div>
-                    <p className="text-xs text-slate-500 font-medium">{item.name}</p>
-                    <p className="text-sm font-bold">{item.value}%</p>
+                    <p className="text-xs text-slate-500 font-medium capitalize">{item.name}</p>
+                    <p className="text-sm font-bold">{item.value}</p>
                   </div>
                 </div>
               ))}
@@ -164,7 +219,7 @@ function Dashboard() {
           </div>
           <div className="h-[200px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={INGRESOS_DATA} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+              <BarChart data={metricas.ingresosMensuales} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorIngresoDash" x1="0" y1="1" x2="0" y2="0">
                     <stop offset="0%" stopColor="#16B1B8" />
@@ -198,7 +253,6 @@ function Dashboard() {
       <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
           <h4 className="text-lg font-bold font-display text-slate-900">Top 5 Clientes por Inversión</h4>
-          <button className="text-sm font-bold text-primary hover:underline">Ver todo</button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -212,28 +266,22 @@ function Dashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {[
-                { icon: 'business', name: 'Banco Nacional S.A.', inv: '$45,000', pautas: 8, region: 'Cundinamarca', regionColor: 'primary', vendedor: 'Carlos Jaramillo' },
-                { icon: 'shopping_bag', name: 'Retail Group Latam', inv: '$32,500', pautas: 12, region: 'Antioquia', regionColor: 'accent-green', vendedor: 'Marta Lucía R.' },
-                { icon: 'directions_car', name: 'AutoMundo Concesionarios', inv: '$28,000', pautas: 5, region: 'Valle del Cauca', regionColor: 'primary', vendedor: 'Andrés F. Rojas' },
-                { icon: 'local_hospital', name: 'Medisalud Prepaga', inv: '$21,200', pautas: 4, region: 'Costa', regionColor: 'secondary', vendedor: 'Carlos Jaramillo' },
-                { icon: 'fastfood', name: 'Foodie & Drinks Co.', inv: '$18,900', pautas: 7, region: 'Eje Cafetero', regionColor: 'accent-green', vendedor: 'Sandra Gómez' },
-              ].map((c) => (
-                <tr key={c.name} className="hover:bg-slate-50 transition-colors">
+              {metricas.topClientes.map((c) => (
+                <tr key={c.nombre} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-slate-400">{c.icon}</span>
+                        <span className="material-symbols-outlined text-slate-400">business</span>
                       </div>
-                      <span className="text-sm font-bold">{c.name}</span>
+                      <span className="text-sm font-bold">{c.nombre}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium">{c.inv}</td>
-                  <td className="px-6 py-4 text-sm">{c.pautas}</td>
+                  <td className="px-6 py-4 text-sm font-medium">${c.inversion.toLocaleString()}</td>
+                  <td className="px-6 py-4 text-sm">{c.pautasActivas}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 text-[10px] font-bold bg-${c.regionColor}/10 text-${c.regionColor} rounded-full uppercase`}>{c.region}</span>
+                    <span className="px-2 py-1 text-[10px] font-bold bg-primary/10 text-primary rounded-full uppercase">{c.region || '—'}</span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-500">{c.vendedor}</td>
+                  <td className="px-6 py-4 text-sm text-slate-500">{c.vendedor || '—'}</td>
                 </tr>
               ))}
             </tbody>

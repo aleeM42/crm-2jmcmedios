@@ -25,8 +25,8 @@ export default function AgregarCliente() {
     fk_vendedor: '',
   });
 
-  // --- CONTACTO principal (DB fields) ---
-  const [contacto, setContacto] = useState({
+  // --- CONTACTOS (DB fields) ---
+  const [contactos, setContactos] = useState([{
     pri_nombre: '',
     seg_nombre: '',
     pri_apellido: '',
@@ -36,7 +36,7 @@ export default function AgregarCliente() {
     anotac_especiales: '',
     rol: '',
     tipo: 'cliente',
-  });
+  }]);
 
   // --- TELEFONOS (PK compuesta: codigo_area + numero) ---
   const [telefonos, setTelefonos] = useState([{ codigo_area: '', numero: '' }]);
@@ -64,12 +64,21 @@ export default function AgregarCliente() {
       try {
         const [empRes, lugRes, venRes] = await Promise.all([
           getEmpresas().catch(() => ({ success: false })),
-          getLugares({ tipo: 'estado' }).catch(() => ({ success: false })),
+          getLugares({ tipo: 'Estado' }).catch(() => ({ success: false })),
           getVendedores().catch(() => ({ success: false })),
         ]);
-        if (empRes.success) setEmpresas(empRes.data);
-        if (lugRes.success) setLugares(lugRes.data);
-        if (venRes.success) setVendedores(venRes.data?.vendedores || []);
+        if (empRes.success) {
+          const data = empRes.data;
+          setEmpresas(Array.isArray(data) ? data : (data?.empresas || []));
+        }
+        if (lugRes.success) {
+          const data = lugRes.data;
+          setLugares(Array.isArray(data) ? data : (data?.lugares || []));
+        }
+        if (venRes.success) {
+          const data = venRes.data;
+          setVendedores(Array.isArray(data) ? data : (data?.vendedores || []));
+        }
       } catch {
         // Silently handle — lookups may fail if endpoints don't exist yet
       }
@@ -95,14 +104,36 @@ export default function AgregarCliente() {
     }
     setCliente({ ...cliente, [name]: value });
   };
-  const handleContacto = (e) => setContacto({ ...contacto, [e.target.name]: e.target.value });
+  const handleContactoChange = (index, e) => {
+    const { name, value } = e.target;
+    setContactos((prev) => {
+      const actualizados = [...prev];
+      actualizados[index] = { ...actualizados[index], [name]: value };
+      return actualizados;
+    });
+  };
+
+  const agregarContacto = () => {
+    setContactos((prev) => [
+      ...prev,
+      {
+        pri_nombre: '', seg_nombre: '', pri_apellido: '',
+        departamento: '', correo: '', fecha_nac: '',
+        anotac_especiales: '', rol: '', tipo: 'cliente'
+      }
+    ]);
+  };
+
+  const eliminarContacto = (index) => {
+    setContactos((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const addTelefono = () => setTelefonos([...telefonos, { codigo_area: '', numero: '' }]);
   const removeTelefono = (i) => setTelefonos(telefonos.filter((_, idx) => idx !== i));
   const handleTelefono = (i, field, val) => {
     // Solo permitir números
     let numericVal = val.replace(/\D/g, '');
-    
+
     // Aplicar límites
     if (field === 'codigo_area') {
       numericVal = numericVal.slice(0, 4);
@@ -136,7 +167,7 @@ export default function AgregarCliente() {
           nombre_agencia: cliente.clasificacion === 'Agencia' ? cliente.nombre_agencia : null,
           fk_lugar: parseInt(cliente.fk_lugar, 10) || null,
         },
-        contacto: contacto.pri_nombre ? contacto : null,
+        contactos: contactos.filter(c => c.pri_nombre),
         telefonos: telefonos.filter(t => t.codigo_area && t.numero),
         marcas: marcas.filter(m => m.nombre),
       };
@@ -325,49 +356,86 @@ export default function AgregarCliente() {
 
         {/* ═══ Contacto Principal + Teléfonos + Asignación ═══ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* --- CONTACTO entity --- */}
+
+          {/* --- CONTACTOS entity --- */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
-            <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
-              <span className="material-symbols-outlined text-secondary">person_add</span>
-              <h3 className="text-lg font-bold font-display">Contacto Principal</h3>
+            <div className="flex items-center justify-between gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-secondary">person_add</span>
+                <h3 className="text-lg font-bold font-display">Contactos</h3>
+              </div>
+              <button
+                type="button"
+                onClick={agregarContacto}
+                className="flex items-center text-primary font-bold text-sm hover:text-secondary transition-all"
+              >
+                <span className="material-symbols-outlined mr-1">add_circle</span>Añadir contacto
+              </button>
             </div>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Nombre <span className="text-red-500">*</span></label>
-                  <input name="pri_nombre" value={contacto.pri_nombre} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+
+            <div className="space-y-8">
+              {contactos.map((contacto, index) => (
+                <div key={index} className="space-y-4 relative">
+
+                  {/* Encabezado con botón de eliminar (solo si hay más de 1 contacto) */}
+                  {contactos.length > 1 && (
+                    <div className="flex justify-between items-center pt-2">
+                      <h4 className="text-sm font-bold text-slate-600">Contacto {index + 1} {index === 0 && <span className="text-primary/70 text-xs font-normal ml-1">(Principal)</span>}</h4>
+                      <button
+                        type="button"
+                        onClick={() => eliminarContacto(index)}
+                        className="p-1 text-slate-300 hover:text-red-400 transition-colors flex items-center justify-center -mr-2"
+                        title="Eliminar contacto"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">delete</span>
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Nombre <span className="text-red-500">*</span></label>
+                      <input name="pri_nombre" value={contacto.pri_nombre} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Segundo Nombre</label>
+                      <input name="seg_nombre" value={contacto.seg_nombre} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Apellido <span className="text-red-500">*</span></label>
+                    <input name="pri_apellido" value={contacto.pri_apellido} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Departamento <span className="text-red-500">*</span></label>
+                      <input name="departamento" value={contacto.departamento} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Mercadeo" type="text" />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rol <span className="text-red-500">*</span></label>
+                      <input name="rol" value={contacto.rol} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Decisor, Operativo..." type="text" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Correo <span className="text-red-500">*</span></label>
+                    <input name="correo" value={contacto.correo} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="email@dominio.com" type="email" />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fecha de Nacimiento</label>
+                    <input name="fecha_nac" value={contacto.fecha_nac} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Anotaciones Especiales</label>
+                    <textarea name="anotac_especiales" value={contacto.anotac_especiales} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Preferencias de contacto..." rows="2"></textarea>
+                  </div>
+
+                  {/* Divisoria entre contactos múltiples */}
+                  {contactos.length > 1 && index < contactos.length - 1 && (
+                    <div className="border-b-2 border-dashed border-slate-200 pt-8 pb-2"></div>
+                  )}
+
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Segundo Nombre</label>
-                  <input name="seg_nombre" value={contacto.seg_nombre} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
-                </div>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Apellido <span className="text-red-500">*</span></label>
-                <input name="pri_apellido" value={contacto.pri_apellido} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Departamento <span className="text-red-500">*</span></label>
-                  <input name="departamento" value={contacto.departamento} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Mercadeo" type="text" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rol <span className="text-red-500">*</span></label>
-                  <input name="rol" value={contacto.rol} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Decisor, Operativo..." type="text" />
-                </div>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Correo <span className="text-red-500">*</span></label>
-                <input name="correo" value={contacto.correo} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="email@dominio.com" type="email" />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fecha de Nacimiento</label>
-                <input name="fecha_nac" value={contacto.fecha_nac} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Anotaciones Especiales</label>
-                <textarea name="anotac_especiales" value={contacto.anotac_especiales} onChange={handleContacto} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Preferencias de contacto..." rows="2"></textarea>
-              </div>
+              ))}
             </div>
           </section>
 
@@ -416,7 +484,7 @@ export default function AgregarCliente() {
                     </option>
                   ))}
                 </select>
-                <p className="text-[10px] text-slate-400 mt-1 italic">El cliente será visible en el pipeline de este usuario.</p>
+                <p className="text-[10px] text-slate-400 mt-1 italic">El cliente formará parte de la cartera comercial de este vendedor.</p>
               </div>
             </section>
           </div>

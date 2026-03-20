@@ -303,7 +303,7 @@ create table PAUTAS(
     observaciones VARCHAR(300),
     programa VARCHAR(100),
     presentadora VARCHAR(50),
-    horario DATE,
+    horario VARCHAR(50),
 	fk_vendedor UUID, 
 	fk_cliente INTEGER,
 	
@@ -311,9 +311,9 @@ create table PAUTAS(
     CONSTRAINT fk_vend FOREIGN KEY (fk_vendedor) references VENDEDORES(usuario_id),
 	CONSTRAINT fk_client FOREIGN KEY (fk_cliente) references CLIENTE(id), 
 	CONSTRAINT check_tipo_compra CHECK (tipo_compra IN('en vivo', 'rotativa')),
-    CONSTRAINT check_tipo_pauta CHECK ((tipo_compra = 'rotativa' AND programa 
+    CONSTRAINT check_tipo_pauta CHECK ((tipo_compra = 'en vivo' AND programa 
     IS NOT NULL  AND presentadora IS NOT NULL) OR 
-    (tipo_compra = 'en vivo' AND presentadora IS NULL AND programa IS NULL)),
+    (tipo_compra = 'rotativa' AND presentadora IS NULL AND programa IS NULL)),
 	CONSTRAINT check_estado CHECK(estado IN ('programada','en transmision','suspendida','finalizada'))
 );
 
