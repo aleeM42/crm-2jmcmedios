@@ -1,9 +1,93 @@
 // ==============================================
 // AgregarAliado.jsx — Formulario Agregar Aliado Comercial
 // ==============================================
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 function AgregarAliado() {
+  const navigate = useNavigate();
+
+  // Estados para opciones dinámicas
+  const [regiones, setRegiones] = useState([]);
+  const [estados, setEstados] = useState([]);
+  const [selectedEstado, setSelectedEstado] = useState('');
+  const [ciudades, setCiudades] = useState([]);
+  const [coberturas, setCoberturas] = useState([]);
+  const [categorias, setCategorias] = useState([
+    { id: 'multitarget', nombre: 'Multitarget' },
+    { id: 'todo público', nombre: 'Todo Público' },
+    { id: 'juvenil', nombre: 'Juvenil' },
+    { id: 'adulto contemporáneo', nombre: 'Adulto Contemporáneo' },
+    { id: 'popular', nombre: 'Popular' },
+    { id: 'adulto', nombre: 'Adulto' },
+  ]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [resRegiones, resEstados, resCoberturas, resCategorias] = await Promise.all([
+          api.get('/lugares?tipo=Region'),
+          api.get('/lugares?tipo=Estado'),
+          api.get('/coberturas'),
+          api.get('/categorias'),
+        ]);
+
+        if (resRegiones.success) setRegiones(resRegiones.data);
+        if (resEstados.success) setEstados(resEstados.data);
+        if (resCoberturas.success) setCoberturas(resCoberturas.data);
+        if (resCategorias.success && resCategorias.data.length > 0) {
+           setCategorias(resCategorias.data);
+        }
+      } catch (err) {
+        console.error('Error fetching select options:', err);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedEstado) {
+      setCiudades([]);
+      return;
+    }
+    const fetchCiudades = async () => {
+      try {
+        const res = await api.get(`/lugares?padre_id=${selectedEstado}`);
+        if (res.success) {
+          setCiudades(res.data);
+        }
+      } catch (err) {
+        console.error('Error fetching ciudades:', err);
+      }
+    };
+    fetchCiudades();
+  }, [selectedEstado]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+
+    // Adaptar data para backend
+    const payload = {
+      ...data,
+      fk_lugar: parseInt(data.lugar, 10) || null,
+      fk_region: parseInt(data.region, 10) || null,
+      fk_cobertura: parseInt(data.cobertura, 10) || null,
+    };
+
+    try {
+      const response = await api.post('/aliados', payload);
+      if (response.success) {
+        navigate('/aliados-comerciales');
+      }
+    } catch (error) {
+      console.error('Error creating aliado:', error);
+      alert('Error al crear aliado');
+    }
+  };
+
   return (
     <>
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -17,12 +101,11 @@ function AgregarAliado() {
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
           <Link to="/aliados-comerciales" className="flex-1 sm:flex-initial text-center px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all">Cancelar</Link>
-          <button className="flex-1 sm:flex-initial px-8 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all">Guardar</button>
         </div>
       </header>
 
       <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <form className="p-8 space-y-12">
+        <form className="p-8 space-y-12" onSubmit={handleSubmit}>
           {/* Section 1: Datos de la Emisora */}
           <section>
             <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
@@ -32,50 +115,66 @@ function AgregarAliado() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Razón Social<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="razon_social" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Circuito Radiofonico Nacional C.A." type="text" />
+                <input name="razon_social" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Circuito Radiofonico Nacional C.A." type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre de la Emisora<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="nombre_emisora" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: La Mega 107.3" type="text" />
+                <input name="nombre_emisora" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: La Mega 107.3" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">RIF<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="rif" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="J-12345678-9" type="text" />
+                <input name="rif" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="J-12345678-9" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Frecuencia<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="frecuencia" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: 107.3 FM" type="text" />
+                <input name="frecuencia" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: 107.3 FM" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Categoría<span className="text-red-500 ml-0.5">*</span></label>
-                <select name="categoria" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
-                  <option value="">Seleccione una categoría</option><option>Musical</option><option>Informativa</option><option>Deportiva</option><option>Variedades</option>
+                <select name="categoria" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                  <option value="">Seleccione una categoría</option>
+                  {categorias.map(cat => (
+                    <option key={cat.id || cat.nombre} value={cat.nombre.toLowerCase()}>{cat.nombre}</option>
+                  ))}
                 </select>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado<span className="text-red-500 ml-0.5">*</span></label>
-                <select name="estado" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
-                  <option>Activo</option><option>Inactivo</option><option>Cerrado</option>
+                <select name="estado" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Inactivo</option>
+                  <option value="cerrado">Cerrado</option>
                 </select>
               </div>
               <div className="space-y-1.5 md:col-span-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Dirección<span className="text-red-500 ml-0.5">*</span></label>
-                <textarea name="direccion" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Av. Principal de las Mercedes..." rows="2"></textarea>
+                <textarea name="direccion" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Av. Principal de las Mercedes..." rows="2"></textarea>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Región<span className="text-red-500 ml-0.5">*</span></label>
-                <select name="region" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                <select name="region" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
                   <option value="">Seleccione una región</option>
-                  <option>Capital</option>
-                  <option>Central</option>
-                  <option>Los Llanos</option>
-                  <option>Centro Occidental</option>
-                  <option>Zuliana</option>
-                  <option>Los Andes</option>
-                  <option>Nor Oriental</option>
-                  <option>Guayana</option>
-                  <option>Insular</option>
-                  <option>Sur Occidental</option>
+                  {regiones.map(reg => (
+                    <option key={reg.id} value={reg.id}>{reg.nombre}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado Geográfico<span className="text-red-500 ml-0.5">*</span></label>
+                <select name="estado_geografico" required value={selectedEstado} onChange={(e) => setSelectedEstado(e.target.value)} className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                  <option value="">Seleccione el estado</option>
+                  {estados.map(est => (
+                    <option key={est.id} value={est.id}>{est.nombre}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Ciudad<span className="text-red-500 ml-0.5">*</span></label>
+                <select name="lugar" required disabled={!selectedEstado} className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary disabled:opacity-50">
+                  <option value="">Seleccione la ciudad</option>
+                  {ciudades.map(ciu => (
+                    <option key={ciu.id} value={ciu.id}>{ciu.nombre}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -88,20 +187,17 @@ function AgregarAliado() {
                 <span className="material-symbols-outlined text-primary">broadcast_on_home</span>
                 <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Cobertura</h3>
               </div>
-              <button className="flex items-center gap-1 text-xs font-bold text-primary hover:text-secondary transition-colors" type="button">
-                <span className="material-symbols-outlined text-[18px]">add_circle</span>Agregar Cobertura
-              </button>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {['Caracas - Los Teques', 'Valles del Tuy', 'Guarenas - Guatire'].map((c) => (
-                <div key={c} className="flex items-center gap-2 bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-full text-primary text-sm font-semibold">
-                  {c}
-                  <button className="material-symbols-outlined text-[16px] hover:text-red-500" type="button">close</button>
-                </div>
-              ))}
+            <div className="space-y-1.5 md:w-1/2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Seleccione Cobertura<span className="text-red-500 ml-0.5">*</span></label>
+                <select name="cobertura" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                  <option value="">Seleccione una cobertura</option>
+                  {coberturas.map(cob => (
+                    <option key={cob.id} value={cob.id}>{cob.descripcion}</option>
+                  ))}
+                </select>
             </div>
           </section>
-
           {/* Section 3: Contacto de la Emisora */}
           <section>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6 border-b border-slate-100 pb-4">
@@ -116,7 +212,7 @@ function AgregarAliado() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Primer Nombre<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="primer_nombre" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Juan" type="text" />
+                <input name="primer_nombre" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Juan" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Segundo Nombre</label>
@@ -124,19 +220,19 @@ function AgregarAliado() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Primer Apellido<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="primer_apellido" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Pérez" type="text" />
+                <input name="primer_apellido" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Pérez" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Departamento<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="departamento" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Ventas" type="text" />
+                <input name="departamento" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Ventas" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Correo Electrónico<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="correo" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="ejemplo@correo.com" type="email" />
+                <input name="correo" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="ejemplo@correo.com" type="email" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Rol en la Emisora<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="rol" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Gerente General" type="text" />
+                <input name="rol" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Gerente General" type="text" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de Nacimiento</label>
@@ -164,11 +260,11 @@ function AgregarAliado() {
               <div className="grid grid-cols-4 gap-4">
                 <div className="space-y-1.5 col-span-1">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.*</label>
-                  <input name="codigo_area" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="0412" type="text" />
+                  <input name="codigo_area" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="0412" type="text" />
                 </div>
                 <div className="space-y-1.5 col-span-3">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Número de Teléfono<span className="text-red-500 ml-0.5">*</span></label>
-                  <input name="cuerpo" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="1234567" type="text" />
+                  <input name="cuerpo" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="1234567" type="text" />
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -191,7 +287,7 @@ function AgregarAliado() {
 
           {/* Action Footer */}
           <div className="pt-8 flex flex-col sm:flex-row justify-end gap-4 border-t border-slate-100">
-            <button className="px-6 py-2.5 text-slate-600 font-bold text-sm hover:underline" type="button">Restaurar formulario</button>
+            <button className="px-6 py-2.5 text-slate-600 font-bold text-sm hover:underline" type="reset">Restaurar formulario</button>
             <button className="px-10 py-2.5 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all" type="submit">Finalizar Registro</button>
           </div>
         </form>

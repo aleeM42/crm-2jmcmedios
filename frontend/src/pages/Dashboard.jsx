@@ -13,10 +13,15 @@ import api from '../services/api.js';
 import { toast } from 'sonner';
 
 const ESTADO_COLORS = {
+  // Estados de pauta
   'programada': '#A1DEE5',
   'en transmision': '#16B1B8',
   'suspendida': '#F59E0B',
   'finalizada': '#8DC63F',
+  // Etapas del Pipeline (OPORTUNIDADES)
+  'Contacto inicial': '#A1DEE5',
+  'Por firmar': '#16B1B8',
+  'Negociado': '#8DC63F',
 };
 
 function Dashboard() {
@@ -32,21 +37,17 @@ function Dashboard() {
     topClientes: [],
   });
 
-  const [usuarioLocal, setUsuarioLocal] = useState({ nombre: '', rol: '', inicial: 'A' });
+  const user = getCurrentUser();
+  const usuarioLocal = {
+    nombre: user ? (`${user.primer_nombre || ''} ${user.primer_apellido || ''}`.trim() || user.nombre_usuario || 'Usuario') : '',
+    rol: user?.rol || 'Rol no definido',
+    inicial: user?.primer_nombre ? user.primer_nombre.charAt(0).toUpperCase() : (user?.nombre_usuario ? user.nombre_usuario.charAt(0).toUpperCase() : 'U')
+  };
 
   useEffect(() => {
-    const user = getCurrentUser();
     if (user?.rol === 'Gestor de Pautas') {
       navigate('/pautas', { replace: true });
       return;
-    }
-
-    if (user) {
-      setUsuarioLocal({
-        nombre: `${user.primer_nombre || ''} ${user.primer_apellido || ''}`.trim() || user.nombre_usuario || 'Usuario',
-        rol: user.rol || 'Rol no definido',
-        inicial: user.primer_nombre ? user.primer_nombre.charAt(0).toUpperCase() : (user.nombre_usuario ? user.nombre_usuario.charAt(0).toUpperCase() : 'U')
-      });
     }
 
     api.get('/dashboard/resumen')

@@ -43,7 +43,6 @@ export default function AgregarPauta() {
   // Emisoras Asociadas
   const [selectedAliadoId, setSelectedAliadoId] = useState('');
   const [emisorasAsoc, setEmisorasAsoc] = useState([]);
-  const [cantidadEmisoras, setCantidadEmisoras] = useState(1);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,11 +90,10 @@ export default function AgregarPauta() {
     }
     const newAddition = {
       ...selectedAliado,
-      cantidad_emisoras: cantidadEmisoras
+      cantidad_emisoras: 1
     };
     setEmisorasAsoc([...emisorasAsoc, newAddition]);
     setSelectedAliadoId('');
-    setCantidadEmisoras(1);
   };
 
   const handleRemoveEmisora = (idToRemove) => {
@@ -373,7 +371,6 @@ export default function AgregarPauta() {
                   <option value="">Selecciona emisora...</option>
                   {aliados.map(a => <option key={a.id} value={a.id}>{a.nombre_emisora}</option>)}
                 </select>
-                <input type="number" min="1" placeholder="Pautas por emisora" value={cantidadEmisoras} onChange={(e) => setCantidadEmisoras(e.target.value)} className="w-full h-10 px-4 bg-white border border-slate-200 rounded-lg text-sm outline-none" />
                 <button onClick={handleAddEmisora} type="button" className="w-full py-2.5 flex items-center justify-center gap-2 border border-dashed border-slate-200 hover:border-primary text-slate-400 hover:text-primary rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors mb-2">
                   <span className="material-symbols-outlined text-[16px]">add_circle</span>
                   Agregar Emisora
@@ -382,40 +379,23 @@ export default function AgregarPauta() {
 
               {/* Lista de emisoras asociadas */}
               {emisorasAsoc.length > 0 && (
-                <div className="space-y-2 mt-4">
+                <div className="space-y-3 mt-4">
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Emisoras agregadas:</p>
                   {emisorasAsoc.map((e) => (
-                    <div key={e.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-white rounded-lg border border-slate-200 shadow-sm gap-2">
-                      <div>
-                        <span className="text-sm font-bold text-slate-700 block">{e.nombre_emisora}</span>
-                        <span className="text-xs text-slate-500 block">{e.cantidad_emisoras} pautas assignadas</span>
+                    <div key={e.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white rounded-lg border border-slate-200 shadow-sm gap-4">
+                      <div className="flex-1">
+                        <span className="text-sm font-bold text-slate-800 block mb-1">{e.nombre_emisora}</span>
+                        <div className="flex flex-wrap items-center gap-2 text-[10px] font-medium text-slate-500">
+                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.region_nombre || 'Sin Región'}</span>
+                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.estado_nombre || 'Sin Estado'}</span>
+                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.ciudad_nombre || 'Sin Ciudad'}</span>
+                        </div>
                       </div>
-                      <button type="button" onClick={() => handleRemoveEmisora(e.id)} className="text-slate-400 hover:text-red-500 transition-colors p-1">
-                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                      <button type="button" onClick={() => handleRemoveEmisora(e.id)} className="text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors p-2 rounded-md">
+                        <span className="material-symbols-outlined text-[18px] block">delete</span>
                       </button>
                     </div>
                   ))}
-                </div>
-              )}
-
-              {/* Ubicación dinámica según emisora seleccionada */}
-              {selectedAliado && (
-                <div className="mt-6 pt-4 border-t border-slate-100">
-                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Ubicación de Emisora Actual</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Región</label>
-                      <input type="text" value={selectedAliado.region_nombre || ''} readOnly className="w-full h-10 px-3 bg-slate-100 border border-slate-200 rounded-md text-sm text-slate-500" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Estado</label>
-                      <input type="text" value={selectedAliado.estado_nombre || ''} readOnly className="w-full h-10 px-3 bg-slate-100 border border-slate-200 rounded-md text-sm text-slate-500" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Ciudad</label>
-                      <input type="text" value={selectedAliado.ciudad_nombre || ''} readOnly className="w-full h-10 px-3 bg-slate-100 border border-slate-200 rounded-md text-sm text-slate-500" />
-                    </div>
-                  </div>
                 </div>
               )}
             </div>

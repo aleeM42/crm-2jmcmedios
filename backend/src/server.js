@@ -24,6 +24,9 @@ import dashboardRouter  from './router/dashboard.router.js';
 import pautaRouter      from './router/pauta.router.js';
 import aliadoRouter     from './router/aliado.router.js';
 import notificacionRouter from './router/notificacion.router.js';
+import coberturaRouter from './router/cobertura.router.js';
+import categoriaRouter from './router/categoria.router.js';
+import oportunidadRouter from './router/oportunidad.router.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -72,6 +75,9 @@ app.use('/api/dashboard',  dashboardRouter);
 app.use('/api/pautas',     pautaRouter);
 app.use('/api/aliados',    aliadoRouter);
 app.use('/api/notificaciones', notificacionRouter);
+app.use('/api/coberturas', coberturaRouter);
+app.use('/api/categorias', categoriaRouter);
+app.use('/api/oportunidades', oportunidadRouter);
 
 // ---- Health Check ----
 app.get('/api/health', (req, res) => {

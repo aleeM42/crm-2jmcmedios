@@ -1,7 +1,7 @@
 // ==============================================
 // Clientes.jsx — Directorio de Clientes (conectado al backend)
 // ==============================================
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getClientes } from '../services/cliente.service.js';
 
@@ -26,7 +26,7 @@ export default function Clientes() {
     search: '',
   });
 
-  const fetchClientes = async (page = 1) => {
+  const fetchClientes = useCallback(async (page = 1) => {
     setLoading(true);
     setError('');
     try {
@@ -41,11 +41,11 @@ export default function Clientes() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
   useEffect(() => {
     fetchClientes();
-  }, [filters]);
+  }, [fetchClientes]);
 
   const handleFilter = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });

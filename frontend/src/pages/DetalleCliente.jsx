@@ -396,12 +396,26 @@ export default function DetalleCliente() {
             <div className="p-6 space-y-4">
               {contactosAdicionales.length > 0 ? (
                 contactosAdicionales.map(ca => (
-                  <div key={ca.id} className="flex items-center justify-between border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
-                    <div>
-                      <p className="text-xs font-bold text-slate-700">{ca.pri_nombre} {ca.pri_apellido}</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">{ca.departamento}</p>
+                  <div key={ca.id} className="border-b border-slate-100 pb-3 last:border-b-0 last:pb-0 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs font-bold text-slate-700">{ca.pri_nombre} {ca.pri_apellido}</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">{ca.departamento}</p>
+                      </div>
+                      <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-bold rounded uppercase">{ca.rol}</span>
                     </div>
-                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-bold rounded uppercase">{ca.rol}</span>
+                    {ca.correo && (
+                      <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                        <span className="material-symbols-outlined text-[13px] text-slate-400">mail</span>
+                        <span className="break-all">{ca.correo}</span>
+                      </div>
+                    )}
+                    {ca.telefonos && ca.telefonos.length > 0 && (
+                      <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                        <span className="material-symbols-outlined text-[13px] text-slate-400">call</span>
+                        <span>{ca.telefonos.map(t => `${t.codigo_area}-${t.numero}`).join(', ')}</span>
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (

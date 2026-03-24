@@ -42,6 +42,13 @@ export default function errorHandler(err, req, res, _next) {
           success: false,
           error: `Campo obligatorio faltante: ${err.column || 'desconocido'}`,
         });
+      // Value too long (e.g. string exceeds varchar limit)
+      case '22001':
+        return res.status(400).json({
+          success: false,
+          error: 'Un campo introducido excede la longitud máxima permitida en la base de datos',
+          detalle: err.message,
+        });
     }
   }
 

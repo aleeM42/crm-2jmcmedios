@@ -11,12 +11,16 @@ export default function PautasCalendario() {
   const [pautas, setPautas] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Estado para la navegación de meses
+  const actualDate = new Date();
+  const [viewDate, setViewDate] = useState(new Date(actualDate.getFullYear(), actualDate.getMonth(), 1));
+
   useEffect(() => {
     const fetchPautas = async () => {
       try {
         const response = await api.get('/pautas');
-        if (response.data.success) {
-          setPautas(response.data.data);
+        if (response.success) {
+          setPautas(response.data);
         }
       } catch (error) {
         console.error('Error al cargar pautas:', error);
@@ -27,10 +31,13 @@ export default function PautasCalendario() {
     fetchPautas();
   }, []);
 
-  const currentDate = new Date();
-  const today = currentDate.getDate();
-  const currentMonth = currentDate.getMonth();
-  const currentYear = currentDate.getFullYear();
+  const today = actualDate.getDate();
+  const currentMonth = viewDate.getMonth();
+  const currentYear = viewDate.getFullYear();
+  const isActualMonth = actualDate.getMonth() === currentMonth && actualDate.getFullYear() === currentYear;
+
+  const handlePrevMonth = () => setViewDate(new Date(currentYear, currentMonth - 1, 1));
+  const handleNextMonth = () => setViewDate(new Date(currentYear, currentMonth + 1, 1));
   
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0(Sun) - 6(Sat)
@@ -44,21 +51,43 @@ export default function PautasCalendario() {
   const EVENTS = {};
   pautas.forEach(pauta => {
     if (pauta.fecha_inicio) {
-      // Ajustar la fecha asegurando que usamos la fecha local para no desfasarnos por timezone si la hora es 00:00:00 UTC
-      const [year, month, day] = pauta.fecha_inicio.split('T')[0].split('-');
-      const pDate = new Date(year, month - 1, day);
+      // Ajustar la fecha asegurando que usamos la fecha local para no desfasarnos por timezone
+      const [sYear, sMonth, sDay] = pauta.fecha_inicio.split('T')[0].split('-');
+      const startDate = new Date(sYear, sMonth - 1, sDay);
       
-      if (pDate.getMonth() === currentMonth && pDate.getFullYear() === currentYear) {
-        const pDay = pDate.getDate();
-        if (!EVENTS[pDay]) EVENTS[pDay] = [];
-        
-        let color = 'bg-slate-400';
-        if (pauta.estado === 'programada') color = 'bg-primary';
-        if (pauta.estado === 'en transmision') color = 'bg-accent-green';
-        if (pauta.estado === 'finalizada') color = 'bg-secondary';
-        if (pauta.estado === 'suspendida') color = 'bg-amber-500';
+      let endDate = startDate;
+      if (pauta.fecha_fin) {
+        const [eYear, eMonth, eDay] = pauta.fecha_fin.split('T')[0].split('-');
+        endDate = new Date(eYear, eMonth - 1, eDay);
+      }
+      
+      let color = 'bg-slate-400';
+      if (pauta.tipo_compra === 'rotativa') color = 'bg-[#55CCD3]';
+      if (pauta.tipo_compra === 'en vivo') color = 'bg-[#8DC63F]';
 
-        EVENTS[pDay].push({ label: pauta.cliente_nombre || `OT-${pauta.numero_ot}`, color });
+      const label = pauta.cliente_nombre ? `OT-${pauta.numero_ot} - ${pauta.cliente_nombre.substring(0, 10)}${pauta.cliente_nombre.length > 10 ? '...' : ''}` : `OT-${pauta.numero_ot}`;
+
+      // Recorrer los días desde inicio hasta fin
+      let currentDate = new Date(startDate);
+      // Solo iterar si las fechas son coherentes
+      if (startDate <= endDate) {
+        while (currentDate <= endDate) {
+          if (currentDate.getMonth() === currentMonth && currentDate.getFullYear() === currentYear) {
+            const pDay = currentDate.getDate();
+            if (!EVENTS[pDay]) EVENTS[pDay] = [];
+            
+            let displayLabel = label;
+            if (startDate.getTime() !== endDate.getTime()) {
+              if (currentDate.getTime() === startDate.getTime()) {
+                displayLabel = `(Inicio) ${label}`;
+              } else if (currentDate.getTime() === endDate.getTime()) {
+                displayLabel = `(Fin) ${label}`;
+              }
+            }
+            EVENTS[pDay].push({ label: displayLabel, color });
+          }
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
       }
     }
   });
@@ -126,15 +155,19 @@ export default function PautasCalendario() {
             {/* Month Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <button disabled className="w-8 h-8 flex items-center justify-center rounded-lg opacity-50 cursor-not-allowed transition-colors">
-                  <span className="material-symbols-outlined text-slate-400">chevron_left</span>
+                <button onClick={handlePrevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors">
+                  <span className="material-symbols-outlined text-slate-700">chevron_left</span>
                 </button>
-                <h3 className="text-lg font-bold text-slate-800 font-display capitalize">{monthNames[currentMonth]} {currentYear}</h3>
-                <button disabled className="w-8 h-8 flex items-center justify-center rounded-lg opacity-50 cursor-not-allowed transition-colors">
-                  <span className="material-symbols-outlined text-slate-400">chevron_right</span>
+                <h3 className="text-lg font-bold text-slate-800 font-display capitalize min-w-[150px] text-center">
+                  {monthNames[currentMonth]} {currentYear}
+                </h3>
+                <button onClick={handleNextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors">
+                  <span className="material-symbols-outlined text-slate-700">chevron_right</span>
                 </button>
               </div>
-              <button className="text-xs font-bold text-primary hover:underline">Hoy: {today}</button>
+              <button onClick={() => setViewDate(new Date(actualDate.getFullYear(), actualDate.getMonth(), 1))} className="text-xs font-bold text-primary hover:underline">
+                Hoy: {actualDate.getDate()} {monthNames[actualDate.getMonth()].slice(0, 3)}
+              </button>
             </div>
 
             {/* Day Names */}
@@ -149,11 +182,11 @@ export default function PautasCalendario() {
               {cells.map((day, i) => (
                 <div
                   key={i}
-                  className={`min-h-[100px] border-b border-r border-slate-50 p-2 ${day === today ? 'bg-primary/5' : ''} ${!day ? 'bg-slate-50/50' : ''}`}
+                  className={`min-h-[100px] border-b border-r border-slate-50 p-2 ${day === today && isActualMonth ? 'bg-primary/5' : ''} ${!day ? 'bg-slate-50/50' : ''}`}
                 >
                   {day && (
                     <>
-                      <span className={`text-xs font-bold ${day === today ? 'text-white bg-primary w-6 h-6 rounded-full flex items-center justify-center' : 'text-slate-500'}`}>
+                      <span className={`text-xs font-bold ${day === today && isActualMonth ? 'text-white bg-primary w-6 h-6 rounded-full flex items-center justify-center' : 'text-slate-500'}`}>
                         {day}
                       </span>
                       <div className="mt-1 space-y-1">
@@ -181,7 +214,7 @@ export default function PautasCalendario() {
               <div className="space-y-3">
                 {proximasPautas.map((pauta) => (
                   <Link key={pauta.id} to={`/pautas/${pauta.id}`} className="flex items-center gap-4 p-3 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
-                    <div className="w-1 h-10 bg-primary rounded-full"></div>
+                    <div className={`w-1 h-10 ${pauta.tipo_compra === 'en vivo' ? 'bg-[#8DC63F]' : 'bg-[#55CCD3]'} rounded-full`}></div>
                     <div className="flex-1 overflow-hidden">
                       <p className="text-xs font-bold text-slate-700 truncate">OT-{pauta.numero_ot} — {pauta.cliente_nombre}</p>
                       <p className="text-[10px] text-slate-400 truncate">

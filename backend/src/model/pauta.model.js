@@ -4,10 +4,39 @@
 import pool from '../config/db.js';
 
 /**
+ * Sincroniza automáticamente los estados de las pautas basándose en las fechas actuales.
+ * Se ejecuta de forma lazy al consultar pautas.
+ */
+async function syncPautasEstados() {
+  const query = `
+    UPDATE PAUTAS 
+    SET estado = CASE 
+      WHEN CURRENT_DATE > fecha_fin THEN 'finalizada'
+      WHEN CURRENT_DATE >= fecha_inicio THEN 'en transmision'
+      ELSE 'programada'
+    END
+    WHERE estado != 'suspendida'
+      AND estado != CASE 
+        WHEN CURRENT_DATE > fecha_fin THEN 'finalizada'
+        WHEN CURRENT_DATE >= fecha_inicio THEN 'en transmision'
+        ELSE 'programada'
+      END
+  `;
+  try {
+    await pool.query(query);
+  } catch (error) {
+    console.error('[syncPautasEstados] Error sincronizando estados:', error);
+  }
+}
+
+/**
  * Obtiene todas las pautas con el nombre del cliente relacionado.
  * No se aplica filtro de rol, todos pueden ver todas las pautas.
  */
 export async function getAllPautas() {
+  // Sincronizar estados antes de consultar
+  await syncPautasEstados();
+
   const query = `
     SELECT p.*, 
            c.nombre AS cliente_nombre 
@@ -23,6 +52,9 @@ export async function getAllPautas() {
  * Obtiene una pauta por su ID, con datos de Emisoras y Negociación Total
  */
 export async function getPautaById(id) {
+  // Sincronizar estados antes de consultar
+  await syncPautasEstados();
+
   // get pauta
   const queryPauta = `
     SELECT p.*,
@@ -58,7 +90,7 @@ export async function getPautaById(id) {
   const queryHistorico = `
     SELECT COALESCE(SUM(monto_negociacion), 0) AS total_negociacion
     FROM HISTORICO_NEGOCIACIONES
-    WHERE fk_pauta = $1
+    WHERE fk_cliente = (SELECT fk_cliente FROM PAUTAS WHERE id = $1)
   `;
   const resultHistorico = await pool.query(queryHistorico, [id]);
   pauta.monto_total_negociacion = parseFloat(resultHistorico.rows[0].total_negociacion);
@@ -133,10 +165,10 @@ export async function createPauta(data) {
 
     // Tabla HISTORICO_NEGOCIACIONES
     const queryHistorico = `
-      INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, tipo_negociacion, fk_pauta)
+      INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, tipo_negociacion, fk_cliente)
       VALUES ($1, $2, $3, $4, $5)
     `;
-    await client.query(queryHistorico, [data.fechaInicio, data.fechaFin, data.montoOT || 0, 'Nueva Pauta', pautaId]);
+    await client.query(queryHistorico, [data.fechaInicio, data.fechaFin, data.montoOT || 0, 'Nueva Pauta', data.clienteId]);
 
     await client.query('COMMIT');
     return pautaId;

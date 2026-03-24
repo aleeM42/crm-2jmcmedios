@@ -4,6 +4,7 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import api from '../services/api.js';
+import { calcularProgresoPauta } from '../utils/pautasUtils';
 
 const STATUS_STYLE = {
   'en transmision': 'bg-primary/10 text-primary',
@@ -109,13 +110,13 @@ export default function PautasLista() {
                 <tr><td colSpan="9" className="text-center py-4 text-slate-500">No hay pautas registradas.</td></tr>
               ) : (
                 pautas.map((p) => {
-                  // Calcular progreso mockeado basado en fechas o 0
-                  const progreso = p.estado === 'finalizada' ? 100 : (p.estado === 'en transmision' ? 50 : 0);
+                  // Calcular progreso real basado en fechas
+                  const { progresoPorcentaje: progreso } = calcularProgresoPauta(p);
                   
                   return (
                     <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                       <td className="py-3 px-6">
-                        <Link to={`/pautas/${p.numero_ot}`} className="font-bold text-primary hover:underline">{p.numero_ot}</Link>
+                        <Link to={`/pautas/${p.id}`} className="font-bold text-primary hover:underline">{p.numero_ot}</Link>
                       </td>
                       <td className="py-3 px-5 font-medium text-slate-700">{p.cliente_nombre || 'Sin cliente'}</td>
                       <td className="py-3 px-5 text-slate-600">{p.marca}</td>

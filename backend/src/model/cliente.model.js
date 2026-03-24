@@ -150,7 +150,7 @@ export const findById = async (id) => {
   const kpisQuery = `
     SELECT
       (SELECT COUNT(*) FROM PAUTAS WHERE fk_cliente = $1 AND estado NOT IN ('finalizada', 'suspendida')) AS pautas_activas,
-      (SELECT SUM(hn.monto_negociacion) FROM HISTORICO_NEGOCIACIONES hn JOIN PAUTAS p ON hn.fk_pauta = p.id WHERE p.fk_cliente = $1) AS monto_total,
+      (SELECT SUM(hn.monto_negociacion) FROM HISTORICO_NEGOCIACIONES hn WHERE hn.fk_cliente = $1) AS monto_total,
       (SELECT MAX(v.fecha) FROM VISITAS v JOIN CONTACTOS c ON v.fk_contacto = c.id WHERE c.fk_cliente = $1) AS ultima_visita,
       (SELECT COUNT(DISTINCT dp.fk_aliado) FROM DETALLE_PAUTA dp JOIN PAUTAS p ON dp.fk_pauta = p.id WHERE p.fk_cliente = $1) AS emisoras_presencia
   `;

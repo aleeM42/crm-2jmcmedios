@@ -4,6 +4,7 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import api from '../services/api.js';
+import { calcularProgresoPauta } from '../utils/pautasUtils';
 
 const COLUMNS_DEF = [
   { estado: 'programada', label: 'Programada', color: 'bg-blue-500' },
@@ -70,9 +71,9 @@ export default function PautasKanban() {
                   <div className="text-center py-4 bg-slate-50/50 rounded-xl border border-dashed border-slate-200 text-xs text-slate-400">Sin pautas en este estado</div>
                 ) : (
                   col.items.map((p) => {
-                    const progreso = p.estado === 'finalizada' ? 100 : (p.estado === 'en transmision' ? 50 : 0);
+                    const { progresoPorcentaje: progreso } = calcularProgresoPauta(p);
                     return (
-                      <Link key={p.id} to={`/pautas/${p.numero_ot}`} className="block bg-[#F4FAFB] rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md hover:border-primary/20 transition-all">
+                      <Link key={p.id} to={`/pautas/${p.id}`} className="block bg-[#F4FAFB] rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md hover:border-primary/20 transition-all">
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-xs font-bold text-primary">{p.numero_ot}</span>
                           <span className="text-[10px] font-bold text-slate-400 uppercase capitalize">{p.tipo_compra}</span>

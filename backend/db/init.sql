@@ -74,7 +74,7 @@ Create Table COBERTURA(
 	fk_lugar INTEGER NOT NULL,
 
     -- Constraints
-	CONSTRAINT fk_lugar_padre FOREIGN KEY (fk_lugar) references LUGAR(id)
+	CONSTRAINT fk_lugar_cobertura FOREIGN KEY (fk_lugar) references LUGAR(id)
 );
 
 CREATE TABLE USUARIOS ( 
@@ -187,8 +187,8 @@ create table ALIADOS_COMERCIALES(
 	id SERIAL PRIMARY KEY,
 	razon_social VARCHAR(80) NOT NULL,
 	nombre_emisora VARCHAR(50) UNIQUE NOT NULL,
-	rif VARCHAR(9) UNIQUE NOT NULL,
-    frecuencia VARCHAR(8) UNIQUE NOT NULL,
+	rif VARCHAR(20) UNIQUE NOT NULL,
+    frecuencia VARCHAR(20) UNIQUE NOT NULL,
     categoria VARCHAR(30) NOT NULL,
     direccion VARCHAR(100) NOT NULL,
     estado VARCHAR(20) NOT NULL,
@@ -200,7 +200,7 @@ create table ALIADOS_COMERCIALES(
     CONSTRAINT fk_lugar_ac FOREIGN KEY (fk_lugar) REFERENCES LUGAR(id),
     CONSTRAINT fk_region_ac FOREIGN KEY (fk_region) REFERENCES LUGAR(id),
     CONSTRAINT fk_cobertura_ac FOREIGN KEY (fk_cobertura) REFERENCES COBERTURA(id),
-	CONSTRAINT check_AC_categoria CHECK (categoria IN ('latinos' ,'exitos urbanos recientes'  ,'exitos latinos recientes' ,'exitos juveniles' ,'exitos recientes ','baladas en ingles' ,'baladas en español ','bachata' ,'salsa' ,'merengue' ,'regueton' ,'pop baladas en ingles ','pop baladas en español','tropical' ,'multitarget ','musica' ,'entretenimiento ','información' ,'venezolanas' ,'retro' )),
+	CONSTRAINT check_AC_categoria CHECK (categoria IN ('multitarget', 'todo público', 'juvenil', 'adulto contemporáneo', 'popular', 'adulto')),
 	CONSTRAINT check_AC_estado CHECK (estado IN ('activo','inactivo','cerrado')) 	
 );
 
@@ -311,9 +311,12 @@ create table PAUTAS(
     CONSTRAINT fk_vend FOREIGN KEY (fk_vendedor) references VENDEDORES(usuario_id),
 	CONSTRAINT fk_client FOREIGN KEY (fk_cliente) references CLIENTE(id), 
 	CONSTRAINT check_tipo_compra CHECK (tipo_compra IN('en vivo', 'rotativa')),
-    CONSTRAINT check_tipo_pauta CHECK ((tipo_compra = 'en vivo' AND programa 
-    IS NOT NULL  AND presentadora IS NOT NULL) OR 
-    (tipo_compra = 'rotativa' AND presentadora IS NULL AND programa IS NULL)),
+    CONSTRAINT check_tipo_pauta 
+      CHECK (
+        (tipo_compra = 'en vivo' AND programa IS NOT NULL AND presentadora IS NOT NULL AND horario IS NOT NULL) 
+        OR 
+        (tipo_compra = 'rotativa' AND presentadora IS NULL AND programa IS NULL AND horario IS NULL)
+      ),
 	CONSTRAINT check_estado CHECK(estado IN ('programada','en transmision','suspendida','finalizada'))
 );
 
@@ -332,12 +335,11 @@ CREATE TABLE HISTORICO_NEGOCIACIONES (
     id SERIAL PRIMARY KEY,                    
     fecha_inicio DATE NOT NULL,             
     fecha_fin DATE,                           
-    monto_negociacion NUMERIC(15, 2) NOT NULL, 
-    tipo_negociacion VARCHAR(100) NOT NULL,   
-    fk_pauta INTEGER NOT NULL,             
+    monto_negociacion NUMERIC(15, 2) NOT NULL,    
+    fk_cliente INTEGER NOT NULL,             
     
     -- Constraints
-    CONSTRAINT fk_pauta_historico FOREIGN KEY (fk_pauta) REFERENCES PAUTAS (id) ON DELETE CASCADE
+    CONSTRAINT fk_cliente_historico FOREIGN KEY (fk_cliente) REFERENCES CLIENTE (id) ON DELETE CASCADE
 );
 
 CREATE TABLE DETALLE_PAUTA (
@@ -351,3 +353,24 @@ CREATE TABLE DETALLE_PAUTA (
     CONSTRAINT fk_aliado_detalle FOREIGN KEY (fk_aliado) REFERENCES ALIADOS_COMERCIALES(id),
 	CONSTRAINT pauta_aliado_unique UNIQUE (fk_pauta, fk_aliado)
 );
+
+CREATE TABLE OPORTUNIDADES (
+    id SERIAL PRIMARY KEY,
+    nombre_cliente VARCHAR(150) NOT NULL,
+    nombre_contacto VARCHAR(50) NOT NULL,           
+    descripcion TEXT,                         -- Notas adicionales del vendedor
+    monto_estimado NUMERIC(15, 2) DEFAULT 0,  -- Cuánto dinero se espera ganar
+    estado VARCHAR(50) NOT NULL DEFAULT 'Contacto inicial', -- La columna en la que está la tarjeta
+    fk_usuario UUID NOT NULL,              -- ¡CLAVE! El vendedor dueño de este lead
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- Restricción para que las tarjetas solo puedan estar en estas columnas válidas
+    CONSTRAINT chk_estado_pipeline CHECK (
+        estado IN ('Contacto inicial', 'Por firmar', 'Negociado', 'Cancelado')
+    ),
+    
+    -- Llaves foráneas (Asumiendo que tienes tablas CLIENTES y USUARIOS)
+    CONSTRAINT fk_lead_usuario FOREIGN KEY (fk_usuario) REFERENCES VENDEDORES(usuario_id) ON DELETE CASCADE
+);
+CREATE INDEX idx_oportunidades_vendedor_estado ON OPORTUNIDADES(fk_usuario, estado);

@@ -45,6 +45,18 @@ export default function AgregarCliente() {
   const [marcas, setMarcas] = useState([]);
   const [nuevaMarca, setNuevaMarca] = useState('');
 
+  // --- NEGOCIACIÓN (HISTORICO_NEGOCIACIONES) ---
+  const [negociacion, setNegociacion] = useState({
+    monto_negociacion: '',
+    fecha_inicio: '',
+    fecha_fin: '',
+  });
+
+  const handleNegociacion = (e) => {
+    const { name, value } = e.target;
+    setNegociacion({ ...negociacion, [name]: value });
+  };
+
   // --- Sub-empresa vinculación ---
   const [isSubEmpresa, setIsSubEmpresa] = useState(false);
 
@@ -170,6 +182,9 @@ export default function AgregarCliente() {
         contactos: contactos.filter(c => c.pri_nombre),
         telefonos: telefonos.filter(t => t.codigo_area && t.numero),
         marcas: marcas.filter(m => m.nombre),
+        negociacion: negociacion.monto_negociacion && negociacion.fecha_inicio
+          ? negociacion
+          : null,
       };
 
       const result = await crearCliente(payload);
@@ -489,6 +504,29 @@ export default function AgregarCliente() {
             </section>
           </div>
         </div>
+
+        {/* ═══ Negociación Comercial — HISTORICO_NEGOCIACIONES entity ═══ */}
+        <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
+          <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
+            <span className="material-symbols-outlined text-primary">handshake</span>
+            <h3 className="text-lg font-bold font-display">Negociación Comercial</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Monto de Negociación <span className="text-red-500">*</span></label>
+              <input name="monto_negociacion" value={negociacion.monto_negociacion} onChange={handleNegociacion} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0.00" type="number" step="0.01" min="0" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fecha de Inicio <span className="text-red-500">*</span></label>
+              <input name="fecha_inicio" value={negociacion.fecha_inicio} onChange={handleNegociacion} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fecha Fin</label>
+              <input name="fecha_fin" value={negociacion.fecha_fin} onChange={handleNegociacion} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
+            </div>
+          </div>
+          <p className="text-[10px] text-slate-400 mt-4 italic">Los campos marcados con * son obligatorios para registrar la negociación. Si se dejan vacíos, no se creará un registro de negociación.</p>
+        </section>
 
         <div className="flex flex-col sm:flex-row justify-end gap-4 py-8">
           <Link to="/clientes" className="px-8 py-3 rounded-lg border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all">Cancelar Cambios</Link>

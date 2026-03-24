@@ -11,5 +11,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', AliadoController.getAll);
+router.get('/:id', AliadoController.getById);
+router.post('/', AliadoController.create);
 
 export default router;

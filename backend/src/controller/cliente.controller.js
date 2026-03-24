@@ -146,6 +146,21 @@ export const create = async (req, res, next) => {
       }
     }
 
+    // 5. Crear registro de negociación (si viene en el payload)
+    const { negociacion } = req.body;
+    if (negociacion && negociacion.monto_negociacion && negociacion.fecha_inicio) {
+      const negQuery = `
+        INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, fk_cliente)
+        VALUES ($1, $2, $3, $4)
+      `;
+      await client.query(negQuery, [
+        negociacion.fecha_inicio,
+        negociacion.fecha_fin || null,
+        negociacion.monto_negociacion,
+        newCliente.id,
+      ]);
+    }
+
     await client.query('COMMIT');
 
     return res.status(201).json({

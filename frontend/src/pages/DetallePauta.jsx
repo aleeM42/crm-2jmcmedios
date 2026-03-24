@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../services/api';
+import { calcularProgresoPauta } from '../utils/pautasUtils';
 
 const STATUS_STYLE = {
   'en transmision': 'bg-primary/10 text-primary',
@@ -21,8 +22,8 @@ export default function DetallePauta() {
     const fetchPauta = async () => {
       try {
         const response = await api.get(`/pautas/${id}`);
-        if (response.data.success) {
-          setPauta(response.data.data);
+        if (response.success) {
+          setPauta(response.data);
         }
       } catch (error) {
         console.error('Error fetching pauta details:', error);
@@ -47,18 +48,18 @@ export default function DetallePauta() {
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString();
+    // Evitar desfase horario al mostrar la fecha
+    const [y, m, d] = dateString.split('T')[0].split('-');
+    return new Date(y, m - 1, d).toLocaleDateString();
   };
 
-  const cuñasEmitidas = pauta.cuñas_emitidas || 0; // Asumiendo que vendrá en un futuro si se hace tracking de emisiones
-  const progresoCunas = pauta.cantidad_cunas > 0 ? Math.round((cuñasEmitidas / pauta.cantidad_cunas) * 100) : 0;
+  const { cuñasEmitidas, progresoPorcentaje: progresoCunas } = calcularProgresoPauta(pauta);
   
   const montoOC = Number(pauta.monto_oc) || 0;
   const montoOT = Number(pauta.monto_ot) || 0;
   const totalNegociacion = Number(pauta.monto_total_negociacion) || 0;
   
   const progresoOC = totalNegociacion > 0 ? Math.min(Math.round((montoOC / totalNegociacion) * 100), 100) : 0;
-  const progresoOT = totalNegociacion > 0 ? Math.min(Math.round((montoOT / totalNegociacion) * 100), 100) : 0;
 
   return (
     <>
@@ -150,19 +151,6 @@ export default function DetallePauta() {
               </div>
             </div>
 
-            {/* MONTO OT */}
-            <div className="flex items-center gap-8 mb-6">
-              <div className="flex-1">
-                <div className="flex justify-between text-xs font-bold mb-2">
-                  <span className="text-slate-600">Monto OT (Transmisión): ${formatCurrency(montoOT)} / Total Negociado: ${formatCurrency(totalNegociacion)}</span>
-                  <span className="text-[#A1DEE5]">{progresoOT}%</span>
-                </div>
-                <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#A1DEE5] rounded-full transition-all" style={{ width: `${progresoOT}%` }}></div>
-                </div>
-              </div>
-            </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
               <div className="bg-slate-50 rounded-lg p-4 text-center border border-slate-100">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Cuñas</p>
@@ -188,16 +176,19 @@ export default function DetallePauta() {
             <div className="space-y-3">
               {pauta.emisoras?.length > 0 ? (
                 pauta.emisoras.map((e, index) => (
-                  <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-slate-50 rounded-lg border border-slate-100">
-                    <div className="flex items-center gap-4">
+                  <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
+                    <div className="flex items-center gap-4 flex-1">
                       <span className="material-symbols-outlined text-primary">radio</span>
                       <div>
-                        <p className="text-sm font-bold text-slate-800">{e.nombre_emisora}</p>
-                        <p className="text-xs text-slate-400">{e.ciudad_nombre || ''}{e.estado_nombre ? `, ${e.estado_nombre}` : ''}</p>
+                        <span className="text-sm font-bold text-slate-800 block mb-1">{e.nombre_emisora}</span>
+                        <div className="flex flex-wrap items-center gap-2 text-[10px] font-medium text-slate-500">
+                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.region_nombre || 'Sin Región'}</span>
+                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.estado_nombre || 'Sin Estado'}</span>
+                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.ciudad_nombre || 'Sin Ciudad'}</span>
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-6">
-                      <span className="text-xs font-medium text-slate-500">{e.cantidad_emisoras} pautas/emisora</span>
                       <span className="w-2 h-2 rounded-full bg-accent-green"></span>
                     </div>
                   </div>

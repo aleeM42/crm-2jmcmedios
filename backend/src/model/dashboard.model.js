@@ -15,7 +15,7 @@ export async function getResumen(anio) {
 
   // ── KPI cards ──
   const totalClientesQ  = `SELECT COUNT(*)::int AS total FROM cliente`;
-  const totalVentasQ    = `SELECT COALESCE(SUM(monto_ot), 0)::numeric AS total FROM pautas`;
+  const totalVentasQ    = `SELECT COALESCE(SUM(monto_oc - monto_ot), 0)::numeric AS total FROM pautas`;
   const pautasTransQ    = `SELECT COUNT(*)::int AS total FROM pautas WHERE estado = 'en transmision'`;
   const totalEmisorasQ  = `SELECT COUNT(*)::int AS total FROM aliados_comerciales`;
 
@@ -25,33 +25,38 @@ export async function getResumen(anio) {
       COALESCE(SUM(CASE
         WHEN EXTRACT(MONTH FROM fecha_emision) = EXTRACT(MONTH FROM CURRENT_DATE)
          AND EXTRACT(YEAR  FROM fecha_emision) = EXTRACT(YEAR  FROM CURRENT_DATE)
-        THEN monto_ot END), 0)::numeric AS mes_actual,
+        THEN (monto_oc - monto_ot) END), 0)::numeric AS mes_actual,
       COALESCE(SUM(CASE
         WHEN EXTRACT(MONTH FROM fecha_emision) = EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL '1 month')
          AND EXTRACT(YEAR  FROM fecha_emision) = EXTRACT(YEAR  FROM CURRENT_DATE - INTERVAL '1 month')
-        THEN monto_ot END), 0)::numeric AS mes_anterior
+        THEN (monto_oc - monto_ot) END), 0)::numeric AS mes_anterior
     FROM pautas`;
 
-  // ── Pipeline: conteo de pautas por estado ──
+  // ── Pipeline de ventas (desde OPORTUNIDADES) ──
   const pipelineQ = `
     SELECT estado AS name, COUNT(*)::int AS value
-    FROM pautas
+    FROM OPORTUNIDADES
+    WHERE estado != 'Cancelado'
     GROUP BY estado
-    ORDER BY value DESC`;
+    ORDER BY CASE estado
+      WHEN 'Contacto inicial' THEN 1
+      WHEN 'Por firmar' THEN 2
+      WHEN 'Negociado' THEN 3
+    END`;
 
   // ── Ingresos mensuales del año solicitado ──
   const ingresosQ = `
     SELECT EXTRACT(MONTH FROM fecha_emision)::int AS mes,
-           COALESCE(SUM(monto_ot), 0)::numeric AS total
+           COALESCE(SUM(monto_oc - monto_ot), 0)::numeric AS total
     FROM pautas
     WHERE EXTRACT(YEAR FROM fecha_emision) = $1
     GROUP BY mes
     ORDER BY mes`;
 
-  // ── Top 5 clientes por inversión (SUM monto_ot) ──
+  // ── Top 5 clientes por inversión (SUM monto_oc) ──
   const topClientesQ = `
     SELECT c.nombre,
-           COALESCE(SUM(p.monto_ot), 0)::numeric AS inversion,
+           COALESCE(SUM(p.monto_oc), 0)::numeric AS inversion,
            COUNT(CASE WHEN p.estado = 'en transmision' THEN 1 END)::int AS pautas_activas,
            l.nombre AS region,
            u.primer_nombre || ' ' || u.primer_apellido AS vendedor
@@ -64,16 +69,16 @@ export async function getResumen(anio) {
     ORDER BY inversion DESC
     LIMIT 5`;
 
-  const [clientes, ventas, pautasT, emisoras, variacion, pipeline, ingresos, topClientes] =
+  const [clientes, ventas, pautasT, emisoras, variacion, ingresos, topClientes, pipelineRes] =
     await Promise.all([
       pool.query(totalClientesQ),
       pool.query(totalVentasQ),
       pool.query(pautasTransQ),
       pool.query(totalEmisorasQ),
       pool.query(variacionQ),
-      pool.query(pipelineQ),
       pool.query(ingresosQ, [year]),
       pool.query(topClientesQ),
+      pool.query(pipelineQ),
     ]);
 
   // Variación porcentual
@@ -95,7 +100,7 @@ export async function getResumen(anio) {
     pautasEnTransmision: pautasT.rows[0].total,
     totalEmisoras:       emisoras.rows[0].total,
     variacionVentas:     variacionPct,
-    pipeline:            pipeline.rows.map((r) => ({ name: r.name, value: r.value })),
+    pipeline:            pipelineRes.rows,
     ingresosMensuales,
     topClientes:         topClientes.rows.map((r) => ({
       nombre:        r.nombre,

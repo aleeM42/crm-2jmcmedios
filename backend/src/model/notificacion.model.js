@@ -35,8 +35,8 @@ export const getNotificaciones = async (userId, rol) => {
     LEFT JOIN HISTORICO_NEGOCIACIONES h ON c.id = h.fk_cliente
     WHERE c.estado = 'Activo' AND ${compVendedorCTE}
     GROUP BY c.id, c.nombre
-    HAVING MAX(h.fecha_negociacion) < CURRENT_DATE - INTERVAL '90 days'
-        OR MAX(h.fecha_negociacion) IS NULL
+    HAVING MAX(h.fecha_inicio) < CURRENT_DATE - INTERVAL '90 days'
+        OR MAX(h.fecha_inicio) IS NULL
   `;
   const resInactivos = await pool.query(queryInactivos, paramVendedor);
   resInactivos.rows.forEach(c => {
@@ -52,7 +52,8 @@ export const getNotificaciones = async (userId, rol) => {
   const queryVisitas = `
     SELECT c.id, c.nombre
     FROM CLIENTE c
-    LEFT JOIN VISITAS v ON c.id = v.fk_cliente
+    LEFT JOIN CONTACTOS ct ON c.id = ct.fk_cliente
+    LEFT JOIN VISITAS v ON ct.id = v.fk_contacto
     WHERE c.estado = 'Activo' AND ${compVendedorCTE}
     GROUP BY c.id, c.nombre
     HAVING MAX(v.fecha) < CURRENT_DATE - INTERVAL '90 days'
