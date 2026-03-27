@@ -21,6 +21,23 @@ export const findByClienteId = async (clienteId) => {
 };
 
 /**
+ * Contactos de un aliado comercial, vía tabla pivote A_CONTACT.
+ */
+export const findByAliadoId = async (aliadoId) => {
+  const query = `
+    SELECT ct.id, ct.pri_nombre, ct.seg_nombre, ct.pri_apellido,
+           ct.departamento, ct.correo, ct.rol, ct.tipo,
+           ct.anotac_especiales, ct.fecha_nac
+    FROM CONTACTOS ct
+    JOIN A_CONTACT ac_rel ON ct.id = ac_rel.fk_contacto
+    WHERE ac_rel.fk_a_c = $1
+    ORDER BY ct.id
+  `;
+  const result = await pool.query(query, [aliadoId]);
+  return result.rows;
+};
+
+/**
  * Un contacto por ID.
  */
 export const findById = async (id) => {

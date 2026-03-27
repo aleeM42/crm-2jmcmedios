@@ -1,16 +1,89 @@
 // ==============================================
-// ActividadComercial.jsx — Registro de Visitas/Gastos
+// ActividadComercial.jsx — Registro de Visitas/Gastos (dinámico)
 // ==============================================
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-
-const VISITAS = [
-  { fecha: '2023-10-24', hora: '09:30', vendedor: 'Carlos Mendoza', cliente: 'Supermercados Rey', tipo: 'Presencial', tipoClass: 'bg-primary/10 text-primary', objetivo_visita: 'Presentación Plan de Medios Q4', efectiva: true, detalle: 'Se acordó enviar propuesta ajustada' },
-  { fecha: '2023-10-24', hora: '11:15', vendedor: 'Lucía Fernández', cliente: 'Banco General', tipo: 'Llamada', tipoClass: 'bg-accent-light/30 text-secondary', objetivo_visita: 'Seguimiento a pauta digital', efectiva: false, detalle: 'Re-agendar para el lunes' },
-  { fecha: '2023-10-23', hora: '14:00', vendedor: 'Ricardo Silva', cliente: 'Toyota Panamá', tipo: 'Presencial', tipoClass: 'bg-primary/10 text-primary', objetivo_visita: 'Cierre de contrato anual', efectiva: true, detalle: 'Solicitar firmas finales' },
-  { fecha: '2023-10-23', hora: '16:30', vendedor: 'Carlos Mendoza', cliente: 'Farmacias Arrocha', tipo: 'Llamada', tipoClass: 'bg-accent-light/30 text-secondary', objetivo_visita: 'Primer contacto prospecto', efectiva: true, detalle: 'Enviar brochure corporativo' },
-];
+import api from '../services/api.js';
 
 function ActividadComercial() {
+  // --- Data ---
+  const [visitas, setVisitas] = useState([]);
+  const [gastosTotales, setGastosTotales] = useState(0);
+  const [vendedores, setVendedores] = useState([]);
+  const [clientes, setClientes] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
+
+  // --- Filters ---
+  const [filterFecha, setFilterFecha] = useState('');
+  const [filterVendedor, setFilterVendedor] = useState('');
+  const [filterCliente, setFilterCliente] = useState('');
+  const [filterTipo, setFilterTipo] = useState('');
+  const [filterEfectiva, setFilterEfectiva] = useState('');
+
+  // --- Pagination ---
+  const [page, setPage] = useState(1);
+  const perPage = 10;
+
+  // Fetch data on mount
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [visRes, gasVisRes, gasMktRes, venRes, cliRes] = await Promise.all([
+          api.get('/visitas').catch(() => ({ success: false })),
+          api.get('/gastos').catch(() => ({ success: false })),
+          api.get('/gastos-marketing').catch(() => ({ success: false })),
+          api.get('/vendedores').catch(() => ({ success: false })),
+          api.get('/clientes').catch(() => ({ success: false })),
+        ]);
+
+        if (visRes.success) setVisitas(Array.isArray(visRes.data) ? visRes.data : []);
+        {
+          const arrVis = gasVisRes.success ? (Array.isArray(gasVisRes.data) ? gasVisRes.data : []) : [];
+          const arrMkt = gasMktRes.success ? (Array.isArray(gasMktRes.data) ? gasMktRes.data : []) : [];
+          const totalVis = arrVis.reduce((s, g) => s + parseFloat(g.monto || 0), 0);
+          const totalMkt = arrMkt.reduce((s, g) => s + parseFloat(g.monto || 0), 0);
+          setGastosTotales(totalVis + totalMkt);
+        }
+        if (venRes.success) {
+          const d = venRes.data;
+          setVendedores(Array.isArray(d) ? d : (d?.vendedores || []));
+        }
+        if (cliRes.success) {
+          const d = cliRes.data;
+          setClientes(Array.isArray(d) ? d : (d?.clientes || []));
+        }
+      } catch { /* silently handle */ }
+      setLoadingData(false);
+    };
+    load();
+  }, []);
+
+  // Filtered visitas
+  const filtered = useMemo(() => {
+    return visitas.filter((v) => {
+      if (filterFecha && v.fecha?.slice(0, 10) !== filterFecha) return false;
+      if (filterVendedor && v.fk_vendedor !== filterVendedor) return false;
+      if (filterCliente && v.cliente_nombre !== filterCliente) return false;
+      if (filterTipo && v.tipo?.toLowerCase() !== filterTipo) return false;
+      if (filterEfectiva === 'si' && v.efectiva !== 'si') return false;
+      if (filterEfectiva === 'no' && v.efectiva !== 'no') return false;
+      return true;
+    });
+  }, [visitas, filterFecha, filterVendedor, filterCliente, filterTipo, filterEfectiva]);
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const paginated = filtered.slice((page - 1) * perPage, page * perPage);
+
+  // KPIs (computed from full dataset)
+  const kpiTotal = visitas.length;
+  const kpiEfectivas = visitas.filter((v) => v.efectiva === 'si').length;
+  const kpiPct = kpiTotal > 0 ? Math.round((kpiEfectivas / kpiTotal) * 100) : 0;
+  const kpiLlamadas = visitas.filter((v) => v.tipo?.toLowerCase() === 'llamada').length;
+
+  // Reset page when filters change
+  useEffect(() => { setPage(1); }, [filterFecha, filterVendedor, filterCliente, filterTipo, filterEfectiva]);
+
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -29,24 +102,24 @@ function ActividadComercial() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-[#F4FAFB] p-6 rounded-2xl shadow-sm border border-slate-100">
           <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Visitas del Mes</p>
-          <p className="text-3xl font-bold text-slate-900">48</p>
+          <p className="text-3xl font-bold text-slate-900">{loadingData ? '...' : kpiTotal}</p>
         </div>
         <div className="bg-[#F4FAFB] p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Visitas Efectivas</p>
-              <p className="text-3xl font-bold text-slate-900">36</p>
+              <p className="text-3xl font-bold text-slate-900">{loadingData ? '...' : kpiEfectivas}</p>
             </div>
-            <span className="bg-accent-green/10 text-accent-green px-2 py-1 rounded text-xs font-bold">75%</span>
+            <span className="bg-accent-green/10 text-accent-green px-2 py-1 rounded text-xs font-bold">{kpiPct}%</span>
           </div>
         </div>
         <div className="bg-[#F4FAFB] p-6 rounded-2xl shadow-sm border border-slate-100">
           <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Gastos del Mes</p>
-          <p className="text-3xl font-bold text-slate-900">$3,450</p>
+          <p className="text-3xl font-bold text-slate-900">{loadingData ? '...' : `$${gastosTotales.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</p>
         </div>
         <div className="bg-[#F4FAFB] p-6 rounded-2xl shadow-sm border border-slate-100">
           <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Llamadas Registradas</p>
-          <p className="text-3xl font-bold text-slate-900">22</p>
+          <p className="text-3xl font-bold text-slate-900">{loadingData ? '...' : kpiLlamadas}</p>
         </div>
       </div>
 
@@ -60,30 +133,42 @@ function ActividadComercial() {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Fecha</label>
-            <input className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary" type="date" />
+            <input value={filterFecha} onChange={(e) => setFilterFecha(e.target.value)} className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary" type="date" />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Vendedor</label>
-            <select className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
-              <option>Todos los vendedores</option><option>Carlos Mendoza</option><option>Lucía Fernández</option>
+            <select value={filterVendedor} onChange={(e) => setFilterVendedor(e.target.value)} className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+              <option value="">Todos los vendedores</option>
+              {vendedores.map((v) => (
+                <option key={v.usuario_id || v.id} value={v.usuario_id || v.id}>
+                  {v.primer_nombre || v.nombre} {v.primer_apellido || v.apellido}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Cliente</label>
-            <select className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
-              <option>Todos los clientes</option><option>Supermercados Rey</option><option>Banco General</option>
+            <select value={filterCliente} onChange={(e) => setFilterCliente(e.target.value)} className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+              <option value="">Todos los clientes</option>
+              {clientes.map((c) => (
+                <option key={c.id} value={c.nombre}>{c.nombre}</option>
+              ))}
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Tipo</label>
-            <select className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
-              <option>Cualquiera</option><option>Presencial</option><option>Llamada</option>
+            <select value={filterTipo} onChange={(e) => setFilterTipo(e.target.value)} className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+              <option value="">Cualquiera</option>
+              <option value="presencial">Presencial</option>
+              <option value="llamada">Llamada</option>
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Efectiva</label>
-            <select className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
-              <option>Ambos</option><option>Sí</option><option>No</option>
+            <select value={filterEfectiva} onChange={(e) => setFilterEfectiva(e.target.value)} className="w-full bg-[#F4FAFB] border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+              <option value="">Ambos</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
             </select>
           </div>
         </div>
@@ -115,36 +200,56 @@ function ActividadComercial() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {VISITAS.map((v, i) => (
-                  <tr key={i} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 text-sm text-slate-700 whitespace-nowrap">{v.fecha}</td>
-                    <td className="px-6 py-4 text-sm text-slate-500 whitespace-nowrap">{v.hora}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-slate-900 whitespace-nowrap">{v.vendedor}</td>
-                    <td className="px-6 py-4 text-sm text-slate-700">{v.cliente}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`${v.tipoClass} px-3 py-1 rounded-full text-[11px] font-bold uppercase`}>{v.tipo}</span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-600 line-clamp-1 max-w-[200px]">{v.objetivo_visita}</td>
-                    <td className="px-6 py-4 text-center">
-                      <span className={`material-symbols-outlined ${v.efectiva ? 'text-accent-green' : 'text-red-400'}`}>
-                        {v.efectiva ? 'check_circle' : 'cancel'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-600 italic whitespace-nowrap">{v.detalle}</td>
-                  </tr>
-                ))}
+                {loadingData ? (
+                  <tr><td colSpan={8} className="px-6 py-12 text-center text-sm text-slate-400">Cargando visitas...</td></tr>
+                ) : paginated.length === 0 ? (
+                  <tr><td colSpan={8} className="px-6 py-12 text-center text-sm text-slate-400">No se encontraron visitas</td></tr>
+                ) : (
+                  paginated.map((v) => {
+                    const tipoClass = v.tipo?.toLowerCase() === 'presencial'
+                      ? 'bg-primary/10 text-primary'
+                      : 'bg-accent-light/30 text-secondary';
+                    const esEfectiva = v.efectiva === 'si';
+                    return (
+                      <tr key={v.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-6 py-4 text-sm text-slate-700 whitespace-nowrap">{v.fecha?.slice(0, 10)}</td>
+                        <td className="px-6 py-4 text-sm text-slate-500 whitespace-nowrap">{v.hora?.slice(0, 5)}</td>
+                        <td className="px-6 py-4 text-sm font-medium text-slate-900 whitespace-nowrap">{v.vendedor_nombre} {v.vendedor_apellido}</td>
+                        <td className="px-6 py-4 text-sm text-slate-700">{v.cliente_nombre || '—'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`${tipoClass} px-3 py-1 rounded-full text-[11px] font-bold uppercase`}>{v.tipo}</span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-slate-600 line-clamp-1 max-w-[200px]">{v.objetivo_visita}</td>
+                        <td className="px-6 py-4 text-center">
+                          <span className={`material-symbols-outlined ${esEfectiva ? 'text-accent-green' : 'text-red-400'}`}>
+                            {esEfectiva ? 'check_circle' : 'cancel'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-slate-600 italic whitespace-nowrap">{v.detalle || '—'}</td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
 
           <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <span className="text-xs text-slate-500 font-medium">Mostrando 1 a 4 de 48 resultados</span>
+            <span className="text-xs text-slate-500 font-medium">
+              Mostrando {filtered.length === 0 ? 0 : (page - 1) * perPage + 1} a {Math.min(page * perPage, filtered.length)} de {filtered.length} resultados
+            </span>
             <div className="flex gap-1">
-              <button className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50"><span className="material-symbols-outlined text-sm">chevron_left</span></button>
-              <button className="w-8 h-8 flex items-center justify-center rounded bg-primary text-white text-xs font-bold">1</button>
-              <button className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">2</button>
-              <button className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">3</button>
-              <button className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50"><span className="material-symbols-outlined text-sm">chevron_right</span></button>
+              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50 disabled:opacity-40">
+                <span className="material-symbols-outlined text-sm">chevron_left</span>
+              </button>
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((n) => (
+                <button key={n} onClick={() => setPage(n)} className={`w-8 h-8 flex items-center justify-center rounded text-xs font-bold ${page === n ? 'bg-primary text-white' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                  {n}
+                </button>
+              ))}
+              <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50 disabled:opacity-40">
+                <span className="material-symbols-outlined text-sm">chevron_right</span>
+              </button>
             </div>
           </div>
         </div>

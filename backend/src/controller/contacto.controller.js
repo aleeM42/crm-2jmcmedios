@@ -32,6 +32,15 @@ export const getByCliente = async (req, res) => {
   }
 };
 
+export const getByAliado = async (req, res) => {
+  try {
+    const contactos = await ContactoModel.findByAliadoId(req.params.aliadoId);
+    res.json(contactos);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener contactos del aliado', detalle: error.message });
+  }
+};
+
 export const create = async (req, res) => {
   try {
     const { nombre, apellido, clienteId } = req.body;

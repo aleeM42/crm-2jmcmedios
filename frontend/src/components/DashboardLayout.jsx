@@ -50,8 +50,8 @@ function DashboardLayout() {
               to={to}
               className={({ isActive }) =>
                 isActive || location.pathname.startsWith(to + '/')
-                  ? 'flex items-center gap-3 px-3 py-2.5 bg-primary/10 text-primary border-l-4 border-primary rounded-r-lg transition-colors'
-                  : 'flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-[#E0F0F2] rounded-lg transition-colors border-l-4 border-transparent'
+                  ? 'flex items-center gap-3 px-4 py-2.5 bg-primary/10 text-primary rounded-lg font-bold transition-all'
+                  : 'flex items-center gap-3 px-4 py-2.5 text-slate-600 hover:bg-[#E0F0F2] hover:text-slate-900 rounded-lg font-medium transition-all'
               }
             >
               <span className="material-symbols-outlined text-[22px]">{icon}</span>

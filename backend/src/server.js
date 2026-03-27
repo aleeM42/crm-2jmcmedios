@@ -27,6 +27,7 @@ import notificacionRouter from './router/notificacion.router.js';
 import coberturaRouter from './router/cobertura.router.js';
 import categoriaRouter from './router/categoria.router.js';
 import oportunidadRouter from './router/oportunidad.router.js';
+import gastoMarketingRouter from './router/gastoMarketing.router.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -78,6 +79,7 @@ app.use('/api/notificaciones', notificacionRouter);
 app.use('/api/coberturas', coberturaRouter);
 app.use('/api/categorias', categoriaRouter);
 app.use('/api/oportunidades', oportunidadRouter);
+app.use('/api/gastos-marketing', gastoMarketingRouter);
 
 // ---- Health Check ----
 app.get('/api/health', (req, res) => {
