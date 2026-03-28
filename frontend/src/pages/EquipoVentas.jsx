@@ -15,7 +15,7 @@ export default function EquipoVentas() {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const currentUser = getCurrentUser();
-  const canManage = ['Administrador', 'Director General'].includes(currentUser?.rol);
+  const canManage = ['Administrador', 'Director General', 'Director'].includes(currentUser?.rol);
 
   useEffect(() => {
     const fetchData = async () => {

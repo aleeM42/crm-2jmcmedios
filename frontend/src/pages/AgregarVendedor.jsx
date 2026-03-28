@@ -13,7 +13,6 @@ const INITIAL_FORM = {
   correo: '',
   nombre_usuario: '',
   password: '',
-  rol: 'Vendedor',
   estado: 'Activo',
   // --- VENDEDOR ---
   tipo: 'Vendedor',
@@ -77,7 +76,7 @@ export default function AgregarVendedor() {
           correo: formData.correo,
           nombre_usuario: formData.nombre_usuario,
           password: formData.password,
-          rol: formData.rol,
+          rol: formData.tipo, // Infiere el rol directo del tipo de la tabla vendedor
           estado: formData.estado,
         },
         vendedor: {
@@ -192,24 +191,12 @@ export default function AgregarVendedor() {
                 </div>
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
-                    Tipo<span className="text-red-500 ml-1">*</span>
+                    Tipo de Perfil / Rol<span className="text-red-500 ml-1">*</span>
                   </label>
                   <select name="tipo" value={formData.tipo} onChange={handleChange}
                     className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]" required>
                     <option value="Vendedor">Vendedor</option>
                     <option value="Director">Director</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
-                    Rol<span className="text-red-500 ml-1">*</span>
-                  </label>
-                  <select name="rol" value={formData.rol} onChange={handleChange}
-                    className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm bg-[#F4FAFB]" required>
-                    <option value="Vendedor">Vendedor</option>
-                    <option value="Director">Director</option>
-                    <option value="Gestor de Pautas">Gestor de Pautas</option>
-                    <option value="Invitado">Invitado</option>
                   </select>
                 </div>
                 <div className="space-y-2">

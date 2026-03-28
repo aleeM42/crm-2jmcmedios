@@ -18,8 +18,8 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     const user = getCurrentUser();
     const rol = user?.rol || '';
 
-    // Regla Global: Director General tiene acceso a todo
-    if (rol === 'Director General') {
+    // Regla Global: Director General y Director tienen acceso a todo
+    if (rol === 'Director General' || rol === 'Director') {
       return children;
     }
 

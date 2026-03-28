@@ -59,12 +59,12 @@ export default function App() {
         {/* ===================== DASHBOARD (protegido + sidebar) ===================== */}
         <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/mi-perfil" element={<ProtectedRoute allowedRoles={['Director General', 'Vendedor', 'Pauta', 'Invitado']}><MiPerfil /></ProtectedRoute>} />
+          <Route path="/mi-perfil" element={<ProtectedRoute allowedRoles={['Director General', 'Director', 'Vendedor', 'Pauta', 'Invitado']}><MiPerfil /></ProtectedRoute>} />
 
           {/* Equipo de Ventas */}
-          <Route path="/equipo-ventas" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Vendedor']}><EquipoVentas /></ProtectedRoute>} />
-          <Route path="/equipo-ventas/agregar" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General']}><AgregarVendedor /></ProtectedRoute>} />
-          <Route path="/equipo-ventas/:id" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General']}><DetalleVendedor /></ProtectedRoute>} />
+          <Route path="/equipo-ventas" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor']}><EquipoVentas /></ProtectedRoute>} />
+          <Route path="/equipo-ventas/agregar" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director']}><AgregarVendedor /></ProtectedRoute>} />
+          <Route path="/equipo-ventas/:id" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director']}><DetalleVendedor /></ProtectedRoute>} />
 
           {/* Pautas */}
           <Route path="/pautas" element={<PautasLista />} />

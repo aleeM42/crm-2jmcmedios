@@ -26,8 +26,8 @@ function DashboardLayout() {
   const filteredNavItems = NAV_ITEMS.filter((item) => {
     const rolAuth = rol.toLowerCase();
 
-    // Director General: Ve todo
-    if (rolAuth === 'director general') return true;
+    // Director General / Director: Ve todo
+    if (rolAuth === 'director general' || rolAuth === 'director') return true;
 
     // Pauta: Solo ve su módulo y reportes/dashboard
     if (rolAuth === 'pauta') {

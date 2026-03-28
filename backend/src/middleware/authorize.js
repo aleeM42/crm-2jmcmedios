@@ -23,8 +23,8 @@ export default function authorize(...rolesPermitidos) {
 
     const { rol } = req.user;
 
-    // 1. Director General: Acceso total (Lectura, Escritura, Borrado y Auditoría)
-    if (rol === 'Director General') {
+    // 1. Director General y Director: Acceso total (Lectura, Escritura, Borrado y Auditoría)
+    if (rol === 'Director General' || rol === 'Director') {
       return next();
     }
 
