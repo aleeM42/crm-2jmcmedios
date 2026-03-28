@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import { getCurrentUser } from '../services/auth.service';
 
 const STATUS_DOT = {
   activo: 'bg-accent-green',
@@ -19,6 +20,9 @@ function AliadosComerciales() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+
+  const user = getCurrentUser();
+  const canCreateAliado = ['Administrador', 'Director General'].includes(user?.rol);
 
   useEffect(() => {
     async function fetchEmisoras() {
@@ -56,9 +60,11 @@ function AliadosComerciales() {
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-display">Aliados Comerciales</h2>
           <p className="text-slate-500 text-sm mt-1">Directorio de emisoras y aliados</p>
         </div>
-        <Link to="/aliados-comerciales/agregar" className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
-          <span className="material-symbols-outlined">add</span>Agregar Aliado
-        </Link>
+        {canCreateAliado && (
+          <Link to="/aliados-comerciales/agregar" className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+            <span className="material-symbols-outlined">add</span>Agregar Aliado
+          </Link>
+        )}
       </header>
 
       {/* KPI Cards */}

@@ -4,12 +4,16 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import { getCurrentUser } from '../services/auth.service';
 
 const DAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
 export default function PautasCalendario() {
   const [pautas, setPautas] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const user = getCurrentUser();
+  const canCreatePauta = ['Administrador', 'Director General', 'Pauta'].includes(user?.rol);
 
   // Estado para la navegación de meses
   const actualDate = new Date();
@@ -120,9 +124,11 @@ export default function PautasCalendario() {
             <Link to="/pautas/kanban" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Kanban</Link>
             <button className="px-3 py-1.5 rounded-md bg-primary text-white text-xs font-bold">Calendario</button>
           </div>
-          <Link to="/pautas/agregar" className="flex items-center justify-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
-            <span className="material-symbols-outlined text-[18px]">add</span> Nueva Pauta
-          </Link>
+          {canCreatePauta && (
+            <Link to="/pautas/agregar" className="flex items-center justify-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+              <span className="material-symbols-outlined text-[18px]">add</span> Nueva Pauta
+            </Link>
+          )}
         </div>
       </div>
 

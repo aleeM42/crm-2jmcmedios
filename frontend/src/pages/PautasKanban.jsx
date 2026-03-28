@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import api from '../services/api.js';
 import { calcularProgresoPauta } from '../utils/pautasUtils';
+import { getCurrentUser } from '../services/auth.service';
 
 const COLUMNS_DEF = [
   { estado: 'programada', label: 'Programada', color: 'bg-blue-500' },
@@ -16,6 +17,9 @@ const COLUMNS_DEF = [
 export default function PautasKanban() {
   const [pautas, setPautas] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const user = getCurrentUser();
+  const canCreatePauta = ['Administrador', 'Director General', 'Pauta'].includes(user?.rol);
 
   useEffect(() => {
     api.get('/pautas')
@@ -45,9 +49,11 @@ export default function PautasKanban() {
             <button className="px-3 py-1.5 rounded-md bg-primary text-white text-xs font-bold">Kanban</button>
             <Link to="/pautas/calendario" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Calendario</Link>
           </div>
-          <Link to="/pautas/agregar" className="flex items-center justify-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
-            <span className="material-symbols-outlined text-[18px]">add</span> Nueva Pauta
-          </Link>
+          {canCreatePauta && (
+            <Link to="/pautas/agregar" className="flex items-center justify-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+              <span className="material-symbols-outlined text-[18px]">add</span> Nueva Pauta
+            </Link>
+          )}
         </div>
       </div>
 

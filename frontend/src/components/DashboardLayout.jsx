@@ -24,12 +24,26 @@ function DashboardLayout() {
 
   // Filtrar NAV_ITEMS según el rol
   const filteredNavItems = NAV_ITEMS.filter((item) => {
-    if (rol === 'gestor de pautas') {
-      return item.to === '/pautas';
+    const rolAuth = rol.toLowerCase();
+
+    // Director General: Ve todo
+    if (rolAuth === 'director general') return true;
+
+    // Pauta: Solo ve su módulo y reportes/dashboard
+    if (rolAuth === 'pauta') {
+      return item.to === '/dashboard' || item.to === '/pautas' || item.to === '/reportes';
     }
-    if (item.to === '/mi-perfil') {
-      return rol === 'vendedor' || rol === 'director';
+
+    // Invitado: Solo ve Dashboard y lectura general si se le habilita
+    if (rolAuth === 'invitado') {
+      return item.to === '/dashboard' || item.to === '/reportes';
     }
+
+    // Administrador: Todo excepto mi-perfil
+    if (rolAuth === 'administrador') {
+      return item.to !== '/mi-perfil';
+    }
+
     return true;
   });
 

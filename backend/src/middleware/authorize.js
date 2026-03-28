@@ -10,7 +10,7 @@
  * @returns {Function} Express middleware
  *
  * @example
- * router.get('/', authenticate, authorize('Administrador', 'Director'), ctrl.getAll);
+ * router.get('/', authenticate, authorize('Administrador', 'Director General'), ctrl.getAll);
  */
 export default function authorize(...rolesPermitidos) {
   return (req, res, next) => {
@@ -21,10 +21,29 @@ export default function authorize(...rolesPermitidos) {
       });
     }
 
-    if (!rolesPermitidos.includes(req.user.rol)) {
+    const { rol } = req.user;
+
+    // 1. Director General: Acceso total (Lectura, Escritura, Borrado y Auditoría)
+    if (rol === 'Director General') {
+      return next();
+    }
+
+    // 2. Invitado: Ingreso de Solo Consulta (Lectura global)
+    if (rol === 'Invitado' && req.method === 'GET') {
+      return next();
+    }
+
+    // 3. Vendedor: Lectura del resto. Sus permisos de gestión (POST/PUT/DELETE)
+    // se validan en rolesPermitidos y dentro de los controladores.
+    if (rol === 'Vendedor' && req.method === 'GET') {
+      return next();
+    }
+
+    // 4. Validar si el rol actual está explícitamente en la lista de permitidos (ej. Administrador, Pauta)
+    if (!rolesPermitidos.includes(rol)) {
       return res.status(403).json({
         success: false,
-        error: `Acceso denegado. Roles permitidos: ${rolesPermitidos.join(', ')}`,
+        error: 'No tiene autorización',
       });
     }
 

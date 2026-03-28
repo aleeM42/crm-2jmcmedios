@@ -59,23 +59,23 @@ export default function App() {
         {/* ===================== DASHBOARD (protegido + sidebar) ===================== */}
         <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/mi-perfil" element={<MiPerfil />} />
+          <Route path="/mi-perfil" element={<ProtectedRoute allowedRoles={['Director General', 'Vendedor', 'Pauta', 'Invitado']}><MiPerfil /></ProtectedRoute>} />
 
           {/* Equipo de Ventas */}
-          <Route path="/equipo-ventas" element={<EquipoVentas />} />
-          <Route path="/equipo-ventas/agregar" element={<AgregarVendedor />} />
-          <Route path="/equipo-ventas/:id" element={<DetalleVendedor />} />
+          <Route path="/equipo-ventas" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Vendedor']}><EquipoVentas /></ProtectedRoute>} />
+          <Route path="/equipo-ventas/agregar" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General']}><AgregarVendedor /></ProtectedRoute>} />
+          <Route path="/equipo-ventas/:id" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General']}><DetalleVendedor /></ProtectedRoute>} />
 
           {/* Pautas */}
           <Route path="/pautas" element={<PautasLista />} />
           <Route path="/pautas/kanban" element={<PautasKanban />} />
           <Route path="/pautas/calendario" element={<PautasCalendario />} />
-          <Route path="/pautas/agregar" element={<AgregarPauta />} />
+          <Route path="/pautas/agregar" element={<ProtectedRoute allowedRoles={['Administrador', 'Pauta']}><AgregarPauta /></ProtectedRoute>} />
           <Route path="/pautas/:id" element={<DetallePauta />} />
 
           {/* Aliados Comerciales */}
           <Route path="/aliados-comerciales" element={<AliadosComerciales />} />
-          <Route path="/aliados-comerciales/agregar" element={<AgregarAliado />} />
+          <Route path="/aliados-comerciales/agregar" element={<ProtectedRoute allowedRoles={['Administrador']}><AgregarAliado /></ProtectedRoute>} />
           <Route path="/aliados-comerciales/:id" element={<DetalleEmisora />} />
 
           {/* Actividad Comercial */}

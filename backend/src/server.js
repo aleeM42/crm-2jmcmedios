@@ -54,17 +54,8 @@ const globalLimiter = rateLimit({
 });
 app.use(globalLimiter);
 
-// ---- Rate Limiting Estricto para Login ----
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 10,                   // 10 intentos de login por ventana
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { success: false, error: 'Demasiados intentos de login. Espere 15 minutos.' },
-});
-
 // ---- Rutas API ----
-app.use('/api/auth',       loginLimiter, authRouter);
+app.use('/api/auth',       authRouter);
 app.use('/api/clientes',   clienteRouter);
 app.use('/api/contactos',  contactoRouter);
 app.use('/api/vendedores', vendedorRouter);

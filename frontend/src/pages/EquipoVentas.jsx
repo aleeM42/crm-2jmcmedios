@@ -15,7 +15,7 @@ export default function EquipoVentas() {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const currentUser = getCurrentUser();
-  const isAdmin = currentUser?.rol === 'Administrador';
+  const canManage = ['Administrador', 'Director General'].includes(currentUser?.rol);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,7 +59,7 @@ export default function EquipoVentas() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          {isAdmin && (
+          {canManage && (
             <Link to="/equipo-ventas/agregar" className="px-6 py-2.5 bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm rounded-xl shadow-lg shadow-primary/20 hover:opacity-90 transition-all flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">person_add</span>
               Agregar Vendedor
@@ -114,8 +114,13 @@ export default function EquipoVentas() {
             filtered.map((v, i) => {
               const initials = `${v.primer_nombre[0]}${v.primer_apellido[0]}`;
               const color = CARD_COLORS[i % CARD_COLORS.length];
+              const CardWrapper = canManage ? Link : 'div';
+              const cardProps = canManage 
+                ? { to: `/equipo-ventas/${v.id}`, className: "bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 hover:shadow-md transition-shadow group block" } 
+                : { className: "bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 block" };
+              
               return (
-                <Link key={v.id} to={`/equipo-ventas/${v.id}`} className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 hover:shadow-md transition-shadow group">
+                <CardWrapper key={v.id} {...cardProps}>
                   <div className="flex items-center gap-4 mb-4">
                     <div className={`w-12 h-12 rounded-full bg-${color} flex items-center justify-center text-white font-bold text-sm border-2 border-${color}/20`}>
                       {initials}
@@ -154,7 +159,7 @@ export default function EquipoVentas() {
                       </p>
                     </div>
                   </div>
-                </Link>
+                </CardWrapper>
               );
             })
           )}
