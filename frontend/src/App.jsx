@@ -75,7 +75,7 @@ export default function App() {
 
           {/* Aliados Comerciales */}
           <Route path="/aliados-comerciales" element={<AliadosComerciales />} />
-          <Route path="/aliados-comerciales/agregar" element={<ProtectedRoute allowedRoles={['Administrador']}><AgregarAliado /></ProtectedRoute>} />
+          <Route path="/aliados-comerciales/agregar" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director']}><AgregarAliado /></ProtectedRoute>} />
           <Route path="/aliados-comerciales/:id" element={<DetalleEmisora />} />
 
           {/* Actividad Comercial */}

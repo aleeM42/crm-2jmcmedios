@@ -22,7 +22,7 @@ function AliadosComerciales() {
   const [statusFilter, setStatusFilter] = useState('');
 
   const user = getCurrentUser();
-  const canCreateAliado = ['Administrador', 'Director General'].includes(user?.rol);
+  const canCreateAliado = ['Administrador', 'Director General', 'Director'].includes(user?.rol);
 
   useEffect(() => {
     async function fetchEmisoras() {
