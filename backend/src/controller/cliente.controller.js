@@ -173,7 +173,21 @@ export const create = async (req, res, next) => {
     });
   } catch (err) {
     await client.query('ROLLBACK');
-    next(err);
+    // LOG DETALLADO para diagnóstico de errores 500
+    console.error('❌ [create cliente] ERROR:', err.message);
+    console.error('   → Code:', err.code);
+    console.error('   → Detail:', err.detail);
+    console.error('   → Table:', err.table);
+    console.error('   → Constraint:', err.constraint);
+    console.error('   → Hint:', err.hint);
+    console.error('   → Stack:', err.stack);
+    // Devolver mensaje de error legible al cliente (en lugar de generic 500)
+    return res.status(500).json({
+      success: false,
+      error: err.message,
+      detail: err.detail || null,
+      code: err.code || null,
+    });
   } finally {
     client.release();
   }

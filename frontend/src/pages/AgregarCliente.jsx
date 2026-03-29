@@ -195,7 +195,16 @@ export default function AgregarCliente() {
         setTimeout(() => navigate('/clientes'), 1500);
       }
     } catch (err) {
-      setError(err.data?.error || err.message || 'Error al crear cliente');
+      // Extraer mensaje detallado del servidor (si el backend lo devuelve)
+      const serverMsg = err?.response?.data?.error
+        || err?.data?.error
+        || err?.data?.detail
+        || err?.message
+        || 'Error al crear cliente';
+      const serverDetail = err?.response?.data?.detail || err?.data?.detail || null;
+      const errorText = serverDetail ? `${serverMsg} — ${serverDetail}` : serverMsg;
+      console.error('[AgregarCliente] Error 500 detalle:', err?.response?.data || err?.data || err);
+      setError(errorText);
     } finally {
       setLoading(false);
     }

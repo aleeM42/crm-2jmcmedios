@@ -7,6 +7,7 @@
 -- ──────────────────────────────────────────────
 
 -- Alejandra
+
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'alejandra') THEN

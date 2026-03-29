@@ -43,9 +43,13 @@ export default function AgregarVendedor() {
   };
 
   const handleTelChange = (index, field, value) => {
+    let newVal = value;
+    if (field === 'numero') {
+      newVal = newVal.replace(/\D/g, '').slice(0, 7);
+    }
     setFormData((prev) => {
       const telefonos = [...prev.telefonos];
-      telefonos[index] = { ...telefonos[index], [field]: value };
+      telefonos[index] = { ...telefonos[index], [field]: newVal };
       return { ...prev, telefonos };
     });
   };
@@ -66,6 +70,24 @@ export default function AgregarVendedor() {
     e.preventDefault();
     setError('');
     setSuccess('');
+
+    // Validación estricta de correo electrónico
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.correo)) {
+      setError('Por favor ingresa un correo electrónico válido. Ej: vendedor@2jmcmedios.com');
+      return;
+    }
+
+    // Validación estricta de teléfonos (código área elegido y 7 dígitos numéricos)
+    for (const tel of formData.telefonos) {
+      if (tel.codigo_area || tel.numero) {
+        if (!tel.codigo_area || tel.numero.length !== 7) {
+          setError('Cada teléfono ingresado debe tener su código de área seleccionado y un número de exactamente 7 dígitos.');
+          return;
+        }
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -176,7 +198,7 @@ export default function AgregarVendedor() {
                   </label>
                   <input name="correo" value={formData.correo} onChange={handleChange}
                     className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm"
-                    placeholder="vendedor@2jmcmedios.com" type="email" required />
+                    placeholder="vendedor@2jmcmedios.com" type="email" pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" title="Debe ser un correo electrónico válido. Ej: vendedor@2jmcmedios.com" required />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-[13px] font-bold text-slate-700 tracking-wide uppercase">
@@ -243,10 +265,18 @@ export default function AgregarVendedor() {
                       <label className="block text-[11px] font-bold text-slate-500 uppercase">
                         Cód. Área<span className="text-red-500 ml-1">*</span>
                       </label>
-                      <input name="codigo_area" value={tel.codigo_area}
+                      <select name="codigo_area" value={tel.codigo_area}
                         onChange={(e) => handleTelChange(idx, 'codigo_area', e.target.value)}
-                        className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm text-center"
-                        maxLength="4" placeholder="0412" type="text" />
+                        className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm text-center bg-white"
+                        required>
+                        <option value="">Selec...</option>
+                        <option value="0414">0414</option>
+                        <option value="0426">0426</option>
+                        <option value="0412">0412</option>
+                        <option value="0422">0422</option>
+                        <option value="0424">0424</option>
+                        <option value="0416">0416</option>
+                      </select>
                     </div>
                     <div className="flex-1 space-y-2">
                       <label className="block text-[11px] font-bold text-slate-500 uppercase">
@@ -255,7 +285,7 @@ export default function AgregarVendedor() {
                       <input name="numero" value={tel.numero}
                         onChange={(e) => handleTelChange(idx, 'numero', e.target.value)}
                         className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm"
-                        placeholder="1234567" type="text" />
+                        placeholder="1234567" type="text" minLength="7" maxLength="7" pattern="\d{7}" title="Debe contener exactamente 7 números" required />
                     </div>
                     {formData.telefonos.length > 1 && (
                       <button className="p-3 text-slate-300 hover:text-red-400 transition-colors" type="button" onClick={() => removeTelefono(idx)}>
