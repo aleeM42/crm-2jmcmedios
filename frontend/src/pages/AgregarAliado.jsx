@@ -5,16 +5,55 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
+// Fecha máxima para fecha de nacimiento (hoy)
+const today = new Date().toISOString().split('T')[0];
+
 function AgregarAliado() {
   const navigate = useNavigate();
+
+  // RIF controlado
+  const [rif, setRif] = useState('');
+  const [rifError, setRifError] = useState('');
+
+  const handleRifChange = (rawValue) => {
+    // Normalizar: quitar guiones y espacios
+    let val = rawValue.replace(/-/g, '').replace(/\s/g, '');
+
+    // Primera letra: solo J, G, V, P (mayúscula)
+    if (val.length === 0) { setRif(''); setRifError(''); return; }
+
+    const firstChar = val[0].toUpperCase();
+    const validPrefixes = ['J', 'G', 'V', 'P'];
+    if (!validPrefixes.includes(firstChar)) {
+      setRifError('El RIF debe comenzar con J, G, V o P');
+      // Permitir solo si es una letra válida al inicio
+      return;
+    }
+
+    // El resto: solo dígitos, máx 9
+    const digits = val.slice(1).replace(/\D/g, '').slice(0, 9);
+    const formatted = firstChar + digits;
+    setRif(formatted);
+
+    if (digits.length > 0 && digits.length < 9) {
+      setRifError('El RIF debe tener exactamente 9 dígitos después de la letra');
+    } else {
+      setRifError('');
+    }
+  };
 
   // Estados para contactos y teléfonos dinámicos
   const [contactos, setContactos] = useState([{ primer_nombre: '', segundo_nombre: '', primer_apellido: '', departamento: '', correo: '', rol: '', fecha_nacimiento: '', anotaciones_especiales: '' }]);
   const [telefonos, setTelefonos] = useState([{ codigo_area: '', numero: '' }]);
 
   const handleContactoChange = (idx, field, value) => {
+    let finalValue = value;
+    // Validar que fecha_nacimiento no sea mayor a hoy
+    if (field === 'fecha_nacimiento' && value && value > today) {
+      return; // Ignorar fechas futuras
+    }
     const newContactos = [...contactos];
-    newContactos[idx] = { ...newContactos[idx], [field]: value };
+    newContactos[idx] = { ...newContactos[idx], [field]: finalValue };
     setContactos(newContactos);
   };
   const addContacto = () => setContactos([...contactos, { primer_nombre: '', segundo_nombre: '', primer_apellido: '', departamento: '', correo: '', rol: '', fecha_nacimiento: '', anotaciones_especiales: '' }]);
@@ -88,18 +127,27 @@ function AgregarAliado() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validar RIF antes de enviar
+    if (!rif || rif.length < 2 || rif.slice(1).replace(/\D/g, '').length !== 9) {
+      setRifError('El RIF debe tener la letra (J/G/V/P) + exactamente 9 dígitos');
+      return;
+    }
+
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
 
     // Adaptar data para backend
     const payload = {
       ...data,
+      rif,                                                  // usar el estado controlado
       fk_lugar: parseInt(data.lugar, 10) || null,
       fk_region: parseInt(data.region, 10) || null,
       fk_cobertura: parseInt(data.cobertura, 10) || null,
       contactos: contactos.filter(c => c.primer_nombre && c.primer_apellido),
       telefonos: telefonos.filter(t => t.codigo_area && t.numero.length === 7)
     };
+
 
     try {
       const response = await api.post('/aliados', payload);
@@ -147,7 +195,17 @@ function AgregarAliado() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">RIF<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="rif" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="J-12345678-9" type="text" />
+                <input
+                  name="rif"
+                  required
+                  value={rif}
+                  onChange={(e) => handleRifChange(e.target.value)}
+                  className={`w-full rounded-lg bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary ${rifError ? 'border-red-400 ring-1 ring-red-400' : 'border-slate-200'}`}
+                  placeholder="J123456789"
+                  type="text"
+                  maxLength={10}
+                />
+                {rifError && <p className="text-xs text-red-500 mt-1">{rifError}</p>}
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Frecuencia<span className="text-red-500 ml-0.5">*</span></label>
@@ -270,7 +328,13 @@ function AgregarAliado() {
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de Nacimiento</label>
-                      <input value={contacto.fecha_nacimiento} onChange={(e) => handleContactoChange(idx, 'fecha_nacimiento', e.target.value)} className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" type="date" />
+                      <input
+                        value={contacto.fecha_nacimiento}
+                        onChange={(e) => handleContactoChange(idx, 'fecha_nacimiento', e.target.value)}
+                        className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary"
+                        type="date"
+                        max={today}
+                      />
                     </div>
                     <div className="space-y-1.5 md:col-span-2">
                       <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Anotaciones Especiales</label>

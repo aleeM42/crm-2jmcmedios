@@ -119,51 +119,55 @@ export async function createAliado(data) {
     const result = await client.query(query, values);
     const nuevoAliado = result.rows[0];
 
-    // Si hay datos de un contacto, intentar guardarlo
-    if (data.primer_nombre && data.primer_apellido && data.correo && data.departamento && data.rol) {
+    // Obtener usuario para FK de teléfonos
+    const userRes = await client.query('SELECT id FROM USUARIOS LIMIT 1');
+    const usuarioId = userRes.rows.length > 0 ? userRes.rows[0].id : null;
+
+    // Guardar cada contacto del array enviado por el frontend
+    const contactosArray = Array.isArray(data.contactos) ? data.contactos : [];
+    let primerContactoId = null;
+
+    for (const contacto of contactosArray) {
+      if (!contacto.primer_nombre || !contacto.primer_apellido) continue;
+
       const qContacto = `
         INSERT INTO CONTACTOS (
           pri_nombre, seg_nombre, pri_apellido, departamento, correo, rol, tipo, anotac_especiales, fecha_nac
         ) VALUES ($1, $2, $3, $4, $5, $6, 'emisora', $7, $8)
         RETURNING id
       `;
-      const fechanac = data.fecha_nacimiento ? data.fecha_nacimiento : null;
+      const fechanac = contacto.fecha_nacimiento || null;
       const valContacto = [
-        data.primer_nombre, data.segundo_nombre || null, data.primer_apellido,
-        data.departamento, data.correo, data.rol, data.anotaciones_especiales || null,
+        contacto.primer_nombre,
+        contacto.segundo_nombre || null,
+        contacto.primer_apellido,
+        contacto.departamento || null,
+        contacto.correo || null,
+        contacto.rol || null,
+        contacto.anotaciones_especiales || null,
         fechanac
       ];
       const resContacto = await client.query(qContacto, valContacto);
       const contactoId = resContacto.rows[0].id;
 
-      // Vincular a aliado
-      await client.query('INSERT INTO A_CONTACT (fk_a_c, fk_contacto) VALUES ($1, $2)', [nuevoAliado.id, contactoId]);
+      // Vincular contacto al aliado
+      await client.query(
+        'INSERT INTO A_CONTACT (fk_a_c, fk_contacto) VALUES ($1, $2)',
+        [nuevoAliado.id, contactoId]
+      );
 
-      // Guardar teléfono si existe
-      if (data.codigo_area && data.cuerpo) {
-        // Encontrar un usuario admin por defecto para fk_usuario
-        const userRes = await client.query("SELECT id FROM USUARIOS LIMIT 1");
-        const usuarioId = userRes.rows.length > 0 ? userRes.rows[0].id : null;
+      if (!primerContactoId) primerContactoId = contactoId;
+    }
 
-        if (usuarioId) {
-          await client.query(
-            'INSERT INTO TELEFONOS (codigo_area, numero, fk_usuario, fk_contacto) VALUES ($1, $2, $3, $4)',
-            [data.codigo_area, data.cuerpo, usuarioId, contactoId]
-          );
-        }
-      }
-      
-      // Guardar teléfono 2 si existe
-      if (data.codigo_area_2 && data.cuerpo_2) {
-        const userRes = await client.query("SELECT id FROM USUARIOS LIMIT 1");
-        const usuarioId = userRes.rows.length > 0 ? userRes.rows[0].id : null;
-
-        if (usuarioId) {
-          await client.query(
-            'INSERT INTO TELEFONOS (codigo_area, numero, fk_usuario, fk_contacto) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-            [data.codigo_area_2, data.cuerpo_2, usuarioId, contactoId]
-          );
-        }
+    // Guardar teléfonos (vinculados al primer contacto)
+    if (primerContactoId && usuarioId) {
+      const telefonosArray = Array.isArray(data.telefonos) ? data.telefonos : [];
+      for (const tel of telefonosArray) {
+        if (!tel.codigo_area || !tel.numero || tel.numero.length !== 7) continue;
+        await client.query(
+          'INSERT INTO TELEFONOS (codigo_area, numero, fk_usuario, fk_contacto) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+          [tel.codigo_area, tel.numero, usuarioId, primerContactoId]
+        );
       }
     }
 

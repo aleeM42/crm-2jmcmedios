@@ -165,10 +165,10 @@ export async function createPauta(data) {
 
     // Tabla HISTORICO_NEGOCIACIONES
     const queryHistorico = `
-      INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, tipo_negociacion, fk_cliente)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, fk_cliente)
+      VALUES ($1, $2, $3, $4)
     `;
-    await client.query(queryHistorico, [data.fechaInicio, data.fechaFin, data.montoOT || 0, 'Nueva Pauta', data.clienteId]);
+    await client.query(queryHistorico, [data.fechaInicio, data.fechaFin, data.montoOT || 0, data.clienteId]);
 
     await client.query('COMMIT');
     return pautaId;
