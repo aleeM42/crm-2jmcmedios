@@ -261,15 +261,15 @@ export default function AgregarVendedor() {
               <div className="space-y-4">
                 {formData.telefonos.map((tel, idx) => (
                   <div key={idx} className="flex gap-4 items-end">
-                    <div className="w-32 space-y-2">
+                    <div className="w-24 space-y-2">
                       <label className="block text-[11px] font-bold text-slate-500 uppercase">
-                        Cód. Área<span className="text-red-500 ml-1">*</span>
+                        Cód.<span className="text-red-500 ml-1">*</span>
                       </label>
                       <select name="codigo_area" value={tel.codigo_area}
                         onChange={(e) => handleTelChange(idx, 'codigo_area', e.target.value)}
-                        className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary px-4 py-3 text-sm text-center bg-white"
+                        className="w-full rounded-xl border-slate-200 focus:ring-primary focus:border-primary pl-4 pr-5 py-3 text-sm bg-white"
                         required>
-                        <option value="">Selec...</option>
+                        <option value="">Cod</option>
                         <option value="0414">0414</option>
                         <option value="0426">0426</option>
                         <option value="0412">0412</option>

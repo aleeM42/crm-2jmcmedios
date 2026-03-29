@@ -8,6 +8,28 @@ import api from '../services/api';
 function AgregarAliado() {
   const navigate = useNavigate();
 
+  // Estados para contactos y teléfonos dinámicos
+  const [contactos, setContactos] = useState([{ primer_nombre: '', segundo_nombre: '', primer_apellido: '', departamento: '', correo: '', rol: '', fecha_nacimiento: '', anotaciones_especiales: '' }]);
+  const [telefonos, setTelefonos] = useState([{ codigo_area: '', numero: '' }]);
+
+  const handleContactoChange = (idx, field, value) => {
+    const newContactos = [...contactos];
+    newContactos[idx] = { ...newContactos[idx], [field]: value };
+    setContactos(newContactos);
+  };
+  const addContacto = () => setContactos([...contactos, { primer_nombre: '', segundo_nombre: '', primer_apellido: '', departamento: '', correo: '', rol: '', fecha_nacimiento: '', anotaciones_especiales: '' }]);
+  const removeContacto = (idx) => setContactos(contactos.filter((_, i) => i !== idx));
+
+  const handleTelefonoChange = (idx, field, value) => {
+    let newVal = value;
+    if (field === 'numero') newVal = newVal.replace(/\D/g, '').slice(0, 7);
+    const newTelefonos = [...telefonos];
+    newTelefonos[idx] = { ...newTelefonos[idx], [field]: newVal };
+    setTelefonos(newTelefonos);
+  };
+  const addTelefono = () => setTelefonos([...telefonos, { codigo_area: '', numero: '' }]);
+  const removeTelefono = (idx) => setTelefonos(telefonos.filter((_, i) => i !== idx));
+
   // Estados para opciones dinámicas
   const [regiones, setRegiones] = useState([]);
   const [estados, setEstados] = useState([]);
@@ -75,6 +97,8 @@ function AgregarAliado() {
       fk_lugar: parseInt(data.lugar, 10) || null,
       fk_region: parseInt(data.region, 10) || null,
       fk_cobertura: parseInt(data.cobertura, 10) || null,
+      contactos: contactos.filter(c => c.primer_nombre && c.primer_apellido),
+      telefonos: telefonos.filter(t => t.codigo_area && t.numero.length === 7)
     };
 
     try {
@@ -203,45 +227,58 @@ function AgregarAliado() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6 border-b border-slate-100 pb-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">person</span>
-                <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Contacto de la Emisora</h3>
+                <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Contactos de la Emisora</h3>
               </div>
-              <button className="flex items-center gap-1 text-xs font-bold text-primary hover:text-secondary transition-colors" type="button">
+              <button onClick={addContacto} className="flex items-center gap-1 text-xs font-bold text-primary hover:text-secondary transition-colors" type="button">
                 <span className="material-symbols-outlined text-[18px]">add_circle</span>Agregar Contacto
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Primer Nombre<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="primer_nombre" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Juan" type="text" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Segundo Nombre</label>
-                <input name="segundo_nombre" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Alberto" type="text" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Primer Apellido<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="primer_apellido" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Pérez" type="text" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Departamento<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="departamento" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Ventas" type="text" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Correo Electrónico<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="correo" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="ejemplo@correo.com" type="email" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Rol en la Emisora<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="rol" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Gerente General" type="text" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de Nacimiento</label>
-                <input name="fecha_nacimiento" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" type="date" />
-              </div>
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Anotaciones Especiales</label>
-                <textarea name="anotaciones_especiales" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Información adicional sobre el contacto..." rows="1"></textarea>
-              </div>
+            
+            <div className="space-y-8">
+              {contactos.map((contacto, idx) => (
+                <div key={idx} className="relative bg-white border border-slate-100 p-6 rounded-xl shadow-sm">
+                  {contactos.length > 1 && (
+                    <button type="button" onClick={() => removeContacto(idx)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors">
+                      <span className="material-symbols-outlined">delete</span>
+                    </button>
+                  )}
+                  <h4 className="text-sm font-bold text-slate-700 mb-4">Contacto #{idx + 1}</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Primer Nombre<span className="text-red-500 ml-0.5">*</span></label>
+                      <input value={contacto.primer_nombre} onChange={(e) => handleContactoChange(idx, 'primer_nombre', e.target.value)} required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Juan" type="text" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Segundo Nombre</label>
+                      <input value={contacto.segundo_nombre} onChange={(e) => handleContactoChange(idx, 'segundo_nombre', e.target.value)} className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Alberto" type="text" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Primer Apellido<span className="text-red-500 ml-0.5">*</span></label>
+                      <input value={contacto.primer_apellido} onChange={(e) => handleContactoChange(idx, 'primer_apellido', e.target.value)} required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Pérez" type="text" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Departamento<span className="text-red-500 ml-0.5">*</span></label>
+                      <input value={contacto.departamento} onChange={(e) => handleContactoChange(idx, 'departamento', e.target.value)} required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Ventas" type="text" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Correo Electrónico<span className="text-red-500 ml-0.5">*</span></label>
+                      <input value={contacto.correo} onChange={(e) => handleContactoChange(idx, 'correo', e.target.value)} required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="ejemplo@correo.com" type="email" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Rol en la Emisora<span className="text-red-500 ml-0.5">*</span></label>
+                      <input value={contacto.rol} onChange={(e) => handleContactoChange(idx, 'rol', e.target.value)} required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Gerente General" type="text" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de Nacimiento</label>
+                      <input value={contacto.fecha_nacimiento} onChange={(e) => handleContactoChange(idx, 'fecha_nacimiento', e.target.value)} className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" type="date" />
+                    </div>
+                    <div className="space-y-1.5 md:col-span-2">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Anotaciones Especiales</label>
+                      <textarea value={contacto.anotaciones_especiales} onChange={(e) => handleContactoChange(idx, 'anotaciones_especiales', e.target.value)} className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Información adicional sobre el contacto..." rows="1"></textarea>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
 
@@ -252,34 +289,16 @@ function AgregarAliado() {
                 <span className="material-symbols-outlined text-primary">call</span>
                 <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Teléfonos</h3>
               </div>
-              <button className="flex items-center gap-1 text-xs font-bold text-primary hover:text-secondary transition-colors" type="button">
+              <button onClick={addTelefono} className="flex items-center gap-1 text-xs font-bold text-primary hover:text-secondary transition-colors" type="button">
                 <span className="material-symbols-outlined text-[18px]">add_circle</span>Agregar Teléfono
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-              <div className="grid grid-cols-4 gap-4">
-                <div className="space-y-1.5 col-span-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.*</label>
-                  <select name="codigo_area" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
-                    <option value="">—</option>
-                    <option value="0412">0412</option>
-                    <option value="0422">0422</option>
-                    <option value="0414">0414</option>
-                    <option value="0424">0424</option>
-                    <option value="0416">0416</option>
-                    <option value="0426">0426</option>
-                  </select>
-                </div>
-                <div className="space-y-1.5 col-span-3">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Número de Teléfono<span className="text-red-500 ml-0.5">*</span></label>
-                  <input name="cuerpo" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="1234567" type="tel" maxLength="7" pattern="[0-9]{7}" title="Debe tener exactamente 7 dígitos" onInput={(e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7); }} />
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="grid grid-cols-4 gap-4 flex-1">
-                  <div className="space-y-1.5 col-span-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.</label>
-                    <select name="codigo_area_2" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+              {telefonos.map((tel, idx) => (
+                <div key={idx} className="flex gap-3 items-end bg-white border border-slate-100 p-4 rounded-xl shadow-sm relative">
+                  <div className="w-24 flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.*</label>
+                    <select value={tel.codigo_area} onChange={(e) => handleTelefonoChange(idx, 'codigo_area', e.target.value)} required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
                       <option value="">—</option>
                       <option value="0412">0412</option>
                       <option value="0422">0422</option>
@@ -289,15 +308,17 @@ function AgregarAliado() {
                       <option value="0426">0426</option>
                     </select>
                   </div>
-                  <div className="space-y-1.5 col-span-3">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Número Fijo</label>
-                    <input name="cuerpo_2" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="9876543" type="tel" maxLength="7" pattern="[0-9]{7}" title="Debe tener exactamente 7 dígitos" onInput={(e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7); }} />
+                  <div className="flex-1 flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Número <span className="text-red-500 ml-0.5">*</span></label>
+                    <input value={tel.numero} onChange={(e) => handleTelefonoChange(idx, 'numero', e.target.value)} required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="1234567" type="tel" maxLength="7" pattern="[0-9]{7}" title="Debe tener exactamente 7 dígitos" />
                   </div>
+                  {telefonos.length > 1 && (
+                    <button type="button" onClick={() => removeTelefono(idx)} className="bg-slate-50 border border-slate-200 p-2.5 rounded-lg hover:bg-red-50 hover:text-red-500 text-slate-400 mb-[1px] transition-colors">
+                      <span className="material-symbols-outlined text-[20px]">delete</span>
+                    </button>
+                  )}
                 </div>
-                <button className="mb-1 text-slate-300 hover:text-red-500 transition-colors" type="button">
-                  <span className="material-symbols-outlined">delete</span>
-                </button>
-              </div>
+              ))}
             </div>
           </section>
 
