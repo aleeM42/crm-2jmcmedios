@@ -13,6 +13,7 @@ import {
   getContactosByCliente,
   getContactosByAliado,
 } from '../services/visita.service.js';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 export default function AgregarVisita() {
   const navigate = useNavigate();
@@ -149,7 +150,7 @@ export default function AgregarVisita() {
       setSuccess('Visita registrada exitosamente');
       setTimeout(() => navigate('/actividad-comercial'), 1500);
     } catch (err) {
-      setError(err.data?.error || err.message || 'Error al registrar visita');
+      setError(resolveErrorMessage(err, 'visitas'));
     } finally {
       setLoading(false);
     }

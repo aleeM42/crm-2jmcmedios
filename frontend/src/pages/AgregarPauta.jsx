@@ -5,6 +5,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { toast } from 'sonner';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
+
+const COORDINADORAS = ['Oriana Mendoza', 'Ysabel Pérez'];
 
 export default function AgregarPauta() {
   const navigate = useNavigate();
@@ -14,6 +17,8 @@ export default function AgregarPauta() {
   const [clientes, setClientes] = useState([]);
   const [vendedores, setVendedores] = useState([]);
   const [aliados, setAliados] = useState([]);
+  const [marcas, setMarcas] = useState([]);
+  const [loadingMarcas, setLoadingMarcas] = useState(false);
 
   // Estados del formulario general
   const [clienteId, setClienteId] = useState('');
@@ -74,11 +79,52 @@ export default function AgregarPauta() {
     fetchData();
   }, []);
 
+  // Cuando cambia el cliente: auto-rellenar vendedor y cargar marcas
+  const handleClienteChange = async (newClienteId) => {
+    setClienteId(newClienteId);
+    setMarca('');
+    setMarcas([]);
+
+    if (!newClienteId) {
+      setVendedorId('');
+      return;
+    }
+
+    // Auto-fill vendedor
+    const clienteObj = clientes.find((c) => c.id.toString() === newClienteId);
+    if (clienteObj?.fk_vendedor) {
+      setVendedorId(clienteObj.fk_vendedor.toString());
+    } else {
+      setVendedorId('');
+    }
+
+    // Fetch marcas del cliente
+    setLoadingMarcas(true);
+    try {
+      const res = await api.get(`/clientes/${newClienteId}/marcas`);
+      if (res.success) {
+        setMarcas(Array.isArray(res.data) ? res.data : []);
+      }
+    } catch (err) {
+      console.error('Error fetching marcas:', err);
+    } finally {
+      setLoadingMarcas(false);
+    }
+  };
+
+  // Seleccionar coordinadora (single select)
+  const handleCoordinadoraSelect = (nombre) => {
+    setCoordinadora(nombre);
+  };
+
   const esEnVivo = tipoCompra === 'en_vivo' || tipoCompra === 'en vivo';
 
   // Computed data based on selections
   const selectedCliente = clientes.find((c) => c.id.toString() === clienteId) || null;
   const nombreAgencia = selectedCliente?.clasificacion === 'Agencia' ? selectedCliente.nombre_agencia : 'Cliente directo';
+
+  // Vendedor display (for read-only field)
+  const selectedVendedor = vendedores.find((v) => v.id.toString() === vendedorId) || null;
 
   const selectedAliado = aliados.find((a) => a.id.toString() === selectedAliadoId) || null;
 
@@ -118,6 +164,11 @@ export default function AgregarPauta() {
       return;
     }
 
+    if (!coordinadora) {
+      toast.error('Debe seleccionar una coordinadora.');
+      return;
+    }
+
     const payload = {
       clienteId,
       vendedorId,
@@ -147,11 +198,11 @@ export default function AgregarPauta() {
         toast.success('Pauta guardada exitosamente');
         navigate('/pautas');
       } else {
-        toast.error(response.error || 'Error al guardar');
+        toast.error(resolveErrorMessage(response, 'pautas'));
       }
-    } catch (error) {
-      console.error(error);
-      toast.error('Error al comunicarse con el servidor.');
+    } catch (err) {
+      console.error(err);
+      toast.error(resolveErrorMessage(err, 'pautas'));
     }
   };
 
@@ -187,22 +238,44 @@ export default function AgregarPauta() {
               Datos Generales
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+              {/* Cliente */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cliente<span className="text-red-500 ml-0.5">*</span></label>
                 <select 
-                  value={clienteId} onChange={(e) => setClienteId(e.target.value)} required
+                  value={clienteId} onChange={(e) => handleClienteChange(e.target.value)} required
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                   <option value="">Seleccionar cliente...</option>
                   {clientes.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
                 </select>
               </div>
+
+              {/* Marca — select dinámico según cliente */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Marca<span className="text-red-500 ml-0.5">*</span></label>
-                <input 
-                  type="text" value={marca} onChange={(e) => setMarca(e.target.value)} required
-                  placeholder="Ej: Marca del producto"
-                  className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                {loadingMarcas ? (
+                  <div className="w-full h-12 px-4 bg-slate-100 border border-slate-200 rounded-lg flex items-center text-sm text-slate-400">
+                    Cargando marcas...
+                  </div>
+                ) : !clienteId ? (
+                  <div className="w-full h-12 px-4 bg-slate-100 border border-slate-200 rounded-lg flex items-center text-sm text-slate-400">
+                    Seleccione un cliente primero
+                  </div>
+                ) : marcas.length === 0 ? (
+                  <div className="w-full h-12 px-4 bg-slate-100 border border-slate-200 rounded-lg flex items-center text-sm text-slate-400">
+                    Sin marcas registradas
+                  </div>
+                ) : (
+                  <select
+                    value={marca} onChange={(e) => setMarca(e.target.value)} required
+                    className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                    <option value="">Seleccionar marca...</option>
+                    {marcas.map(m => <option key={m.id} value={m.nombre}>{m.nombre}</option>)}
+                  </select>
+                )}
               </div>
+
+              {/* Tipo de Compra */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tipo de Compra<span className="text-red-500 ml-0.5">*</span></label>
                 <select name="tipo_compra" value={tipoCompra} onChange={(e) => setTipoCompra(e.target.value)} required className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
@@ -211,15 +284,26 @@ export default function AgregarPauta() {
                   <option value="en_vivo">En Vivo</option>
                 </select>
               </div>
+
+              {/* Vendedor — auto-rellenado y de solo lectura */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Vendedor<span className="text-red-500 ml-0.5">*</span></label>
-                <select 
-                  value={vendedorId} onChange={(e) => setVendedorId(e.target.value)} required
-                  className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                  <option value="">Seleccionar vendedor...</option>
-                  {vendedores.map(v => <option key={v.id} value={v.id}>{v.primer_nombre} {v.primer_apellido}</option>)}
-                </select>
+                <div className="relative">
+                  <input
+                    type="text"
+                    readOnly
+                    value={selectedVendedor ? `${selectedVendedor.primer_nombre} ${selectedVendedor.primer_apellido}` : ''}
+                    placeholder="Se asigna al seleccionar el cliente"
+                    className="w-full h-12 px-4 pr-10 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 cursor-not-allowed"
+                  />
+                  {selectedVendedor && (
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-primary">check_circle</span>
+                  )}
+                </div>
+                {/* Hidden input to keep the value in form state */}
+                <input type="hidden" value={vendedorId} required />
               </div>
+
               {selectedCliente?.clasificacion === 'Agencia' && (
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Nombre Agencia</label>
@@ -229,24 +313,58 @@ export default function AgregarPauta() {
                     className="w-full h-12 px-4 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-500" />
                 </div>
               )}
+
+              {/* Número OT */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Número OT<span className="text-red-500 ml-0.5">*</span></label>
                 <input 
                   type="text" value={numeroOt} onChange={(e) => setNumeroOt(e.target.value)} required
                   placeholder="Ej: OT-00125" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
+
+              {/* Coordinadora — multi-select tipo checkbox */}
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Coordinadora<span className="text-red-500 ml-0.5">*</span></label>
-                <input 
-                  type="text" value={coordinadora} onChange={(e) => setCoordinadora(e.target.value)} required
-                  placeholder="Nombre de la coordinadora" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                  Coordinadora<span className="text-red-500 ml-0.5">*</span>
+                </label>
+                <div className="flex flex-col gap-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg min-h-[48px]">
+                  {COORDINADORAS.map((nombre) => {
+                    const selected = coordinadora === nombre;
+                    return (
+                      <label
+                        key={nombre}
+                        onClick={() => handleCoordinadoraSelect(nombre)}
+                        className={`flex items-center gap-3 cursor-pointer select-none rounded-md px-2 py-1.5 transition-colors ${selected ? 'bg-primary/10' : 'hover:bg-slate-100'}`}
+                      >
+                        <span
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                            selected ? 'border-primary' : 'border-slate-300 bg-white'
+                          }`}
+                        >
+                          {selected && (
+                            <span className="w-2.5 h-2.5 rounded-full bg-primary block" />
+                          )}
+                        </span>
+                        <span
+                          className={`text-sm font-medium transition-colors ${selected ? 'text-primary' : 'text-slate-600'}`}
+                        >
+                          {nombre}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
+
+              {/* Fecha de Emisión */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Fecha de Emisión<span className="text-red-500 ml-0.5">*</span></label>
                 <input 
                   type="date" value={fechaEmision} onChange={(e) => setFechaEmision(e.target.value)} required
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
+
+              {/* Estado */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Estado<span className="text-red-500 ml-0.5">*</span></label>
                 <select 
@@ -258,6 +376,8 @@ export default function AgregarPauta() {
                   <option value="suspendida">Suspendida</option>
                 </select>
               </div>
+
+              {/* Observaciones */}
               <div className="col-span-2">
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Observaciones</label>
                 <textarea 
@@ -405,4 +525,3 @@ export default function AgregarPauta() {
     </form>
   );
 }
-

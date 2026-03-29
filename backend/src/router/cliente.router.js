@@ -19,6 +19,9 @@ router.get('/', authenticate, authorize(...ROLES_CLIENTES), ClienteCtrl.getAll);
 // GET  /api/clientes/empresas  — Lista de empresas para select de sub-empresas
 router.get('/empresas', authenticate, authorize(...ROLES_CLIENTES), ClienteCtrl.getEmpresas);
 
+// GET  /api/clientes/:id/marcas  — Marcas del cliente (para select en pauta)
+router.get('/:id/marcas', authenticate, authorize(...ROLES_CLIENTES), ClienteCtrl.getMarcasByCliente);
+
 // GET  /api/clientes/:id       — Detalle completo
 router.get('/:id', authenticate, authorize(...ROLES_CLIENTES), ClienteCtrl.getById);
 

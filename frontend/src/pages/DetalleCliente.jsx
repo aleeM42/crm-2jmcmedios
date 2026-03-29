@@ -4,12 +4,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getClienteById } from '../services/cliente.service.js';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 export default function DetalleCliente() {
   const { id } = useParams();
   const [cliente, setCliente] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [subEmpresaModal, setSubEmpresaModal] = useState(null);
 
   useEffect(() => {
     const fetchCliente = async () => {
@@ -19,7 +21,7 @@ export default function DetalleCliente() {
           setCliente(result.data);
         }
       } catch (err) {
-        setError(err.message || 'Error al cargar cliente');
+        setError(resolveErrorMessage(err, 'clientes'));
       } finally {
         setLoading(false);
       }
@@ -194,14 +196,14 @@ export default function DetalleCliente() {
             <div className="p-6 space-y-6">
               {c.sub_empresas && c.sub_empresas.length > 0 ? (
                 c.sub_empresas.map((se, i) => (
-                  <div key={se.id} className="flex gap-4">
+                  <div key={se.id} className="flex gap-4 cursor-pointer group" onClick={() => setSubEmpresaModal(se)}>
                     <div className="flex flex-col items-center">
                       <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
                       {i < c.sub_empresas.length - 1 && <div className="w-px h-full bg-slate-100"></div>}
                     </div>
                     <div className="flex-1 space-y-3">
                       <div>
-                        <h4 className="text-sm font-bold text-slate-800 font-display">{se.nombre}</h4>
+                        <h4 className="text-sm font-bold text-slate-800 font-display group-hover:text-primary transition-colors">{se.nombre}</h4>
                         <p className="text-[10px] text-slate-400 font-medium">RIF: {se.rif_fiscal} • {se.direccion}</p>
                       </div>
                       {se.marcas && se.marcas.length > 0 && (
@@ -212,6 +214,7 @@ export default function DetalleCliente() {
                         </div>
                       )}
                     </div>
+                    <span className="material-symbols-outlined text-slate-300 group-hover:text-primary text-sm self-center transition-colors">chevron_right</span>
                   </div>
                 ))
               ) : (
@@ -439,6 +442,123 @@ export default function DetalleCliente() {
           )}
         </div>
       </div>
+      {/* ═══ MODAL SUB-EMPRESA ═══ */}
+      {subEmpresaModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSubEmpresaModal(null)}>
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          {/* Panel */}
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-[fadeIn_0.2s_ease-out]" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-primary">corporate_fare</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-800 font-display text-base">{subEmpresaModal.nombre}</h3>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Sub-Empresa</p>
+                </div>
+              </div>
+              <button onClick={() => setSubEmpresaModal(null)} className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
+                <span className="material-symbols-outlined text-slate-500 text-lg">close</span>
+              </button>
+            </div>
+            {/* Body */}
+            <div className="p-6 space-y-5">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-5">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Nombre</p>
+                  <p className="text-sm font-semibold text-slate-700">{subEmpresaModal.nombre}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Razón Social</p>
+                  <p className="text-sm font-semibold text-slate-700">{subEmpresaModal.razon_social || '—'}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">RIF Fiscal</p>
+                  <p className="text-sm font-semibold text-slate-700">{subEmpresaModal.rif_fiscal || '—'}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Estado</p>
+                  <span className={`inline-block px-2 py-0.5 text-[10px] font-black rounded uppercase ${subEmpresaModal.estado === 'Activo' ? 'bg-accent-green/10 text-accent-green' : 'bg-slate-100 text-slate-500'}`}>{subEmpresaModal.estado}</span>
+                </div>
+                <div className="space-y-1 col-span-2">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Dirección</p>
+                  <p className="text-sm font-semibold text-slate-700">{subEmpresaModal.direccion || '—'}</p>
+                </div>
+              </div>
+              {/* Marcas */}
+              {subEmpresaModal.marcas && subEmpresaModal.marcas.length > 0 && (
+                <div className="pt-4 border-t border-slate-100">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Marcas Asociadas</p>
+                  <div className="flex flex-wrap gap-2">
+                    {subEmpresaModal.marcas.map(m => (
+                      <span key={m.id} className="px-3 py-1 bg-accent-light/30 text-slate-700 text-xs font-bold rounded-lg border border-accent-light/50">{m.nombre}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {/* Contactos propios de la sub-empresa (distintos al padre) */}
+              {(() => {
+                const padreContactoIds = new Set((c.contactos || []).map(ct => ct.id));
+                const contactosPropios = (subEmpresaModal.contactos || []).filter(ct => !padreContactoIds.has(ct.id));
+                if (contactosPropios.length === 0) return null;
+                return (
+                  <div className="pt-4 border-t border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Contactos</p>
+                    <div className="space-y-4">
+                      {contactosPropios.map(ct => (
+                        <div key={ct.id} className="bg-slate-50 rounded-lg p-4 border border-slate-100 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-xs font-display">
+                                {ct.pri_nombre?.[0]}{ct.pri_apellido?.[0]}
+                              </div>
+                              <div>
+                                <p className="text-xs font-bold text-slate-700">{ct.pri_nombre} {ct.seg_nombre || ''} {ct.pri_apellido}</p>
+                                <p className="text-[10px] text-slate-400">{ct.departamento}</p>
+                              </div>
+                            </div>
+                            {ct.rol && <span className="px-2 py-0.5 bg-primary/10 text-primary text-[9px] font-black rounded uppercase">{ct.rol}</span>}
+                          </div>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2">
+                            {ct.correo && (
+                              <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                                <span className="material-symbols-outlined text-[13px] text-slate-400">mail</span>
+                                <span className="break-all">{ct.correo}</span>
+                              </div>
+                            )}
+                            {ct.telefonos && ct.telefonos.length > 0 && (
+                              <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                                <span className="material-symbols-outlined text-[13px] text-slate-400">call</span>
+                                <span>{ct.telefonos.map(t => `${t.codigo_area}-${t.numero}`).join(', ')}</span>
+                              </div>
+                            )}
+                            {ct.fecha_nac && (
+                              <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                                <span className="material-symbols-outlined text-[13px] text-slate-400">cake</span>
+                                <span>{new Date(ct.fecha_nac).toLocaleDateString()}</span>
+                              </div>
+                            )}
+                          </div>
+                          {ct.anotac_especiales && (
+                            <p className="text-[10px] italic text-slate-500 bg-white border border-slate-100 p-2 rounded mt-1">{ct.anotac_especiales}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/30 flex justify-end">
+              <button onClick={() => setSubEmpresaModal(null)} className="px-5 py-2 rounded-lg bg-primary text-white text-sm font-bold hover:opacity-90 transition-opacity shadow-sm shadow-primary/20">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

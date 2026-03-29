@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { crearCliente, getClienteById, getLugares, getVendedores } from '../services/cliente.service.js';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 export default function AgregarSubEmpresa() {
   const { clienteId } = useParams();
@@ -57,6 +58,18 @@ export default function AgregarSubEmpresa() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // --- NEGOCIACIÓN (HISTORICO_NEGOCIACIONES) ---
+  const [negociacion, setNegociacion] = useState({
+    monto_negociacion: '',
+    fecha_inicio: '',
+    fecha_fin: '',
+  });
+
+  const handleNegociacion = (e) => {
+    const { name, value } = e.target;
+    setNegociacion({ ...negociacion, [name]: value });
+  };
 
   // Cargar lookups y datos de la empresa padre
   useEffect(() => {
@@ -217,6 +230,9 @@ export default function AgregarSubEmpresa() {
         contactos: validContactos,
         telefonos: firstContactPhones,
         marcas: marcas.filter(m => m.nombre),
+        negociacion: negociacion.monto_negociacion && negociacion.fecha_inicio
+          ? negociacion
+          : null,
       };
 
       const result = await crearCliente(payload);
@@ -225,14 +241,14 @@ export default function AgregarSubEmpresa() {
         setTimeout(() => navigate(`/clientes/${clienteId}`), 1500);
       }
     } catch (err) {
-      setError(err.data?.error || err.message || 'Error al crear sub-empresa');
+      setError(resolveErrorMessage(err, 'clientes'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <>
+    <div className="pb-96 min-h-[300vh] w-full block">
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
@@ -505,8 +521,31 @@ export default function AgregarSubEmpresa() {
           </div>
         </section>
 
+        {/* ═══ NEGOCIACIÓN COMERCIAL — HISTORICO_NEGOCIACIONES entity ═══ */}
+        <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
+          <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
+            <span className="material-symbols-outlined text-primary">handshake</span>
+            Negociación Comercial
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Monto de Negociación <span className="text-red-500">*</span></label>
+              <input type="number" name="monto_negociacion" value={negociacion.monto_negociacion} onChange={handleNegociacion} placeholder="0.00" step="0.01" min="0" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Fecha de Inicio <span className="text-red-500">*</span></label>
+              <input type="date" name="fecha_inicio" value={negociacion.fecha_inicio} onChange={handleNegociacion} className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Fecha Fin</label>
+              <input type="date" name="fecha_fin" value={negociacion.fecha_fin} onChange={handleNegociacion} className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+            </div>
+          </div>
+          <p className="text-[10px] text-slate-400 mt-4 italic">Los campos marcados con * son obligatorios para registrar la negociación. Este monto alimenta la barra de progreso de pautas (Monto OC vs Monto Negociado). Si se dejan vacíos, no se creará un registro de negociación.</p>
+        </section>
+
         {/* Footer buttons */}
-        <div className="flex flex-col sm:flex-row justify-end gap-4 py-4">
+        <div className="flex flex-col sm:flex-row justify-end gap-4 pt-8 pb-16 shrink-0 mt-8">
           <Link to={`/clientes/${clienteId || ''}`} className="px-8 py-3 rounded-lg border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all text-center">Cancelar</Link>
           <button
             className="px-12 py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all disabled:opacity-60"
@@ -517,6 +556,6 @@ export default function AgregarSubEmpresa() {
           </button>
         </div>
       </form>
-    </>
+    </div>
   );
 }

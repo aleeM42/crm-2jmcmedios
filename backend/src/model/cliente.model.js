@@ -122,18 +122,18 @@ export const findById = async (id) => {
   `;
   const marcasResult = await pool.query(marcasQuery, [allClienteIds]);
 
-  // Contactos del cliente
+  // Contactos del cliente principal + sub-empresas
   const contactosQuery = `
     SELECT ct.id, ct.pri_nombre, ct.seg_nombre, ct.pri_apellido,
            ct.departamento, ct.correo, ct.rol, ct.tipo,
-           ct.anotac_especiales, ct.fecha_nac
+           ct.anotac_especiales, ct.fecha_nac, ct.fk_cliente
     FROM CONTACTOS ct
-    WHERE ct.fk_cliente = $1
-    ORDER BY ct.id
+    WHERE ct.fk_cliente = ANY($1)
+    ORDER BY ct.fk_cliente, ct.id
   `;
-  const contactosResult = await pool.query(contactosQuery, [id]);
+  const contactosResult = await pool.query(contactosQuery, [allClienteIds]);
 
-  // Teléfonos de los contactos
+  // Teléfonos de todos los contactos
   const contactoIds = contactosResult.rows.map(c => c.id);
   let telefonos = [];
   if (contactoIds.length > 0) {
@@ -192,6 +192,16 @@ export const findById = async (id) => {
     telefonosByContacto[t.fk_contacto].push(t);
   }
 
+  const contactosByCliente = {};
+  for (const ct of contactosResult.rows) {
+    const key = ct.fk_cliente;
+    if (!contactosByCliente[key]) contactosByCliente[key] = [];
+    contactosByCliente[key].push({
+      ...ct,
+      telefonos: telefonosByContacto[ct.id] || [],
+    });
+  }
+
   return {
     ...cliente,
     kpis: kpisResult.rows[0],
@@ -201,11 +211,9 @@ export const findById = async (id) => {
     sub_empresas: subEmpresasResult.rows.map(se => ({
       ...se,
       marcas: marcasByCliente[se.id] || [],
+      contactos: contactosByCliente[se.id] || [],
     })),
-    contactos: contactosResult.rows.map(ct => ({
-      ...ct,
-      telefonos: telefonosByContacto[ct.id] || [],
-    })),
+    contactos: (contactosByCliente[id] || []),
   };
 };
 

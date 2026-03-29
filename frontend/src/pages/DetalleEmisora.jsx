@@ -76,9 +76,9 @@ export default function DetalleEmisora() {
           <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
             <span className="material-symbols-outlined text-lg">delete</span> Eliminar
           </button>
-          <Link to={`/aliados-comerciales/editar/${emisora.id}`} className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+          <button className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
             <span className="material-symbols-outlined text-lg">edit</span> Editar
-          </Link>
+          </button>
         </div>
       </header>
 

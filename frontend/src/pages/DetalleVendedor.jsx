@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getVendedorById } from '../services/vendedor.service.js';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 const ESTADO_CLIENTE_BADGE = {
   Activo: 'bg-green-100 text-green-700',
@@ -29,7 +30,7 @@ export default function DetalleVendedor() {
         if (err.status === 403) {
           setForbidden(true);
         }
-        setError(err.data?.error || err.message || 'Error al cargar vendedor');
+        setError(resolveErrorMessage(err, 'vendedores'));
       } finally {
         setLoading(false);
       }
