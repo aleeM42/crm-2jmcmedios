@@ -24,8 +24,19 @@ const ESTADO_COLORS = {
   'Negociado': '#8DC63F',
 };
 
+const NOTIF_ICONS = {
+  CUMPLEAÑOS: { icon: '🎂', color: 'text-green-600', bg: 'bg-green-50 border-green-200' },
+  INACTIVO: { icon: '⚠️', color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
+  SIN_VISITAS: { icon: '⚠️', color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
+  PAUTA_VENCIMIENTO: { icon: '🔴', color: 'text-red-600', bg: 'bg-red-50 border-red-200' },
+  default: { icon: 'ℹ️', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
+};
+
 function Dashboard() {
   const navigate = useNavigate();
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notificaciones, setNotificaciones] = useState([]);
+  const [hasUnread, setHasUnread] = useState(false);
   const [metricas, setMetricas] = useState({
     totalClientes: 0,
     totalVentas: 0,
@@ -58,20 +69,8 @@ function Dashboard() {
     api.get('/notificaciones')
       .then((res) => {
         if (res.success && res.data) {
-          const notifs = res.data;
-          notifs.forEach((notif, idx) => {
-            setTimeout(() => {
-              if (notif.tipo === 'CUMPLEAÑOS') {
-                toast.success(notif.titulo, { description: notif.mensaje, icon: '🎂' });
-              } else if (notif.tipo === 'INACTIVO' || notif.tipo === 'SIN_VISITAS') {
-                toast.warning(notif.titulo, { description: notif.mensaje });
-              } else if (notif.tipo === 'PAUTA_VENCIMIENTO') {
-                toast.error(notif.titulo, { description: notif.mensaje });
-              } else {
-                toast.info(notif.titulo, { description: notif.mensaje });
-              }
-            }, idx * 1000); // 1s staggered
-          });
+          setNotificaciones(res.data);
+          if (res.data.length > 0) setHasUnread(true);
         }
       })
       .catch(() => {});
@@ -87,9 +86,70 @@ function Dashboard() {
           <p className="text-slate-500 text-sm mt-1">Resumen de métricas y rendimiento comercial</p>
         </div>
         <div className="flex items-center gap-6">
-          <button className="relative p-2 text-slate-400 hover:text-primary transition-colors">
-            <span className="material-symbols-outlined text-[28px]">notifications</span>
-          </button>
+          <div className="relative">
+            <button
+              className="relative p-2 text-slate-400 hover:text-primary transition-colors"
+              onClick={() => { setNotifOpen(!notifOpen); setHasUnread(false); }}
+            >
+              <span className="material-symbols-outlined text-[28px]">notifications</span>
+              {hasUnread && (
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse" />
+              )}
+            </button>
+
+            {/* Popover de notificaciones — sale de la campana */}
+            {notifOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
+                <div className="absolute right-0 top-full mt-2 z-50 w-[380px] max-h-[520px] flex flex-col overflow-hidden bg-white rounded-2xl shadow-2xl border border-slate-200 animate-[fadeSlideDown_0.2s_ease-out]">
+                  {/* Flecha triangular */}
+                  <div className="absolute -top-2 right-4 w-4 h-4 bg-white border-l border-t border-slate-200 rotate-45" />
+
+                  {/* Header */}
+                  <div className="relative flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-white rounded-t-2xl">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[22px]">notifications</span>
+                      <h3 className="font-bold text-slate-800 text-sm">Notificaciones</h3>
+                      {notificaciones.length > 0 && (
+                        <span className="px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-600 rounded-full">
+                          {notificaciones.length}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => setNotifOpen(false)}
+                      className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-lg hover:bg-slate-100"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                  </div>
+
+                  {/* Listado */}
+                  <div className="flex-1 overflow-y-auto divide-y divide-slate-50">
+                    {notificaciones.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                        <span className="material-symbols-outlined text-4xl mb-2">notifications_off</span>
+                        <p className="text-sm font-medium">No hay notificaciones</p>
+                      </div>
+                    ) : (
+                      notificaciones.map((notif, idx) => {
+                        const style = NOTIF_ICONS[notif.tipo] || NOTIF_ICONS.default;
+                        return (
+                          <div key={idx} className={`flex gap-3 px-5 py-4 border-l-4 ${style.bg}`}>
+                            <span className="text-xl flex-shrink-0">{style.icon}</span>
+                            <div>
+                              <p className={`text-xs font-bold ${style.color}`}>{notif.titulo}</p>
+                              <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{notif.mensaje}</p>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-bold text-slate-900">{usuarioLocal.nombre}</p>

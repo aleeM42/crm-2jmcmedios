@@ -3,15 +3,17 @@
 // Campos mapeados 1:1 con entidades CLIENTE, CONTACTO, TELEFONO, MARCA_INTER del CSV ER
 // ==============================================
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { crearCliente, getEmpresas, getLugares, getVendedores } from '../services/cliente.service.js';
 
 export default function AgregarCliente() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nombreDesdeQuery = searchParams.get('nombre') || '';
 
   // --- CLIENTE (DB fields) ---
   const [cliente, setCliente] = useState({
-    nombre: '',
+    nombre: nombreDesdeQuery,
     razon_social: '',
     tipo: 'Empresa',
     direccion: '',
@@ -466,11 +468,19 @@ export default function AgregarCliente() {
                   <div key={i} className="flex gap-3 items-end">
                     <div className="w-24 flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-500 uppercase">Cód. Área <span className="text-red-500">*</span></label>
-                      <input value={tel.codigo_area} onChange={(e) => handleTelefono(i, 'codigo_area', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0212" type="tel" maxLength="4" />
+                      <select value={tel.codigo_area} onChange={(e) => handleTelefono(i, 'codigo_area', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
+                        <option value="">—</option>
+                        <option value="0412">0412</option>
+                        <option value="0422">0422</option>
+                        <option value="0414">0414</option>
+                        <option value="0424">0424</option>
+                        <option value="0416">0416</option>
+                        <option value="0426">0426</option>
+                      </select>
                     </div>
                     <div className="flex-1 flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-500 uppercase">Número <span className="text-red-500">*</span></label>
-                      <input value={tel.numero} onChange={(e) => handleTelefono(i, 'numero', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0000000" type="tel" maxLength="7" />
+                      <input value={tel.numero} onChange={(e) => handleTelefono(i, 'numero', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0000000" type="tel" maxLength="7" pattern="[0-9]{7}" title="Debe tener exactamente 7 dígitos" />
                     </div>
                     <button type="button" onClick={() => removeTelefono(i)} className="bg-slate-50 border border-slate-200 p-3 rounded-lg hover:bg-slate-100 text-primary">
                       <span className="material-symbols-outlined">delete</span>

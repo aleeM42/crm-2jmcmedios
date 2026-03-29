@@ -260,22 +260,38 @@ function AgregarAliado() {
               <div className="grid grid-cols-4 gap-4">
                 <div className="space-y-1.5 col-span-1">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.*</label>
-                  <input name="codigo_area" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="0412" type="text" />
+                  <select name="codigo_area" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                    <option value="">—</option>
+                    <option value="0412">0412</option>
+                    <option value="0422">0422</option>
+                    <option value="0414">0414</option>
+                    <option value="0424">0424</option>
+                    <option value="0416">0416</option>
+                    <option value="0426">0426</option>
+                  </select>
                 </div>
                 <div className="space-y-1.5 col-span-3">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Número de Teléfono<span className="text-red-500 ml-0.5">*</span></label>
-                  <input name="cuerpo" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="1234567" type="text" />
+                  <input name="cuerpo" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="1234567" type="tel" maxLength="7" pattern="[0-9]{7}" title="Debe tener exactamente 7 dígitos" onInput={(e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7); }} />
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="grid grid-cols-4 gap-4 flex-1">
                   <div className="space-y-1.5 col-span-1">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.</label>
-                    <input name="codigo_area_2" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="0212" type="text" />
+                    <select name="codigo_area_2" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                      <option value="">—</option>
+                      <option value="0412">0412</option>
+                      <option value="0422">0422</option>
+                      <option value="0414">0414</option>
+                      <option value="0424">0424</option>
+                      <option value="0416">0416</option>
+                      <option value="0426">0426</option>
+                    </select>
                   </div>
                   <div className="space-y-1.5 col-span-3">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Número Fijo</label>
-                    <input name="cuerpo_2" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="9876543" type="text" />
+                    <input name="cuerpo_2" className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="9876543" type="tel" maxLength="7" pattern="[0-9]{7}" title="Debe tener exactamente 7 dígitos" onInput={(e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7); }} />
                   </div>
                 </div>
                 <button className="mb-1 text-slate-300 hover:text-red-500 transition-colors" type="button">

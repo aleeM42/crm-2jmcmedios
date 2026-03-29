@@ -2,6 +2,7 @@
 // Pipeline.jsx — Kanban Board de Ventas (Dinámico)
 // ==============================================
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../services/api.js';
 
 const ESTADOS = [
@@ -205,6 +206,14 @@ export default function Pipeline() {
                         {new Date(card.fecha_creacion).toLocaleDateString('es-VE', { day: '2-digit', month: 'short' })}
                       </span>
                     </div>
+                    {card.estado === 'Negociado' && (
+                      <Link
+                        to={`/clientes/agregar?nombre=${encodeURIComponent(card.nombre_cliente)}`}
+                        className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-accent-green hover:text-secondary transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-sm">person_add</span>Agregar Cliente
+                      </Link>
+                    )}
                     <div className="mt-3 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
