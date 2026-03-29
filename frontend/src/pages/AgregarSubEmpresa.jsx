@@ -145,19 +145,19 @@ export default function AgregarSubEmpresa() {
     if (checked && padreData?.contactos?.length > 0) {
       const pc = padreData.contactos[0];
       setContactos([{
-        pri_nombre: pc.pri_nombre || '',
-        seg_nombre: pc.seg_nombre || '',
-        pri_apellido: pc.pri_apellido || '',
-        departamento: pc.departamento || '',
-        correo: pc.correo || '',
-        fecha_nac: pc.fecha_nac ? pc.fecha_nac.split('T')[0] : '',
-        anotac_especiales: pc.anotac_especiales || '',
-        rol: pc.rol || '',
+        pri_nombre: pc?.pri_nombre || '',
+        seg_nombre: pc?.seg_nombre || '',
+        pri_apellido: pc?.pri_apellido || '',
+        departamento: pc?.departamento || '',
+        correo: pc?.correo || '',
+        fecha_nac: (pc?.fecha_nac && typeof pc.fecha_nac === 'string') ? pc.fecha_nac.split('T')[0] : '',
+        anotac_especiales: pc?.anotac_especiales || '',
+        rol: pc?.rol || '',
         tipo: 'cliente',
       }]);
       // Copiar teléfonos del contacto padre
-      const padrePhones = pc.telefonos?.length > 0
-        ? pc.telefonos.map(t => ({ codigo_area: t.codigo_area, numero: t.numero }))
+      const padrePhones = (pc?.telefonos && Array.isArray(pc.telefonos) && pc.telefonos.length > 0)
+        ? pc.telefonos.map(t => ({ codigo_area: t?.codigo_area || '', numero: t?.numero || '' }))
         : [{ codigo_area: '', numero: '' }];
       setTelefonosPorContacto({ 0: padrePhones });
     } else {
@@ -271,7 +271,7 @@ export default function AgregarSubEmpresa() {
         </div>
       )}
 
-      <form className="max-w-3xl space-y-8" onSubmit={handleSubmit}>
+      <form className="max-w-5xl space-y-8" onSubmit={handleSubmit}>
         {/* ═══ DATOS SUB-EMPRESA — CLIENTE entity ═══ */}
         <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
           <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">

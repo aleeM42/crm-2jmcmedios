@@ -86,7 +86,7 @@ function DashboardLayout() {
       </aside>
 
       {/* ===================== MAIN CONTENT ===================== */}
-      <main className="flex-1 ml-[240px] p-8 overflow-y-auto">
+      <main className="flex-1 ml-[240px] p-8 overflow-y-auto min-h-0 min-w-0 w-full">
         <Outlet />
       </main>
     </div>
