@@ -1,9 +1,11 @@
 // ==============================================
 // DashboardLayout.jsx — Layout compartido (Sidebar + Header)
 // ==============================================
+import { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { getCurrentUser } from '../services/auth.service';
 import { Toaster } from 'sonner';
+import HelpModal from './HelpModal';
 
 const NAV_ITEMS = [
   { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
@@ -21,6 +23,7 @@ function DashboardLayout() {
   const location = useLocation();
   const user = getCurrentUser();
   const rol = user?.rol?.toLowerCase() || '';
+  const [showHelp, setShowHelp] = useState(false);
 
   // Filtrar NAV_ITEMS según el rol
   const filteredNavItems = NAV_ITEMS.filter((item) => {
@@ -74,7 +77,17 @@ function DashboardLayout() {
           ))}
         </nav>
 
-        <div className="p-4 mt-auto border-t border-[#E0F0F2]">
+        <div className="p-4 mt-auto border-t border-[#E0F0F2] space-y-1">
+          {/* Ayuda */}
+          <button
+            onClick={() => setShowHelp(true)}
+            className="flex items-center gap-3 w-full px-3 py-2.5 text-[#16B1B8] hover:bg-[#E0F0F2] rounded-lg transition-colors"
+          >
+            <span className="material-symbols-outlined text-[22px]">help</span>
+            <span className="text-sm font-medium">Ayuda</span>
+          </button>
+
+          {/* Cerrar Sesión */}
           <NavLink
             to="/login"
             className="flex items-center gap-3 w-full px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
@@ -83,6 +96,9 @@ function DashboardLayout() {
             <span className="text-sm font-medium">Cerrar Sesión</span>
           </NavLink>
         </div>
+
+        {/* Modal de Ayuda */}
+        {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
       </aside>
 
       {/* ===================== MAIN CONTENT ===================== */}
