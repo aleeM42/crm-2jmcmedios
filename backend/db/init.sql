@@ -97,11 +97,6 @@ CREATE TABLE USUARIOS (
 	CONSTRAINT estado_chk CHECK (estado IN('Suspendido', 'Activo'))
 );
 
-CREATE TABLE CATEGORIA_EMISORA (
-    id SERIAL PRIMARY KEY,              
-    nombre VARCHAR(100) NOT NULL UNIQUE 
-);
-
 Create table VENDEDORES(
 	usuario_id UUID PRIMARY KEY REFERENCES USUARIOS(id) ON DELETE CASCADE,
 	meta INTEGER NOT NULL,
@@ -124,6 +119,7 @@ CREATE TABLE CLIENTE (
     sector VARCHAR(50) NOT NULL,
     estado VARCHAR(20) NOT NULL,
     nombre_agencia VARCHAR(150),
+    archivo_adjunto TEXT,
     observacion TEXT,
     fk_lugar INTEGER NOT NULL, 
     fk_cliente_padre INTEGER, 
@@ -176,7 +172,7 @@ CREATE TABLE TELEFONOS (
     codigo_area VARCHAR(4) NOT NULL, 
     numero VARCHAR(7) NOT NULL, 
     fk_usuario UUID NOT NULL, 
-    fk_contacto INTEGER NOT NULL, 
+    fk_contacto INTEGER, 
     
     -- Constraints
     CONSTRAINT pk_telefono PRIMARY KEY (codigo_area, numero),
@@ -201,7 +197,7 @@ create table ALIADOS_COMERCIALES(
     CONSTRAINT fk_lugar_ac FOREIGN KEY (fk_lugar) REFERENCES LUGAR(id),
     CONSTRAINT fk_region_ac FOREIGN KEY (fk_region) REFERENCES LUGAR(id),
     CONSTRAINT fk_cobertura_ac FOREIGN KEY (fk_cobertura) REFERENCES COBERTURA(id),
-	CONSTRAINT check_AC_categoria CHECK (categoria IN ('multitarget', 'todo público', 'juvenil', 'adulto contemporáneo', 'popular', 'adulto')),
+	CONSTRAINT check_AC_categoria CHECK (categoria IN ('multitarget', 'comunitaria', 'juvenil', 'adulto contemporáneo', 'popular', 'adulto', 'deportivo')),
 	CONSTRAINT check_AC_estado CHECK (estado IN ('activo','inactivo','cerrado')) 	
 );
 
@@ -215,18 +211,8 @@ CREATE TABLE A_CONTACT(
     CONSTRAINT fk_contact FOREIGN KEY (fk_contacto) references CONTACTOS(id)    
 );
 
-CREATE TABLE C_M (
-    fk_aliado INTEGER NOT NULL,
-    fk_categoria INTEGER NOT NULL,
-
-    -- Constraints
-    CONSTRAINT pk_CM PRIMARY KEY (fk_aliado, fk_categoria),
-    CONSTRAINT fk_cm_aliado FOREIGN KEY (fk_aliado) REFERENCES ALIADOS_COMERCIALES(id) ON DELETE CASCADE,
-    CONSTRAINT fk_cm_categoria FOREIGN KEY (fk_categoria) REFERENCES CATEGORIA_EMISORA(id) ON DELETE CASCADE
-);
-
 CREATE TABLE MARCA_INTER (
-    id SERIAL NOT NULL,
+    id INTEGER NOT NULL,
     nombre VARCHAR(150) NOT NULL,       
     observaciones TEXT,                 
     fk_cliente INTEGER NOT NULL,        
@@ -235,6 +221,27 @@ CREATE TABLE MARCA_INTER (
     CONSTRAINT pk_marca_inter PRIMARY KEY (fk_cliente, id),
     CONSTRAINT fk_cliente_marca FOREIGN KEY (fk_cliente) REFERENCES CLIENTE(id) ON DELETE CASCADE
 );
+
+--función y trigger para que el id de MARCA_INTER sea único por cliente en secuencia 
+CREATE OR REPLACE FUNCTION generar_id_marca()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Busca el max id para el cliente específico, si es null (no tiene marcas), pone 0 y suma 1.
+    SELECT COALESCE(MAX(id), 0) + 1
+    INTO NEW.id
+    FROM MARCA_INTER
+    WHERE fk_cliente = NEW.fk_cliente;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Creamos el gatillo (trigger) que dispara la función automáticamente
+CREATE TRIGGER trg_generar_id_marca
+BEFORE INSERT ON MARCA_INTER
+FOR EACH ROW
+EXECUTE FUNCTION generar_id_marca();
+
 
 Create table VISITAS(
 	id SERIAL PRIMARY KEY,
@@ -245,6 +252,7 @@ Create table VISITAS(
     tipo VARCHAR(20) NOT NULL,
     detalle VARCHAR(100),
 	lugar VARCHAR(100) NOT NULL,
+	archivo_adjunto TEXT,
 	fk_contacto INTEGER NOT NULL,
 	fk_vendedor UUID NOT NULL,
 	
@@ -259,7 +267,7 @@ Create table GASTOS_VISITAS (
 	id SERIAL PRIMARY KEY,
 	fecha DATE NOT NULL,
 	concepto VARCHAR(100) NOT NULL,
-	monto NUMERIC(8,4) NOT NULL,
+	monto NUMERIC(15,2) NOT NULL,
     categoria VARCHAR(50) NOT NULL,
     fk_visita INTEGER NOT NULL,
 	
@@ -272,7 +280,7 @@ create table GASTOS_MARKETING (
 	id SERIAL PRIMARY KEY,
 	fecha DATE NOT NULL,
 	concepto VARCHAR(100) NOT NULL,
-	monto NUMERIC(8,4) NOT NULL,
+	monto NUMERIC(15,2) NOT NULL,
     tipo VARCHAR(50) NOT NULL,
     fk_cliente INTEGER,
     fk_aliado_c INTEGER,
@@ -290,6 +298,7 @@ create table GASTOS_MARKETING (
 create table PAUTAS(
 	id SERIAL PRIMARY KEY,
     numero_OT VARCHAR(20) NOT NULL,
+    numero_OC VARCHAR(20) NOT NULL,
 	fecha_emision DATE NOT NULL,
 	marca VARCHAR(20) NOT NULL,
 	coordinadora VARCHAR(20) NOT NULL,
@@ -297,8 +306,8 @@ create table PAUTAS(
 	fecha_fin DATE NOT NULL,
 	cantidad_cunas INTEGER NOT NULL,
 	costo_cunas NUMERIC(8,4) NOT NULL,
-	monto_OC NUMERIC(8,4) NOT NULL,
-	monto_OT NUMERIC(8,4) NOT NULL,
+	monto_OC NUMERIC(15,2) NOT NULL,
+	monto_OT NUMERIC(15,2) NOT NULL,
 	tipo_compra VARCHAR(10) NOT NULL,
     estado VARCHAR(20) NOT NULL,
     observaciones VARCHAR(300),
@@ -337,7 +346,9 @@ CREATE TABLE HISTORICO_NEGOCIACIONES (
     fecha_inicio DATE NOT NULL,             
     fecha_fin DATE,                           
     monto_negociacion NUMERIC(15, 2) NOT NULL,    
-    fk_cliente INTEGER NOT NULL,             
+    total_cunas INTEGER NOT NULL, 
+    fk_cliente INTEGER NOT NULL,
+
     
     -- Constraints
     CONSTRAINT fk_cliente_historico FOREIGN KEY (fk_cliente) REFERENCES CLIENTE (id) ON DELETE CASCADE
