@@ -38,20 +38,25 @@ const ERROR_DICTIONARY = {
   // ─── Clientes ──────────────────────────────────────────
   clientes: {
     byStatus: {
-      400: 'Faltan campos obligatorios para registrar el cliente. Revise el formulario.',
+      400: 'Datos inválidos. Revise el formulario antes de continuar.',
       404: 'El cliente solicitado no fue encontrado en el sistema.',
-      409: 'Ya existe un cliente con ese RIF fiscal registrado.',
+      409: 'Ya existe un cliente con ese RIF fiscal o razón social registrado.',
       500: 'Error interno al procesar la solicitud del cliente. Intente nuevamente.',
     },
     byKeyword: [
-      ['rif_fiscal',         'El RIF fiscal ingresado ya se encuentra registrado en el sistema o tiene un formato incorrecto.'],
-      ['duplicate',          'Ya existe un registro con esos datos. Verifique el RIF o la razón social.'],
-      ['unique',             'Ya existe un cliente con ese dato único (RIF o razón social).'],
+      ['rif fiscal ya está registrado',  'El RIF fiscal ingresado ya se encuentra registrado en el sistema.'],
+      ['rif',                'El RIF fiscal está duplicado o tiene formato incorrecto (debe ser J/G/V/P + 9 dígitos).'],
+      ['razón social',       'Ya existe un cliente con esa razón social.'],
       ['razon_social',       'La razón social es un campo obligatorio y no puede estar vacía.'],
+      ['correo',             'El correo electrónico ya está registrado o tiene un formato incorrecto.'],
+      ['nombre_usuario',     'El nombre de usuario ya está en uso.'],
       ['fk_vendedor',        'Debe seleccionar un vendedor asignado para este cliente.'],
       ['fk_lugar',           'Debe seleccionar la ubicación (estado) del cliente.'],
       ['violates not-null',  'Uno o más campos obligatorios están vacíos. Revise el formulario.'],
       ['sub-empresa',        'Error al crear la sub-empresa. Verifique que todos los datos estén completos.'],
+      ['duplicate',          'Ya existe un registro con esos datos. Verifique el RIF o la razón social.'],
+      ['unique',             'Ya existe un cliente con ese dato único (RIF o razón social).'],
+      ['teléfono',           'El teléfono tiene un formato incorrecto. Debe incluir código de área y 7 dígitos.'],
     ],
     fallback: 'Error al procesar la solicitud del cliente. Revise los datos e intente nuevamente.',
   },
@@ -59,20 +64,24 @@ const ERROR_DICTIONARY = {
   // ─── Aliados Comerciales (Emisoras) ────────────────────
   aliados: {
     byStatus: {
-      400: 'Faltan campos obligatorios para registrar el aliado comercial.',
+      400: 'Datos inválidos. Revise el formulario antes de continuar.',
       404: 'No se encontró el aliado comercial solicitado.',
       409: 'Ya existe un aliado comercial con ese RIF o razón social.',
       500: 'Error interno al registrar el aliado comercial.',
     },
     byKeyword: [
-      ['rif',               'El RIF ingresado ya está registrado o tiene un formato inválido (debe comenzar con J, G, V o P seguido de hasta 9 dígitos).'],
+      ['rif fiscal de la emisora ya está registrado', 'El RIF de la emisora ya está registrado en el sistema.'],
+      ['rif',               'El RIF ingresado ya está registrado o tiene un formato inválido (debe comenzar con J, G, V o P seguido de 9 dígitos).'],
+      ['razón social',      'Ya existe una emisora con esa razón social.'],
+      ['razon_social',      'La razón social del aliado es obligatoria.'],
+      ['nombre_emisora',    'El nombre de la emisora es un campo obligatorio o ya existe.'],
+      ['fk_categoria',      'Debe seleccionar una categoría para el aliado comercial.'],
+      ['frecuencia',        'La frecuencia debe terminar en FM o AM (ej: 107.3 FM).'],
+      ['correo',            'El correo electrónico del contacto tiene un formato inválido.'],
+      ['telefono',          'El teléfono tiene un formato incorrecto. Debe incluir código de área y exactamente 7 dígitos.'],
+      ['contacto',          'Los datos del contacto están incompletos. Verifique nombre y apellido.'],
       ['duplicate',         'Ya existe un aliado con esos datos. Verifique el RIF o la razón social.'],
       ['unique',            'Dato duplicado. Ya existe un aliado comercial con esa información.'],
-      ['razon_social',      'La razón social del aliado es obligatoria.'],
-      ['nombre_emisora',    'El nombre de la emisora es un campo obligatorio.'],
-      ['fk_categoria',      'Debe seleccionar una categoría para el aliado comercial.'],
-      ['contacto',          'Los datos del contacto están incompletos. Verifique nombre y apellido.'],
-      ['telefono',          'El teléfono tiene un formato incorrecto. Debe incluir código de área y 7 dígitos.'],
     ],
     fallback: 'Error al procesar la solicitud del aliado comercial. Revise los datos e intente nuevamente.',
   },
@@ -80,21 +89,26 @@ const ERROR_DICTIONARY = {
   // ─── Pautas ────────────────────────────────────────────
   pautas: {
     byStatus: {
-      400: 'Faltan campos obligatorios para registrar la pauta. Revise el formulario.',
+      400: 'Datos inválidos. Revise el formulario antes de continuar.',
       404: 'No se encontró la pauta solicitada.',
       409: 'Ya existe una pauta con datos similares para ese período.',
       500: 'Error interno al registrar la pauta. Intente nuevamente.',
     },
     byKeyword: [
-      ['fecha',             'Las fechas de la pauta son inválidas. Verifique que la fecha de inicio sea anterior a la de fin.'],
-      ['disponibilidad',    'No hay disponibilidad en las emisoras seleccionadas para ese período.'],
-      ['monto',             'El monto de la orden de compra es obligatorio y debe ser un número válido.'],
-      ['fk_cliente',        'Debe seleccionar un cliente asociado a esta pauta.'],
-      ['fk_vendedor',       'Debe seleccionar el vendedor responsable de esta pauta.'],
-      ['fk_marca',          'Debe seleccionar la marca asociada a esta pauta.'],
-      ['emisora',           'Debe seleccionar al menos una emisora para la pauta.'],
-      ['coordinadora',      'Debe seleccionar una coordinadora para esta pauta.'],
-      ['cuña',              'Los datos de la cuña están incompletos. Verifique duración y mensaje.'],
+      ['monto ot debe ser mayor',     'El monto OT debe ser mayor al monto OC.'],
+      ['monto oc',                    'El monto OC debe ser un valor positivo mayor a cero.'],
+      ['monto ot',                    'El monto OT debe ser un valor positivo mayor a cero.'],
+      ['fecha de inicio de la cuña',  'La fecha de inicio de la cuña debe ser igual o posterior a la fecha de emisión.'],
+      ['fecha',                       'Las fechas de la pauta son inválidas. Verifique que la fecha de inicio sea anterior a la de fin.'],
+      ['costo',                       'El costo por cuña debe ser un valor positivo.'],
+      ['disponibilidad',              'No hay disponibilidad en las emisoras seleccionadas para ese período.'],
+      ['monto',                       'El monto es obligatorio y debe ser un número válido y positivo.'],
+      ['fk_cliente',                  'Debe seleccionar un cliente asociado a esta pauta.'],
+      ['fk_vendedor',                 'Debe seleccionar el vendedor responsable de esta pauta.'],
+      ['fk_marca',                    'Debe seleccionar la marca asociada a esta pauta.'],
+      ['emisora',                     'Debe seleccionar al menos una emisora para la pauta.'],
+      ['coordinadora',                'Debe seleccionar una coordinadora para esta pauta.'],
+      ['cuña',                        'Los datos de la cuña están incompletos. Verifique duración y mensaje.'],
     ],
     fallback: 'Error al procesar la pauta. Revise todos los campos e intente nuevamente.',
   },
@@ -102,32 +116,37 @@ const ERROR_DICTIONARY = {
   // ─── Vendedores ────────────────────────────────────────
   vendedores: {
     byStatus: {
-      400: 'Faltan campos obligatorios para registrar el vendedor.',
+      400: 'Datos inválidos. Revise el formulario antes de continuar.',
       403: 'No tiene permisos para registrar vendedores.',
       404: 'El vendedor solicitado no fue encontrado.',
       409: 'Ya existe un vendedor con ese correo o nombre de usuario.',
       500: 'Error interno al registrar el vendedor.',
     },
     byKeyword: [
-      ['correo',            'El correo electrónico ya está registrado o tiene un formato inválido.'],
+      ['nombre de usuario ya está en uso',  'El nombre de usuario ya está en uso. Elija uno diferente.'],
+      ['correo electrónico ya está registrado', 'El correo electrónico ya está registrado. Use uno diferente.'],
       ['nombre_usuario',    'El nombre de usuario ya se encuentra registrado en el sistema.'],
+      ['correo',            'El correo electrónico ya está registrado o tiene un formato inválido.'],
+      ['meta anual',        'La meta anual no puede ser un número negativo.'],
+      ['meta',              'La meta de ventas debe ser un valor numérico positivo válido.'],
+      ['teléfono',          'El teléfono tiene un formato incorrecto. Debe incluir código de área y exactamente 7 dígitos.'],
       ['duplicate',         'Ya existe un vendedor con los mismos datos de acceso.'],
       ['unique',            'Dato duplicado: el correo o nombre de usuario ya existe.'],
       ['password',          'La contraseña es obligatoria y debe cumplir los requisitos de seguridad.'],
-      ['meta',              'La meta de ventas debe ser un valor numérico válido.'],
     ],
     fallback: 'Error al procesar la solicitud del vendedor. Revise los datos e intente nuevamente.',
   },
 
-  // ─── Actividad Comercial (Visitas / Gastos) ────────────
+  // ─── Actividad Comercial / Gastos ──────────────────────
   actividad: {
     byStatus: {
-      400: 'Faltan campos obligatorios. Revise el formulario antes de enviar.',
+      400: 'Datos inválidos. Revise el formulario antes de enviar.',
       404: 'No se encontró el registro solicitado.',
       500: 'Error interno al guardar la actividad comercial.',
     },
     byKeyword: [
-      ['monto',             'El monto ingresado no es válido. Debe ser un número positivo.'],
+      ['monto del gasto debe ser',  'El monto del gasto debe ser un número positivo mayor a cero.'],
+      ['monto',             'El monto ingresado no es válido. Debe ser un número positivo mayor a cero.'],
       ['fecha',             'La fecha es obligatoria y debe tener un formato válido.'],
       ['fk_contacto',       'Debe seleccionar el contacto asociado a esta visita.'],
       ['fk_vendedor',       'Debe seleccionar el vendedor responsable.'],
@@ -136,6 +155,22 @@ const ERROR_DICTIONARY = {
       ['permiso',           'No tiene permisos para realizar esta operación.'],
     ],
     fallback: 'Error al registrar la actividad comercial. Revise los datos e intente nuevamente.',
+  },
+
+  // ─── Gastos (módulo separado de marketing) ─────────────
+  gastos: {
+    byStatus: {
+      400: 'Datos inválidos. Revise el formulario antes de enviar.',
+      404: 'No se encontró el gasto solicitado.',
+      500: 'Error interno al guardar el gasto.',
+    },
+    byKeyword: [
+      ['monto del gasto debe ser',  'El monto del gasto debe ser un número positivo mayor a cero.'],
+      ['monto',             'El monto ingresado debe ser un valor positivo mayor a cero.'],
+      ['concepto',          'El concepto del gasto es obligatorio.'],
+      ['fecha',             'La fecha del gasto es obligatoria.'],
+    ],
+    fallback: 'Error al registrar el gasto. Revise los datos e intente nuevamente.',
   },
 
   // ─── General (fallback global) ─────────────────────────

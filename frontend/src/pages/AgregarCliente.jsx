@@ -169,21 +169,78 @@ export default function AgregarCliente() {
   };
   const removeMarca = (i) => setMarcas(marcas.filter((_, idx) => idx !== i));
 
+  // ── Validaciones locales antes del submit ──────────────────────────────
+  const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+  const RIF_RE   = /^[JGVP]\d{9}$/;
+  const PHONE_RE = /^\d{7}$/;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    setLoading(true);
 
+    // ── Campos obligatorios del cliente ───────────────────
+    if (!cliente.nombre?.trim())
+      return setError('El nombre comercial del cliente es obligatorio.');
+    if (!cliente.razon_social?.trim())
+      return setError('La razón social del cliente es obligatoria.');
+    if (!cliente.rif_fiscal?.trim())
+      return setError('El RIF fiscal es obligatorio.');
+    if (!RIF_RE.test(cliente.rif_fiscal))
+      return setError('El RIF debe comenzar con J, G, V o P seguido de exactamente 9 dígitos (ej: J123456789).');
+    if (!cliente.fk_lugar)
+      return setError('Debe seleccionar la ubicación (estado) del cliente.');
+    if (!cliente.clasificacion)
+      return setError('Debe seleccionar la clasificación del cliente.');
+    if (cliente.clasificacion === 'Agencia' && !cliente.nombre_agencia?.trim())
+      return setError('El nombre de la agencia es obligatorio cuando la clasificación es Agencia.');
+    if (!cliente.sector)
+      return setError('Debe seleccionar el sector del cliente.');
+    if (!cliente.fk_vendedor)
+      return setError('Debe seleccionar un vendedor asignado.');
+
+    // ── Validación de contactos ───────────────────────────
+    const contactosActivos = contactos.filter(c => c.pri_nombre);
+    for (let i = 0; i < contactosActivos.length; i++) {
+      const c = contactosActivos[i];
+      const label = `Contacto ${i + 1}`;
+      if (!c.pri_nombre?.trim())
+        return setError(`${label}: el primer nombre es obligatorio.`);
+      if (!c.pri_apellido?.trim())
+        return setError(`${label}: el primer apellido es obligatorio.`);
+      if (!c.departamento?.trim())
+        return setError(`${label}: el departamento es obligatorio.`);
+      if (!c.rol?.trim())
+        return setError(`${label}: el rol es obligatorio.`);
+      if (c.correo && !EMAIL_RE.test(c.correo))
+        return setError(`${label}: el correo "${c.correo}" no es válido (ej: nombre@dominio.com).`);
+    }
+
+    // ── Validación de teléfonos ───────────────────────────
+    const telsFiltrados = telefonos.filter(t => t.codigo_area || t.numero);
+    if (telsFiltrados.length === 0)
+      return setError('Debe agregar al menos un teléfono con código de área y número completo.');
+    for (let i = 0; i < telefonos.length; i++) {
+      const t = telefonos[i];
+      if (t.codigo_area || t.numero) {
+        if (!t.codigo_area)
+          return setError(`Teléfono ${i + 1}: seleccione el código de área.`);
+        if (!PHONE_RE.test(t.numero))
+          return setError(`Teléfono ${i + 1}: el número debe tener exactamente 7 dígitos.`);
+      }
+    }
+
+    setLoading(true);
     try {
       const payload = {
         cliente: {
           ...cliente,
+          rif_fiscal: cliente.rif_fiscal.toUpperCase(),
           fk_cliente_padre: isSubEmpresa ? (cliente.fk_cliente_padre || null) : null,
           nombre_agencia: cliente.clasificacion === 'Agencia' ? cliente.nombre_agencia : null,
           fk_lugar: parseInt(cliente.fk_lugar, 10) || null,
         },
-        contactos: contactos.filter(c => c.pri_nombre),
+        contactos: contactosActivos,
         telefonos: telefonos.filter(t => t.codigo_area && t.numero),
         marcas: marcas.filter(m => m.nombre),
         negociacion: negociacion.monto_negociacion && negociacion.fecha_inicio

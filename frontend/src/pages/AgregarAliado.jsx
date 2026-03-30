@@ -18,6 +18,19 @@ function AgregarAliado() {
   const [rif, setRif] = useState('');
   const [rifError, setRifError] = useState('');
 
+  // Frecuencia controlada (debe terminar en FM o AM)
+  const [frecuencia, setFrecuencia] = useState('');
+  const [frecuenciaError, setFrecuenciaError] = useState('');
+
+  const handleFrecuenciaChange = (val) => {
+    setFrecuencia(val);
+    if (val && !/\b(FM|AM)$/i.test(val.trim())) {
+      setFrecuenciaError('La frecuencia debe terminar en FM o AM (ej: 107.3 FM)');
+    } else {
+      setFrecuenciaError('');
+    }
+  };
+
   const handleRifChange = (rawValue) => {
     // Normalizar: quitar guiones y espacios
     let val = rawValue.replace(/-/g, '').replace(/\s/g, '');
@@ -128,29 +141,63 @@ function AgregarAliado() {
     fetchCiudades();
   }, [selectedEstado]);
 
+  const EMAIL_RE_ALIADO = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+  const PHONE_RE_ALIADO = /^\d{7}$/;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validar RIF antes de enviar
-    if (!rif || rif.length < 2 || rif.slice(1).replace(/\D/g, '').length !== 9) {
+    // ── Validar RIF ──────────────────────────────────────
+    if (!rif || rif.slice(1).replace(/\D/g, '').length !== 9) {
       setRifError('El RIF debe tener la letra (J/G/V/P) + exactamente 9 dígitos');
       return;
+    }
+
+    // ── Validar Frecuencia ───────────────────────────────
+    if (!frecuencia?.trim()) {
+      setFrecuenciaError('La frecuencia es obligatoria.');
+      return;
+    }
+    if (!/\b(FM|AM)$/i.test(frecuencia.trim())) {
+      setFrecuenciaError('La frecuencia debe terminar en FM o AM (ej: 107.3 FM)');
+      return;
+    }
+
+    // ── Validar correos de contactos ─────────────────────
+    const contactosActivos = contactos.filter(c => c.primer_nombre && c.primer_apellido);
+    for (let i = 0; i < contactosActivos.length; i++) {
+      const c = contactosActivos[i];
+      const label = `Contacto ${i + 1}`;
+      if (c.correo && !EMAIL_RE_ALIADO.test(c.correo))
+        return setError(`${label}: el correo "${c.correo}" no tiene un formato válido (ej: nombre@dominio.com).`);
+    }
+
+    // ── Validar teléfonos ────────────────────────────────
+    if (!telefonos.some(t => t.codigo_area && t.numero))
+      return setError('Debe agregar al menos un teléfono con código de área y número completo.');
+    for (let i = 0; i < telefonos.length; i++) {
+      const t = telefonos[i];
+      if (t.codigo_area || t.numero) {
+        if (!t.codigo_area)
+          return setError(`Teléfono ${i + 1}: seleccione el código de área.`);
+        if (!PHONE_RE_ALIADO.test(t.numero))
+          return setError(`Teléfono ${i + 1}: el número debe tener exactamente 7 dígitos numéricos.`);
+      }
     }
 
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
 
-    // Adaptar data para backend
     const payload = {
       ...data,
-      rif,                                                  // usar el estado controlado
+      rif,
+      frecuencia: frecuencia.trim().toUpperCase(),
       fk_lugar: parseInt(data.lugar, 10) || null,
       fk_region: parseInt(data.region, 10) || null,
       fk_cobertura: parseInt(data.cobertura, 10) || null,
-      contactos: contactos.filter(c => c.primer_nombre && c.primer_apellido),
-      telefonos: telefonos.filter(t => t.codigo_area && t.numero.length === 7)
+      contactos: contactosActivos,
+      telefonos: telefonos.filter(t => t.codigo_area && PHONE_RE_ALIADO.test(t.numero))
     };
-
 
     try {
       setError('');
@@ -215,7 +262,16 @@ function AgregarAliado() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Frecuencia<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="frecuencia" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: 107.3 FM" type="text" />
+                <input
+                  name="frecuencia"
+                  required
+                  value={frecuencia}
+                  onChange={(e) => handleFrecuenciaChange(e.target.value)}
+                  className={`w-full rounded-lg bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary ${frecuenciaError ? 'border-red-400 ring-1 ring-red-400' : 'border-slate-200'}`}
+                  placeholder="Ej: 107.3 FM"
+                  type="text"
+                />
+                {frecuenciaError && <p className="text-xs text-red-500 mt-1">{frecuenciaError}</p>}
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Categoría<span className="text-red-500 ml-0.5">*</span></label>

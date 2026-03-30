@@ -8,11 +8,45 @@ import * as VendedorModel from '../model/vendedor.model.js';
 import * as TelefonoModel from '../model/telefono.model.js';
 
 const SALT_ROUNDS = 12;
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+const PHONE_REGEX = /^\d{7}$/;
+
+// ─── Helpers de validación ────────────────────────────────
+function validarVendedor(usuario, vendedor) {
+  const errores = [];
+  if (!usuario.primer_nombre?.trim())  errores.push('El primer nombre es obligatorio.');
+  if (!usuario.primer_apellido?.trim()) errores.push('El primer apellido es obligatorio.');
+  if (!usuario.correo?.trim())          errores.push('El correo electrónico es obligatorio.');
+  if (usuario.correo && !EMAIL_REGEX.test(usuario.correo))
+    errores.push('El correo electrónico no tiene un formato válido (ej: vendedor@empresa.com).');
+  if (!usuario.nombre_usuario?.trim())  errores.push('El nombre de usuario es obligatorio.');
+  if (!usuario.password?.trim())        errores.push('La contraseña es obligatoria.');
+
+  const meta = parseFloat(vendedor?.meta ?? '');
+  if (isNaN(meta) || meta < 0)
+    errores.push('La meta anual no puede ser un número negativo.');
+
+  return errores;
+}
+
+function validarTelefonos(telefonos) {
+  const errores = [];
+  if (!telefonos || telefonos.length === 0) return errores; // teléfonos opcionales en vendedor
+  telefonos.forEach((t, i) => {
+    if (t.codigo_area || t.numero) {
+      if (!t.codigo_area)
+        errores.push(`Teléfono ${i + 1}: falta el código de área.`);
+      if (!t.numero || !PHONE_REGEX.test(t.numero))
+        errores.push(`Teléfono ${i + 1}: el número debe tener exactamente 7 dígitos numéricos.`);
+    }
+  });
+  return errores;
+}
+
+// ─── Controladores ────────────────────────────────────────
 
 /**
  * GET /api/vendedores
- * Datos públicos de todos los vendedores + KPIs.
- * Accesible por: Admin, Director, Vendedor.
  */
 export const getAll = async (req, res, next) => {
   try {
@@ -40,7 +74,6 @@ export const getAll = async (req, res, next) => {
 
 /**
  * GET /api/vendedores/directores
- * Lista de directores para select de "jefe vendedor".
  */
 export const getDirectores = async (req, res, next) => {
   try {
@@ -53,17 +86,13 @@ export const getDirectores = async (req, res, next) => {
 
 /**
  * GET /api/vendedores/:id
- * Detalle completo de un vendedor.
- * RBAC en controller:
- *   - Admin/Director → siempre permitido
- *   - Vendedor → solo si req.params.id === req.user.id
+ * RBAC: Vendedor solo puede ver su propio perfil
  */
 export const getById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { rol, id: userId } = req.user;
 
-    // RBAC: Vendedor solo puede ver su propio perfil
     if (rol === 'Vendedor' && id !== userId) {
       return res.status(403).json({
         success: false,
@@ -72,12 +101,8 @@ export const getById = async (req, res, next) => {
     }
 
     const vendedor = await VendedorModel.findById(id);
-
     if (!vendedor) {
-      return res.status(404).json({
-        success: false,
-        error: 'Vendedor no encontrado',
-      });
+      return res.status(404).json({ success: false, error: 'Vendedor no encontrado' });
     }
 
     return res.json({ success: true, data: vendedor });
@@ -89,14 +114,6 @@ export const getById = async (req, res, next) => {
 /**
  * POST /api/vendedores
  * Transacción atómica: USUARIO → VENDEDOR → TELEFONOS
- * Solo Admin.
- *
- * Body esperado:
- * {
- *   usuario: { primer_nombre, primer_apellido, correo, nombre_usuario, password, rol, estado },
- *   vendedor: { meta, tipo, fk_vendedor_jefe? },
- *   telefonos: [{ codigo_area, numero }]
- * }
  */
 export const create = async (req, res, next) => {
   const client = await pool.connect();
@@ -106,24 +123,35 @@ export const create = async (req, res, next) => {
 
     const { usuario, vendedor, telefonos } = req.body;
 
-    // Hash de la contraseña
+    // ── Validaciones de negocio ──────────────────────────
+    const errores = [
+      ...validarVendedor(usuario || {}, vendedor || {}),
+      ...validarTelefonos(telefonos || []),
+    ];
+    if (errores.length > 0) {
+      await client.query('ROLLBACK');
+      client.release();
+      return res.status(400).json({ success: false, error: errores[0] });
+    }
+
+    // ── Hash de contraseña ───────────────────────────────
     const password_hash = await bcrypt.hash(usuario.password, SALT_ROUNDS);
 
-    // 1. Crear USUARIO + VENDEDOR
+    // ── 1. Crear USUARIO + VENDEDOR ──────────────────────
     const newVendedor = await VendedorModel.create(
       { ...usuario, password_hash },
       vendedor,
       client
     );
 
-    // 2. Crear teléfonos (fk_contacto = null para vendedores)
+    // ── 2. Crear teléfonos ───────────────────────────────
     let newTelefonos = [];
     if (telefonos && telefonos.length > 0) {
       const validTels = telefonos.filter(t => t.codigo_area && t.numero);
       if (validTels.length > 0) {
         newTelefonos = await TelefonoModel.createBatch(
-          null,           // fk_contacto = null (vendedor directo)
-          newVendedor.id, // fk_usuario
+          null,
+          newVendedor.id,
           validTels,
           client
         );
@@ -134,10 +162,7 @@ export const create = async (req, res, next) => {
 
     return res.status(201).json({
       success: true,
-      data: {
-        ...newVendedor,
-        telefonos: newTelefonos,
-      },
+      data: { ...newVendedor, telefonos: newTelefonos },
     });
   } catch (err) {
     await client.query('ROLLBACK');

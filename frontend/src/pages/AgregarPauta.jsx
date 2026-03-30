@@ -148,19 +148,58 @@ export default function AgregarPauta() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    
+
+    // ── Validaciones de negocio ────────────────────────────
     if (emisorasAsoc.length === 0) {
       toast.error('Debe agregar al menos una emisora asociada.');
       return;
     }
 
-    if (new Date(fechaInicio) > new Date(fechaFin)) {
-      toast.error('La fecha de inicio no puede ser posterior a la fecha de fin.');
+    if (!fechaEmision) {
+      toast.error('La fecha de emisión de la pauta es obligatoria.');
       return;
     }
 
-    if (Number(cantidadCunas) <= 0 || Number(costoCuna) <= 0 || Number(montoOC) <= 0 || Number(montoOT) <= 0) {
-      toast.error('Todos los montos y cantidades deben ser mayores a cero.');
+    if (!fechaInicio || !fechaFin) {
+      toast.error('Las fechas de inicio y fin de las cuñas son obligatorias.');
+      return;
+    }
+
+    // Fecha inicio cuña debe ser >= fecha de emisión de la pauta
+    if (new Date(fechaInicio) < new Date(fechaEmision)) {
+      toast.error('La fecha de inicio de la cuña debe ser igual o posterior a la fecha de emisión de la pauta.');
+      return;
+    }
+
+    // Fecha inicio debe ser antes que fecha fin
+    if (new Date(fechaInicio) > new Date(fechaFin)) {
+      toast.error('La fecha de inicio no puede ser posterior a la fecha de fin de la cuña.');
+      return;
+    }
+
+    // Montos positivos
+    if (Number(montoOC) <= 0) {
+      toast.error('El monto OC debe ser un valor positivo mayor a cero.');
+      return;
+    }
+    if (Number(montoOT) <= 0) {
+      toast.error('El monto OT debe ser un valor positivo mayor a cero.');
+      return;
+    }
+
+    // Monto OT debe ser mayor al monto OC
+    if (Number(montoOT) <= Number(montoOC)) {
+      toast.error('El monto OT debe ser mayor al monto OC.');
+      return;
+    }
+
+    // Cantidad de cuñas y costo por cuña positivos
+    if (Number(cantidadCunas) <= 0) {
+      toast.error('La cantidad de cuñas debe ser mayor a cero.');
+      return;
+    }
+    if (Number(costoCuna) <= 0) {
+      toast.error('El costo por cuña debe ser un valor positivo mayor a cero.');
       return;
     }
 

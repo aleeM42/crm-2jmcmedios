@@ -72,25 +72,39 @@ export default function AgregarVendedor() {
     setError('');
     setSuccess('');
 
-    // Validación estricta de correo electrónico
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(formData.correo)) {
-      setError('Por favor ingresa un correo electrónico válido. Ej: vendedor@2jmcmedios.com');
-      return;
-    }
+    // ── Validaciones locales ─────────────────────────────
+    const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+    const PHONE_RE = /^\d{7}$/;
 
-    // Validación estricta de teléfonos (código área elegido y 7 dígitos numéricos)
-    for (const tel of formData.telefonos) {
+    if (!formData.primer_nombre?.trim())
+      return setError('El primer nombre es obligatorio.');
+    if (!formData.primer_apellido?.trim())
+      return setError('El primer apellido es obligatorio.');
+    if (!formData.correo?.trim())
+      return setError('El correo electrónico es obligatorio.');
+    if (!EMAIL_RE.test(formData.correo))
+      return setError('El correo electrónico no tiene un formato válido. Ej: vendedor@empresa.com');
+    if (!formData.nombre_usuario?.trim())
+      return setError('El nombre de usuario es obligatorio.');
+    if (!formData.password?.trim())
+      return setError('La contraseña es obligatoria.');
+
+    const metaNum = parseFloat(formData.meta);
+    if (formData.meta !== '' && (isNaN(metaNum) || metaNum < 0))
+      return setError('La meta anual no puede ser un número negativo.');
+
+    // Teléfonos: todos los que se hayan iniciado deben estar completos
+    for (let i = 0; i < formData.telefonos.length; i++) {
+      const tel = formData.telefonos[i];
       if (tel.codigo_area || tel.numero) {
-        if (!tel.codigo_area || tel.numero.length !== 7) {
-          setError('Cada teléfono ingresado debe tener su código de área seleccionado y un número de exactamente 7 dígitos.');
-          return;
-        }
+        if (!tel.codigo_area)
+          return setError(`Teléfono ${i + 1}: debe seleccionar el código de área.`);
+        if (!PHONE_RE.test(tel.numero))
+          return setError(`Teléfono ${i + 1}: el número debe tener exactamente 7 dígitos.`);
       }
     }
 
     setLoading(true);
-
     try {
       const payload = {
         usuario: {
@@ -99,7 +113,7 @@ export default function AgregarVendedor() {
           correo: formData.correo,
           nombre_usuario: formData.nombre_usuario,
           password: formData.password,
-          rol: formData.tipo, // Infiere el rol directo del tipo de la tabla vendedor
+          rol: formData.tipo,
           estado: formData.estado,
         },
         vendedor: {

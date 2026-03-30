@@ -46,6 +46,13 @@ export const create = async (req, res, next) => {
         error: 'fecha, concepto, monto, categoria y fk_visita son obligatorios',
       });
     }
+    const montoNum = parseFloat(monto);
+    if (isNaN(montoNum) || montoNum <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'El monto del gasto debe ser un número positivo mayor a cero.',
+      });
+    }
     const gasto = await GastoModel.create(req.body);
     res.status(201).json({ success: true, data: gasto });
   } catch (err) {

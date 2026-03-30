@@ -8,10 +8,60 @@ import * as ContactoModel from '../model/contacto.model.js';
 import * as MarcaModel from '../model/marca.model.js';
 import * as TelefonoModel from '../model/telefono.model.js';
 
+// ─── Helpers de validación ────────────────────────────────
+const RIF_REGEX    = /^[JGVP]\d{9}$/;
+const EMAIL_REGEX  = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+const PHONE_REGEX  = /^\d{7}$/;
+
+function validarCliente(data) {
+  const errores = [];
+  if (!data.nombre?.trim())       errores.push('El nombre comercial del cliente es obligatorio.');
+  if (!data.razon_social?.trim()) errores.push('La razón social es obligatoria.');
+  if (!data.rif_fiscal?.trim())   errores.push('El RIF fiscal es obligatorio.');
+  if (data.rif_fiscal && !RIF_REGEX.test(data.rif_fiscal))
+    errores.push('El RIF fiscal debe comenzar con J, G, V o P seguido de exactamente 9 dígitos (ej: J123456789).');
+  if (!data.fk_lugar)    errores.push('Debe seleccionar la ubicación (estado) del cliente.');
+  if (!data.clasificacion?.trim()) errores.push('La clasificación del cliente es obligatoria.');
+  if (!data.sector?.trim())        errores.push('El sector del cliente es obligatorio.');
+  if (data.clasificacion === 'Agencia' && !data.nombre_agencia?.trim())
+    errores.push('El nombre de la agencia es obligatorio cuando la clasificación es Agencia.');
+  return errores;
+}
+
+function validarContacto(c, idx) {
+  const errores = [];
+  const label = `Contacto ${idx + 1}`;
+  if (!c.pri_nombre?.trim())    errores.push(`${label}: el primer nombre es obligatorio.`);
+  if (!c.pri_apellido?.trim())  errores.push(`${label}: el primer apellido es obligatorio.`);
+  if (!c.departamento?.trim())  errores.push(`${label}: el departamento es obligatorio.`);
+  if (!c.rol?.trim())           errores.push(`${label}: el rol es obligatorio.`);
+  if (c.correo && !EMAIL_REGEX.test(c.correo))
+    errores.push(`${label}: el correo electrónico no tiene un formato válido (ej: nombre@dominio.com).`);
+  return errores;
+}
+
+function validarTelefonos(telefonos) {
+  const errores = [];
+  if (!telefonos || telefonos.length === 0)
+    return ['Debe agregar al menos un número de teléfono con código de área y 7 dígitos.'];
+  const validos = telefonos.filter(t => t.codigo_area && t.numero);
+  if (validos.length === 0)
+    return ['Debe agregar al menos un número de teléfono con código de área y 7 dígitos.'];
+  telefonos.forEach((t, i) => {
+    if (t.codigo_area || t.numero) {
+      if (!t.codigo_area) errores.push(`Teléfono ${i + 1}: falta el código de área.`);
+      if (!t.numero || !PHONE_REGEX.test(t.numero))
+        errores.push(`Teléfono ${i + 1}: el número debe tener exactamente 7 dígitos numéricos.`);
+    }
+  });
+  return errores;
+}
+
+// ─── Controladores ────────────────────────────────────────
+
 /**
  * GET /api/clientes
  * Query params: sector, estado, clasificacion, search, page, limit
- * Retorna lista paginada + KPIs.
  */
 export const getAll = async (req, res, next) => {
   try {
@@ -24,7 +74,6 @@ export const getAll = async (req, res, next) => {
       limit: req.query.limit,
     };
 
-    // RBAC: vendedor solo ve sus clientes
     const vendedorId = req.user.rol === 'Vendedor' ? req.user.id : null;
 
     const [result, kpis] = await Promise.all([
@@ -56,19 +105,13 @@ export const getAll = async (req, res, next) => {
 
 /**
  * GET /api/clientes/:id
- * Detalle completo: cliente + sub-empresas + marcas + contactos + teléfonos.
  */
 export const getById = async (req, res, next) => {
   try {
     const cliente = await ClienteModel.findById(req.params.id);
-
     if (!cliente) {
-      return res.status(404).json({
-        success: false,
-        error: 'Cliente no encontrado',
-      });
+      return res.status(404).json({ success: false, error: 'Cliente no encontrado' });
     }
-
     return res.json({ success: true, data: cliente });
   } catch (err) {
     next(err);
@@ -77,7 +120,6 @@ export const getById = async (req, res, next) => {
 
 /**
  * GET /api/clientes/empresas
- * Lista empresas disponibles para select de sub-empresas.
  */
 export const getEmpresas = async (req, res, next) => {
   try {
@@ -90,7 +132,6 @@ export const getEmpresas = async (req, res, next) => {
 
 /**
  * GET /api/clientes/:id/marcas
- * Retorna las marcas (MARCA_INTER) asociadas a un cliente.
  */
 export const getMarcasByCliente = async (req, res, next) => {
   try {
@@ -104,14 +145,6 @@ export const getMarcasByCliente = async (req, res, next) => {
 /**
  * POST /api/clientes
  * Transacción atómica: CLIENTE → MARCAS → CONTACTO → TELEFONOS
- *
- * Body esperado:
- * {
- *   cliente: { nombre, razon_social, tipo, direccion, rif_fiscal, ... },
- *   contacto: { pri_nombre, pri_apellido, departamento, correo, rol, tipo },
- *   telefonos: [{ codigo_area, numero }],
- *   marcas: [{ nombre, observaciones? }]
- * }
  */
 export const create = async (req, res, next) => {
   const client = await pool.connect();
@@ -121,86 +154,91 @@ export const create = async (req, res, next) => {
 
     const { cliente, contacto, contactos, telefonos, marcas } = req.body;
 
-    // 1. Crear cliente
+    // ── Validaciones de negocio ──────────────────────────
+    const errCliente = validarCliente(cliente || {});
+    if (errCliente.length > 0) {
+      await client.query('ROLLBACK');
+      client.release();
+      return res.status(400).json({ success: false, error: errCliente[0] });
+    }
+
+    // Normalizar RIF a mayúsculas
+    if (cliente.rif_fiscal) cliente.rif_fiscal = cliente.rif_fiscal.toUpperCase();
+
+    const reqContactos = contactos && Array.isArray(contactos)
+      ? contactos
+      : (contacto ? [contacto] : []);
+
+    const contactosActivos = reqContactos.filter(c => c.pri_nombre);
+
+    for (let i = 0; i < contactosActivos.length; i++) {
+      const errC = validarContacto(contactosActivos[i], i);
+      if (errC.length > 0) {
+        await client.query('ROLLBACK');
+        client.release();
+        return res.status(400).json({ success: false, error: errC[0] });
+      }
+    }
+
+    const errTel = validarTelefonos(telefonos);
+    if (errTel.length > 0) {
+      await client.query('ROLLBACK');
+      client.release();
+      return res.status(400).json({ success: false, error: errTel[0] });
+    }
+
+    // ── 1. Crear cliente ─────────────────────────────────
     const newCliente = await ClienteModel.create(cliente, client);
 
-    // 2. Crear marcas asociadas
+    // ── 2. Crear marcas ──────────────────────────────────
     let newMarcas = [];
     if (marcas && marcas.length > 0) {
       newMarcas = await MarcaModel.createBatch(newCliente.id, marcas, client);
     }
 
-    // 3. Crear contactos
+    // ── 3. Crear contactos y teléfonos ───────────────────
     let insertedContactos = [];
     let newTelefonos = [];
-    
-    // Soportar tanto "contactos" (array) como "contacto" (objeto) para compatibilidad
-    const reqContactos = contactos && Array.isArray(contactos) ? contactos : (contacto ? [contacto] : []);
 
-    for (let i = 0; i < reqContactos.length; i++) {
-      const cData = reqContactos[i];
-      if (cData.pri_nombre) {
-        cData.fk_cliente = newCliente.id;
-        const insertedC = await ContactoModel.create(cData, client);
+    for (let i = 0; i < contactosActivos.length; i++) {
+      const cData = { ...contactosActivos[i], fk_cliente: newCliente.id };
+      const insertedC = await ContactoModel.create(cData, client);
 
-        // 4. Crear teléfonos asociados al contacto principal (el primero)
-        if (i === 0 && telefonos && telefonos.length > 0) {
-          newTelefonos = await TelefonoModel.createBatch(
-            insertedC.id,
-            req.user.id, // usuario autenticado
-            telefonos,
-            client
-          );
-          insertedC.telefonos = newTelefonos;
-        } else {
-          insertedC.telefonos = [];
-        }
-        insertedContactos.push(insertedC);
+      if (i === 0 && telefonos && telefonos.length > 0) {
+        const validTels = telefonos.filter(t => t.codigo_area && t.numero);
+        newTelefonos = await TelefonoModel.createBatch(
+          insertedC.id,
+          req.user.id,
+          validTels,
+          client
+        );
+        insertedC.telefonos = newTelefonos;
+      } else {
+        insertedC.telefonos = [];
       }
+      insertedContactos.push(insertedC);
     }
 
-    // 5. Crear registro de negociación (si viene en el payload)
+    // ── 4. Negociación opcional ──────────────────────────
     const { negociacion } = req.body;
     if (negociacion && negociacion.monto_negociacion && negociacion.fecha_inicio) {
-      const negQuery = `
-        INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, fk_cliente)
-        VALUES ($1, $2, $3, $4)
-      `;
-      await client.query(negQuery, [
-        negociacion.fecha_inicio,
-        negociacion.fecha_fin || null,
-        negociacion.monto_negociacion,
-        newCliente.id,
-      ]);
+      await client.query(
+        `INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, fk_cliente)
+         VALUES ($1, $2, $3, $4)`,
+        [negociacion.fecha_inicio, negociacion.fecha_fin || null, negociacion.monto_negociacion, newCliente.id]
+      );
     }
 
     await client.query('COMMIT');
 
     return res.status(201).json({
       success: true,
-      data: {
-        ...newCliente,
-        marcas: newMarcas,
-        contactos: insertedContactos,
-      },
+      data: { ...newCliente, marcas: newMarcas, contactos: insertedContactos },
     });
   } catch (err) {
     await client.query('ROLLBACK');
-    // LOG DETALLADO para diagnóstico de errores 500
-    console.error('❌ [create cliente] ERROR:', err.message);
-    console.error('   → Code:', err.code);
-    console.error('   → Detail:', err.detail);
-    console.error('   → Table:', err.table);
-    console.error('   → Constraint:', err.constraint);
-    console.error('   → Hint:', err.hint);
-    console.error('   → Stack:', err.stack);
-    // Devolver mensaje de error legible al cliente (en lugar de generic 500)
-    return res.status(500).json({
-      success: false,
-      error: err.message,
-      detail: err.detail || null,
-      code: err.code || null,
-    });
+    console.error('❌ [create cliente] ERROR:', err.message, '| Code:', err.code, '| Detail:', err.detail);
+    next(err);
   } finally {
     client.release();
   }

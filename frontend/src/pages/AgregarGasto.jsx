@@ -64,13 +64,19 @@ export default function AgregarGasto() {
     e.preventDefault();
     setError('');
     setSuccess('');
-    setLoading(true);
 
+    // ── Validaciones locales ─────────────────────────────
+    const montoNum = parseFloat(formData.monto);
+    if (!formData.monto || isNaN(montoNum) || montoNum <= 0) {
+      return setError('El monto del gasto debe ser un número positivo mayor a cero.');
+    }
+
+    setLoading(true);
     try {
       const payload = {
         fecha: formData.fecha,
         concepto: formData.concepto,
-        monto: parseFloat(formData.monto),
+        monto: montoNum,
         tipo: formData.tipo,
         fk_cliente: asociarA === 'cliente' ? (parseInt(fkCliente, 10) || null) : null,
         fk_aliado_c: asociarA === 'aliado' ? (parseInt(fkAliado, 10) || null) : null,
