@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getClientes } from '../services/cliente.service.js';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 function getInitials(nombre) {
   return nombre.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -37,7 +38,7 @@ export default function Clientes() {
         setPagination(result.data.pagination);
       }
     } catch (err) {
-      setError(err.message || 'Error al cargar clientes');
+      setError(resolveErrorMessage(err, 'clientes'));
     } finally {
       setLoading(false);
     }

@@ -1,8 +1,10 @@
 // ==============================================
-// Login.jsx — Pantalla de Inicio de Sesión (conectada al backend)
+// Login.jsx — Pantalla de Login CRM Vortice
 // ==============================================
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AlertError from '../components/AlertError.jsx';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 import { login } from '../services/auth.service.js';
 
 export default function Login() {
@@ -29,7 +31,7 @@ export default function Login() {
         }
       }
     } catch (err) {
-      setError(err.data?.error || err.message || 'Error al iniciar sesión');
+      setError(resolveErrorMessage(err, 'auth'));
     } finally {
       setLoading(false);
     }
@@ -79,10 +81,7 @@ export default function Login() {
 
           {/* Error Alert */}
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
-              <span className="material-symbols-outlined text-red-500">error</span>
-              <p className="text-sm text-red-600 font-medium">{error}</p>
-            </div>
+            <AlertError message={error} onClose={() => setError('')} />
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>

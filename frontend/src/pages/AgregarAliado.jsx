@@ -4,12 +4,15 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import AlertError from '../components/AlertError.jsx';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 // Fecha máxima para fecha de nacimiento (hoy)
 const today = new Date().toISOString().split('T')[0];
 
 function AgregarAliado() {
   const navigate = useNavigate();
+  const [error, setError] = useState('');
 
   // RIF controlado
   const [rif, setRif] = useState('');
@@ -150,13 +153,14 @@ function AgregarAliado() {
 
 
     try {
+      setError('');
       const response = await api.post('/aliados', payload);
       if (response.success) {
         navigate('/aliados-comerciales');
       }
-    } catch (error) {
-      console.error('Error creating aliado:', error);
-      alert('Error al crear aliado');
+    } catch (err) {
+      console.error('Error creating aliado:', err);
+      setError(resolveErrorMessage(err, 'aliados'));
     }
   };
 
@@ -175,6 +179,8 @@ function AgregarAliado() {
           <Link to="/aliados-comerciales" className="flex-1 sm:flex-initial text-center px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all">Cancelar</Link>
         </div>
       </header>
+
+      {error && <AlertError message={error} onClose={() => setError('')} />}
 
       <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <form className="p-8 space-y-12" onSubmit={handleSubmit}>

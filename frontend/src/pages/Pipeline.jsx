@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api.js';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 const ESTADOS = [
   { key: 'Contacto inicial', color: '#A1DEE5', label: 'Contacto Inicial' },
@@ -83,7 +84,7 @@ export default function Pipeline() {
       setShowModal(false);
       fetchData();
     } catch (err) {
-      alert(err.message || 'Error al guardar');
+      alert(resolveErrorMessage(err, 'actividad_comercial'));
     } finally {
       setSaving(false);
     }

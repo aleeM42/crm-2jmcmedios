@@ -4,6 +4,8 @@
 // ==============================================
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import AlertError from '../components/AlertError.jsx';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 import { crearCliente, getEmpresas, getLugares, getVendedores } from '../services/cliente.service.js';
 
 export default function AgregarCliente() {
@@ -195,16 +197,8 @@ export default function AgregarCliente() {
         setTimeout(() => navigate('/clientes'), 1500);
       }
     } catch (err) {
-      // Extraer mensaje detallado del servidor (si el backend lo devuelve)
-      const serverMsg = err?.response?.data?.error
-        || err?.data?.error
-        || err?.data?.detail
-        || err?.message
-        || 'Error al crear cliente';
-      const serverDetail = err?.response?.data?.detail || err?.data?.detail || null;
-      const errorText = serverDetail ? `${serverMsg} — ${serverDetail}` : serverMsg;
-      console.error('[AgregarCliente] Error 500 detalle:', err?.response?.data || err?.data || err);
-      setError(errorText);
+      console.error('[AgregarCliente] Error:', err?.data || err);
+      setError(resolveErrorMessage(err, 'clientes'));
     } finally {
       setLoading(false);
     }
@@ -235,10 +229,7 @@ export default function AgregarCliente() {
 
       {/* Messages */}
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
-          <span className="material-symbols-outlined text-red-500">error</span>
-          <p className="text-sm text-red-600 font-medium">{error}</p>
-        </div>
+        <AlertError message={error} onClose={() => setError('')} />
       )}
       {success && (
         <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 flex items-center gap-3">

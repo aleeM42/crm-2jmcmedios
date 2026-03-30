@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { crearVendedor, getDirectores } from '../services/vendedor.service.js';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 const INITIAL_FORM = {
   // --- USUARIO ---
@@ -115,7 +116,7 @@ export default function AgregarVendedor() {
         setTimeout(() => navigate('/equipo-ventas'), 1500);
       }
     } catch (err) {
-      setError(err.data?.error || err.data?.detalle || err.message || 'Error al registrar vendedor');
+      setError(resolveErrorMessage(err, 'vendedores'));
     } finally {
       setLoading(false);
     }

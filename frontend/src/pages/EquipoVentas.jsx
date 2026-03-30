@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getVendedores } from '../services/vendedor.service.js';
 import { getCurrentUser } from '../services/auth.service.js';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 const CARD_COLORS = ['primary', 'accent-green', 'secondary', 'primary'];
 
@@ -26,7 +27,7 @@ export default function EquipoVentas() {
           setKpis(result.data.kpis);
         }
       } catch (err) {
-        setError(err.message || 'Error al cargar vendedores');
+        setError(resolveErrorMessage(err, 'vendedores'));
       } finally {
         setLoading(false);
       }

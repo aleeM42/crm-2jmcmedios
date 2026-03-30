@@ -89,6 +89,19 @@ export const getEmpresas = async (req, res, next) => {
 };
 
 /**
+ * GET /api/clientes/:id/marcas
+ * Retorna las marcas (MARCA_INTER) asociadas a un cliente.
+ */
+export const getMarcasByCliente = async (req, res, next) => {
+  try {
+    const marcas = await MarcaModel.findByClienteId(req.params.id);
+    return res.json({ success: true, data: marcas });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * POST /api/clientes
  * Transacción atómica: CLIENTE → MARCAS → CONTACTO → TELEFONOS
  *

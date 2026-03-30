@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { crearGastoMarketing, getClientes, getAliados } from '../services/gasto.service.js';
+import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 export default function AgregarGasto() {
   const navigate = useNavigate();
@@ -81,7 +82,7 @@ export default function AgregarGasto() {
         setTimeout(() => navigate('/actividad-comercial/gastos'), 1500);
       }
     } catch (err) {
-      setError(err.data?.error || err.message || 'Error al registrar gasto');
+      setError(resolveErrorMessage(err, 'gastos'));
     } finally {
       setLoading(false);
     }
