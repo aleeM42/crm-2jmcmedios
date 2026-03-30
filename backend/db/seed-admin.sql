@@ -52,8 +52,53 @@ INSERT INTO USUARIOS (
   'Yossuel',
   'Marcano',
   '2jmcpautaii@gmail.com',
-  'yossuel',
+  'yossuelM2jmc',
   '$2b$10$jfA3jJzjpVggVfL5EkJ/Oehsfvd.rYb3cCRn5fOuVf9d8QYK909wm',
   'Gestor de Pautas',
   'Activo'
 ) ON CONFLICT (correo) DO NOTHING;
+
+-- 5. Insertar usuario Jullisette Marin (Administrador)
+-- Password: Juli.crm26 (bcrypt hash)
+INSERT INTO USUARIOS (
+  primer_nombre,
+  primer_apellido,
+  correo,
+  nombre_usuario,
+  password_hash,
+  rol,
+  estado
+) VALUES (
+  'Julisette',
+  'marin',
+  '2jmcmedios@gmail.com',
+  'juliM2jmc',
+  '$2b$12$3PFTOsR/kZlmJfzqQKsaceLG9rlqYSafalELJBD3XxbjZwWbp8EWC',
+  'Administrador',
+  'Activo'
+) ON CONFLICT (correo) DO NOTHING;
+
+-- 6. Insertar usuaria Adriana Sabino (Vendedor)
+-- Password: AdrianaS.crm26 (bcrypt hash)
+WITH nuevo_vendedor AS (
+  INSERT INTO USUARIOS (
+    primer_nombre,
+    primer_apellido,
+    correo,
+    nombre_usuario,
+    password_hash,
+    rol,
+    estado
+  ) VALUES (
+    'Adriana',
+    'Sabino',
+    '2jmcventas.adriana@gmail.com',
+    'adrianaS2jmc',
+    '$2b$12$zDPzNMCj.uA8M4gqv2f40e18wBqWuNxacQAJYsniIexerHwgqkYxm',
+    'Vendedor',
+    'Activo'
+  ) ON CONFLICT (correo) DO NOTHING
+  RETURNING id
+)
+INSERT INTO VENDEDORES (usuario_id, meta, tipo)
+SELECT id, 0, 'Vendedor' FROM nuevo_vendedor;

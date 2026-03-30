@@ -2,7 +2,7 @@
 // services/api.js — Fetch wrapper base con JWT
 // ==============================================
 
-const BASE_URL = 'http://localhost:3001/api';
+const BASE_URL = '/api';
 
 /**
  * Wrapper genérico para fetch con autenticación JWT.

@@ -141,11 +141,16 @@ export default function EquipoVentas() {
                   <div className="mb-4">
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-[10px] font-bold text-slate-400 uppercase">Meta</span>
-                      <span className="text-xs font-bold text-slate-700">${v.meta?.toLocaleString() || 0}</span>
+                      <span className="text-xs font-bold text-slate-700">
+                        ${Number(v.total_negociado || 0).toLocaleString()} / ${v.meta?.toLocaleString() || 0}
+                      </span>
                     </div>
                     <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-primary rounded-full transition-all" style={{ width: '0%' }}></div>
+                      <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${Math.min((Number(v.total_negociado || 0) / (v.meta || 1)) * 100, 100)}%` }}></div>
                     </div>
+                    <p className="text-[10px] text-slate-500 text-right mt-1">
+                      Falta: ${Math.max((v.meta || 0) - Number(v.total_negociado || 0), 0).toLocaleString()}
+                    </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">

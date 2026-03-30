@@ -17,7 +17,13 @@ const STATUS_STYLE = {
 export default function PautasLista() {
   const [pautas, setPautas] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
+  // Filter states
+  const [search, setSearch] = useState('');
+  const [estadoFilter, setEstadoFilter] = useState('');
+  const [tipoCompraFilter, setTipoCompraFilter] = useState('');
+  const [vendedorFilter, setVendedorFilter] = useState('');
+
   const user = getCurrentUser();
   const canCreatePauta = ['Administrador', 'Director General', 'Pauta'].includes(user?.rol);
 
@@ -29,10 +35,44 @@ export default function PautasLista() {
       .finally(() => setLoading(false));
   }, []);
 
-  const totalPautas = pautas.length;
-  const enTransmision = pautas.filter(p => p.estado === 'en transmision').length;
-  const montoOC = pautas.reduce((sum, p) => sum + Number(p.monto_oc || 0), 0);
-  const montoOT = pautas.reduce((sum, p) => sum + Number(p.monto_ot || 0), 0);
+
+  // Compute unique filters
+  const vendedoresOpciones = [...new Set(pautas.map(p => p.vendedor_nombre).filter(Boolean))].sort();
+
+  // Apply filters
+  const filteredPautas = pautas.filter(p => {
+    // 1. Search text
+    if (search) {
+      const sTerm = search.toLowerCase();
+      const matchSearch =
+        (p.numero_ot?.toLowerCase().includes(sTerm)) ||
+        (p.cliente_nombre?.toLowerCase().includes(sTerm)) ||
+        (p.marca?.toLowerCase().includes(sTerm));
+      if (!matchSearch) return false;
+    }
+
+    // 2. Estado
+    if (estadoFilter) {
+      if (p.estado !== estadoFilter) return false;
+    }
+
+    // 3. Tipo compra
+    if (tipoCompraFilter) {
+      if (p.tipo_compra !== tipoCompraFilter) return false;
+    }
+
+    // 4. Vendedor
+    if (vendedorFilter) {
+      if (p.vendedor_nombre !== vendedorFilter) return false;
+    }
+
+    return true;
+  });
+
+  const totalPautas = filteredPautas.length;
+  const enTransmision = filteredPautas.filter(p => p.estado === 'en transmision').length;
+  const montoOC = filteredPautas.reduce((sum, p) => sum + Number(p.monto_oc || 0), 0);
+  const montoOT = filteredPautas.reduce((sum, p) => sum + Number(p.monto_ot || 0), 0);
 
   return (
     <>
@@ -79,16 +119,43 @@ export default function PautasLista() {
       <div className="flex flex-wrap items-center gap-4 mb-6">
         <div className="relative flex-1 min-w-0 max-w-full sm:max-w-xs">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
-          <input type="text" placeholder="Buscar por OT, cliente, marca..." className="w-full h-10 pl-10 pr-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm focus:ring-primary focus:border-primary outline-none" />
+          <input
+            type="text"
+            placeholder="Buscar por OT, cliente, marca..."
+            className="w-full h-10 pl-10 pr-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm focus:ring-primary focus:border-primary outline-none"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-        <select className="h-10 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none">
-          <option>Estado</option><option>En transmisión</option><option>Programada</option><option>Finalizada</option><option>Cancelada</option>
+        <select
+          className="h-10 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none"
+          value={estadoFilter}
+          onChange={(e) => setEstadoFilter(e.target.value)}
+        >
+          <option value="">Estado</option>
+          <option value="en transmision">En transmisión</option>
+          <option value="programada">Programada</option>
+          <option value="finalizada">Finalizada</option>
+          <option value="suspendida">Suspendida</option>
         </select>
-        <select className="h-10 pr-8 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none">
-          <option>Tipo de compra</option><option>Rotativa</option><option>En vivo</option>
+        <select
+          className="h-10 pr-8 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none"
+          value={tipoCompraFilter}
+          onChange={(e) => setTipoCompraFilter(e.target.value)}
+        >
+          <option value="">Tipo de compra</option>
+          <option value="rotativa">Rotativa</option>
+          <option value="en vivo">En vivo</option>
         </select>
-        <select className="h-10 pr-8 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none">
-          <option>Vendedor</option>
+        <select
+          className="h-10 pr-8 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none"
+          value={vendedorFilter}
+          onChange={(e) => setVendedorFilter(e.target.value)}
+        >
+          <option value="">Vendedor</option>
+          {vendedoresOpciones.map(v => (
+            <option key={v} value={v}>{v}</option>
+          ))}
         </select>
       </div>
 
@@ -112,13 +179,13 @@ export default function PautasLista() {
             <tbody>
               {loading ? (
                 <tr><td colSpan="9" className="text-center py-4 text-slate-500">Cargando pautas...</td></tr>
-              ) : pautas.length === 0 ? (
-                <tr><td colSpan="9" className="text-center py-4 text-slate-500">No hay pautas registradas.</td></tr>
+              ) : filteredPautas.length === 0 ? (
+                <tr><td colSpan="9" className="text-center py-4 text-slate-500">No hay pautas que coincidan con los filtros.</td></tr>
               ) : (
-                pautas.map((p) => {
+                filteredPautas.map((p) => {
                   // Calcular progreso real basado en fechas
                   const { progresoPorcentaje: progreso } = calcularProgresoPauta(p);
-                  
+
                   return (
                     <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                       <td className="py-3 px-6">
@@ -152,7 +219,7 @@ export default function PautasLista() {
         </div>
 
         <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span className="text-xs text-slate-400">Mostrando {pautas.length} resultados</span>
+          <span className="text-xs text-slate-400">Mostrando {filteredPautas.length} resultados</span>
         </div>
       </div>
     </>

@@ -121,7 +121,7 @@ export default function DetalleVendedor() {
       {/* KPI ROW */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100">
-          <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Meta Mensual</p>
+          <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Meta Anual</p>
           <h4 className="text-2xl font-bold text-slate-800">${v.meta?.toLocaleString() || 0}</h4>
         </div>
         <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100">

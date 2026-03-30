@@ -38,7 +38,6 @@ export default function AgregarSubEmpresa() {
     anotac_especiales: '', rol: '', tipo: 'cliente',
   };
   const [contactos, setContactos] = useState([{ ...CONTACTO_VACIO }]);
-  const [usarContactoPadre, setUsarContactoPadre] = useState(false);
 
   // --- TELEFONOS por contacto (indexado) ---
   const [telefonosPorContacto, setTelefonosPorContacto] = useState({ 0: [{ codigo_area: '', numero: '' }] });
@@ -98,6 +97,25 @@ export default function AgregarSubEmpresa() {
               clasificacion: padreRes.data.clasificacion || '',
               nombre_agencia: padreRes.data.nombre_agencia || '',
             }));
+
+            if (padreRes.data.contactos?.length > 0) {
+              const pc = padreRes.data.contactos[0];
+              setContactos([{
+                pri_nombre: pc?.pri_nombre || '',
+                seg_nombre: pc?.seg_nombre || '',
+                pri_apellido: pc?.pri_apellido || '',
+                departamento: pc?.departamento || '',
+                correo: pc?.correo || '',
+                fecha_nac: (pc?.fecha_nac && typeof pc.fecha_nac === 'string') ? pc.fecha_nac.split('T')[0] : '',
+                anotac_especiales: pc?.anotac_especiales || '',
+                rol: pc?.rol || '',
+                tipo: 'cliente',
+              }]);
+              const padrePhones = (pc?.telefonos && Array.isArray(pc.telefonos) && pc.telefonos.length > 0)
+                ? pc.telefonos.map(t => ({ codigo_area: t?.codigo_area || '', numero: t?.numero || '' }))
+                : [{ codigo_area: '', numero: '' }];
+              setTelefonosPorContacto({ 0: padrePhones });
+            }
           }
         }
       } catch {
@@ -126,7 +144,7 @@ export default function AgregarSubEmpresa() {
     setSubEmpresa({ ...subEmpresa, [name]: value });
   };
 
-  // --- Manejo de contactos múltiples ---
+  // --- Manejo de contactos adicionales ---
   const handleContacto = (idx, e) => {
     const updated = [...contactos];
     updated[idx] = { ...updated[idx], [e.target.name]: e.target.value };
@@ -142,7 +160,6 @@ export default function AgregarSubEmpresa() {
   const removeContacto = (idx) => {
     if (contactos.length <= 1) return;
     setContactos(contactos.filter((_, i) => i !== idx));
-    // Reindexar teléfonos
     const newTels = {};
     Object.keys(telefonosPorContacto).forEach(k => {
       const ki = parseInt(k, 10);
@@ -150,33 +167,6 @@ export default function AgregarSubEmpresa() {
       else if (ki > idx) newTels[ki - 1] = telefonosPorContacto[ki];
     });
     setTelefonosPorContacto(newTels);
-  };
-
-  // Toggle usar contacto de la empresa padre
-  const toggleContactoPadre = (checked) => {
-    setUsarContactoPadre(checked);
-    if (checked && padreData?.contactos?.length > 0) {
-      const pc = padreData.contactos[0];
-      setContactos([{
-        pri_nombre: pc?.pri_nombre || '',
-        seg_nombre: pc?.seg_nombre || '',
-        pri_apellido: pc?.pri_apellido || '',
-        departamento: pc?.departamento || '',
-        correo: pc?.correo || '',
-        fecha_nac: (pc?.fecha_nac && typeof pc.fecha_nac === 'string') ? pc.fecha_nac.split('T')[0] : '',
-        anotac_especiales: pc?.anotac_especiales || '',
-        rol: pc?.rol || '',
-        tipo: 'cliente',
-      }]);
-      // Copiar teléfonos del contacto padre
-      const padrePhones = (pc?.telefonos && Array.isArray(pc.telefonos) && pc.telefonos.length > 0)
-        ? pc.telefonos.map(t => ({ codigo_area: t?.codigo_area || '', numero: t?.numero || '' }))
-        : [{ codigo_area: '', numero: '' }];
-      setTelefonosPorContacto({ 0: padrePhones });
-    } else {
-      setContactos([{ ...CONTACTO_VACIO }]);
-      setTelefonosPorContacto({ 0: [{ codigo_area: '', numero: '' }] });
-    }
   };
 
   // --- Manejo de teléfonos por contacto ---
@@ -248,7 +238,7 @@ export default function AgregarSubEmpresa() {
   };
 
   return (
-    <div className="pb-96 min-h-[300vh] w-full block">
+    <div className="pb-24 w-full block">
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
@@ -383,110 +373,138 @@ export default function AgregarSubEmpresa() {
           </div>
         </section>
 
-        {/* ═══ CONTACTOS — CONTACTO entity (múltiples) ═══ */}
+        {/* ═══ CONTACTO HEREDADO ═══ */}
         <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">contact_phone</span>
-              Contactos
-            </h3>
-            {/* Toggle: usar contacto de empresa padre */}
-            {padreData?.contactos?.length > 0 && (
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={usarContactoPadre}
-                  onChange={(e) => toggleContactoPadre(e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="relative w-10 h-5 bg-slate-200 rounded-full peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
-                <span className="text-xs font-semibold text-slate-500">Usar contacto de empresa padre</span>
-              </label>
-            )}
+          <div className="flex items-center gap-3 mb-6">
+            <span className="material-symbols-outlined text-primary text-2xl">contact_phone</span>
+            <div>
+              <h3 className="text-lg font-bold text-slate-800 font-display">
+                Contacto Principal
+              </h3>
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+                Asignado automáticamente de la Empresa Padre
+              </p>
+            </div>
           </div>
+          
+          {padreData?.contactos?.length > 0 ? (
+            <div className="relative p-5 bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl border border-primary/30 overflow-hidden shadow-sm shadow-primary/5">
+              <div className="absolute -right-6 -top-6 w-32 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+              <p className="font-bold text-slate-800 text-lg relative z-10 flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">person</span>
+                {padreData.contactos[0].pri_nombre} {padreData.contactos[0].pri_apellido}
+              </p>
+              <div className="mt-3 space-y-2 relative z-10 ml-1">
+                <p className="text-sm text-slate-600 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[16px] text-slate-400">mail</span>
+                  {padreData.contactos[0].correo || 'Sin correo'}
+                </p>
+                {padreData.contactos[0].departamento && (
+                  <p className="text-sm text-slate-600 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[16px] text-slate-400">badge</span>
+                    {padreData.contactos[0].departamento}
+                  </p>
+                )}
+                {padreData.contactos[0].telefonos?.length > 0 && (
+                  <p className="text-sm text-slate-600 flex items-center gap-2 font-mono">
+                    <span className="material-symbols-outlined text-[16px] text-slate-400">call</span>
+                    {padreData.contactos[0].telefonos.map(t => `${t.codigo_area}-${t.numero}`).join(', ')}
+                  </p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+              <p className="text-sm font-medium text-amber-700">La Empresa Padre no posee un contacto registrado. Por favor, añada uno a continuación.</p>
+            </div>
+          )}
 
-          {contactos.map((ct, cIdx) => (
-            <div key={cIdx} className={`${cIdx > 0 ? 'mt-6 pt-6 border-t border-slate-200' : ''}`}>
-              {/* Header del contacto con botón eliminar */}
-              {contactos.length > 1 && (
+          {contactos.map((ct, cIdx) => {
+            if (padreData?.contactos?.length > 0 && cIdx === 0) return null;
+
+            return (
+              <div key={cIdx} className="mt-8 pt-8 border-t border-slate-200">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-bold text-slate-600">Contacto {cIdx + 1}</span>
-                  <button type="button" onClick={() => removeContacto(cIdx)} className="flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-600 transition-colors">
-                    <span className="material-symbols-outlined text-[14px]">close</span>
-                    Eliminar
-                  </button>
-                </div>
-              )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Primer Nombre <span className="text-red-500">*</span></label>
-                  <input type="text" name="pri_nombre" value={ct.pri_nombre} onChange={(e) => handleContacto(cIdx, e)} placeholder="Primer nombre" readOnly={usarContactoPadre} className={`w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none ${usarContactoPadre ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50'}`} />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Segundo Nombre</label>
-                  <input type="text" name="seg_nombre" value={ct.seg_nombre} onChange={(e) => handleContacto(cIdx, e)} placeholder="Segundo nombre" readOnly={usarContactoPadre} className={`w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none ${usarContactoPadre ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50'}`} />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Primer Apellido <span className="text-red-500">*</span></label>
-                  <input type="text" name="pri_apellido" value={ct.pri_apellido} onChange={(e) => handleContacto(cIdx, e)} placeholder="Primer apellido" readOnly={usarContactoPadre} className={`w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none ${usarContactoPadre ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50'}`} />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Departamento <span className="text-red-500">*</span></label>
-                  <input type="text" name="departamento" value={ct.departamento} onChange={(e) => handleContacto(cIdx, e)} placeholder="Mercadeo, Ventas..." readOnly={usarContactoPadre} className={`w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none ${usarContactoPadre ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50'}`} />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Correo <span className="text-red-500">*</span></label>
-                  <input type="email" name="correo" value={ct.correo} onChange={(e) => handleContacto(cIdx, e)} placeholder="correo@ejemplo.com" readOnly={usarContactoPadre} className={`w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none ${usarContactoPadre ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50'}`} />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Rol <span className="text-red-500">*</span></label>
-                  <input type="text" name="rol" value={ct.rol} onChange={(e) => handleContacto(cIdx, e)} placeholder="Decisor, Operativo..." readOnly={usarContactoPadre} className={`w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none ${usarContactoPadre ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50'}`} />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Fecha de Nacimiento</label>
-                  <input type="date" name="fecha_nac" value={ct.fecha_nac} onChange={(e) => handleContacto(cIdx, e)} readOnly={usarContactoPadre} className={`w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none ${usarContactoPadre ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50'}`} />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Anotaciones Especiales</label>
-                  <textarea name="anotac_especiales" value={ct.anotac_especiales} onChange={(e) => handleContacto(cIdx, e)} placeholder="Preferencias de contacto..." rows="2" readOnly={usarContactoPadre} className={`w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none ${usarContactoPadre ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50'}`}></textarea>
-                </div>
-                {/* Teléfonos de este contacto */}
-                <div className="col-span-2">
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Teléfonos</label>
-                  <div className="space-y-3">
-                    {(telefonosPorContacto[cIdx] || []).map((tel, tIdx) => (
-                      <div key={tIdx} className="flex gap-2 items-center">
-                        <select
-                          value={tel.codigo_area}
-                          onChange={(e) => handleTelefono(cIdx, tIdx, 'codigo_area', e.target.value)}
-                          className="w-24 h-12 px-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-center"
-                        >
-                          <option value="">Código</option>
-                          {CODIGOS_AREA.map(c => (
-                            <option key={c} value={c}>{c}</option>
-                          ))}
-                        </select>
-                        <input type="tel" value={tel.numero} onChange={(e) => handleTelefono(cIdx, tIdx, 'numero', e.target.value)} placeholder="1234567" maxLength="7" className="flex-1 h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
-                        <button type="button" onClick={() => removeTelefono(cIdx, tIdx)} className="h-12 w-12 flex items-center justify-center rounded-lg bg-slate-50 border border-slate-200 text-primary hover:bg-slate-100">
-                          <span className="material-symbols-outlined text-[18px]">delete</span>
-                        </button>
-                      </div>
-                    ))}
-                    <button type="button" onClick={() => addTelefono(cIdx)} className="w-full py-2.5 flex items-center justify-center gap-2 border border-dashed border-slate-200 hover:border-primary text-slate-400 hover:text-primary rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors">
-                      <span className="material-symbols-outlined text-[16px]">add_call</span>
-                      Agregar Teléfono
+                  <span className="text-sm font-bold text-slate-600">
+                    Contacto {padreData?.contactos?.length > 0 ? cIdx + 1 : cIdx + 1} {cIdx === 0 && !padreData?.contactos?.length ? '(Principal)' : '(Adicional)'}
+                  </span>
+                  {(cIdx > 0 || (cIdx === 0 && contactos.length > 1)) && (
+                    <button type="button" onClick={() => removeContacto(cIdx)} className="flex items-center gap-1 text-xs font-semibold text-red-500 hover:text-red-700 transition-colors bg-red-50 px-3 py-1.5 rounded-lg border border-red-200">
+                      <span className="material-symbols-outlined text-[14px]">delete</span>
+                      Eliminar
                     </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Primer Nombre <span className="text-red-500">*</span></label>
+                    <input type="text" name="pri_nombre" value={ct.pri_nombre} onChange={(e) => handleContacto(cIdx, e)} placeholder="Primer nombre" className="w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Segundo Nombre</label>
+                    <input type="text" name="seg_nombre" value={ct.seg_nombre} onChange={(e) => handleContacto(cIdx, e)} placeholder="Segundo nombre" className="w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Primer Apellido <span className="text-red-500">*</span></label>
+                    <input type="text" name="pri_apellido" value={ct.pri_apellido} onChange={(e) => handleContacto(cIdx, e)} placeholder="Primer apellido" className="w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Departamento <span className="text-red-500">*</span></label>
+                    <input type="text" name="departamento" value={ct.departamento} onChange={(e) => handleContacto(cIdx, e)} placeholder="Mercadeo, Ventas..." className="w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Correo <span className="text-red-500">*</span></label>
+                    <input type="email" name="correo" value={ct.correo} onChange={(e) => handleContacto(cIdx, e)} placeholder="correo@ejemplo.com" className="w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Rol <span className="text-red-500">*</span></label>
+                    <input type="text" name="rol" value={ct.rol} onChange={(e) => handleContacto(cIdx, e)} placeholder="Decisor, Operativo..." className="w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Fecha de Nacimiento</label>
+                    <input type="date" name="fecha_nac" value={ct.fecha_nac} onChange={(e) => handleContacto(cIdx, e)} className="w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Anotaciones Especiales</label>
+                    <textarea name="anotac_especiales" value={ct.anotac_especiales} onChange={(e) => handleContacto(cIdx, e)} placeholder="Preferencias de contacto..." rows="2" className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white"></textarea>
+                  </div>
+                  {/* Teléfonos de este contacto */}
+                  <div className="col-span-1 sm:col-span-2">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Teléfonos</label>
+                    <div className="space-y-3">
+                      {(telefonosPorContacto[cIdx] || []).map((tel, tIdx) => (
+                        <div key={tIdx} className="flex gap-2 items-center">
+                          <select
+                            value={tel.codigo_area}
+                            onChange={(e) => handleTelefono(cIdx, tIdx, 'codigo_area', e.target.value)}
+                            className="w-24 h-12 px-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-center shadow-sm"
+                          >
+                            <option value="">Código</option>
+                            {CODIGOS_AREA.map(c => (
+                              <option key={c} value={c}>{c}</option>
+                            ))}
+                          </select>
+                          <input type="tel" value={tel.numero} onChange={(e) => handleTelefono(cIdx, tIdx, 'numero', e.target.value)} placeholder="1234567" maxLength="7" className="flex-1 h-12 px-4 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none shadow-sm" />
+                          <button type="button" onClick={() => removeTelefono(cIdx, tIdx)} className="h-12 w-12 flex items-center justify-center rounded-lg bg-red-50 border border-red-200 text-red-500 hover:bg-red-100 hover:text-red-700 transition-colors shadow-sm">
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                          </button>
+                        </div>
+                      ))}
+                      <button type="button" onClick={() => addTelefono(cIdx)} className="w-full py-2.5 flex items-center justify-center gap-2 border text-slate-600 bg-white border-slate-200 hover:bg-slate-50 hover:text-primary rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors shadow-sm mt-2">
+                        <span className="material-symbols-outlined text-[16px]">add_call</span>
+                        Agregar Teléfono
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
-          {/* Botón añadir otro contacto */}
           <button
             type="button"
             onClick={addContacto}
-            className="mt-6 w-full py-3 flex items-center justify-center gap-2 border-2 border-dashed border-primary/30 hover:border-primary text-primary/60 hover:text-primary rounded-xl text-xs font-bold uppercase tracking-widest transition-all hover:bg-primary/5"
+            className="mt-8 w-full py-4 flex items-center justify-center gap-2 border-2 border-dashed border-primary/40 hover:border-primary text-primary hover:text-primary/80 rounded-xl text-xs font-bold uppercase tracking-widest transition-all hover:bg-primary/5 bg-white shadow-sm"
           >
             <span className="material-symbols-outlined text-[18px]">person_add</span>
             Añadir Otro Contacto

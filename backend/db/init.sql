@@ -375,3 +375,4 @@ CREATE TABLE OPORTUNIDADES (
     CONSTRAINT fk_lead_usuario FOREIGN KEY (fk_usuario) REFERENCES VENDEDORES(usuario_id) ON DELETE CASCADE
 );
 CREATE INDEX idx_oportunidades_vendedor_estado ON OPORTUNIDADES(fk_usuario, estado);
+

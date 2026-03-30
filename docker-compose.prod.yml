@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: crm-2jmcmedios-prod-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-crm2jmc_root_2024}
+      POSTGRES_DB: ${POSTGRES_DB:-crm_2jmc}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+      # Cargamos los archivos SQL en orden alfabético para que se ejecuten automáticamente al crear la BD
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./backend/db/insert_lugares.sql:/docker-entrypoint-initdb.d/02_insert_lugares.sql
+      - ./backend/db/seed-admin.sql:/docker-entrypoint-initdb.d/03_seed-admin.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d crm_2jmc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: crm-2jmcmedios-prod-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@crm2jmc.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin2024}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data_prod:/var/lib/pgadmin
+    depends_on:
+      db:
+        condition: service_healthy
+
+  backend:
+    image: crm-2jmcmedios-backend
+    container_name: crm-2jmcmedios-prod-backend
+    restart: always
+    environment:
+      # Conexión local en docker (nombre de host es 'db')
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-crm2jmc_root_2024}@db:5432/${POSTGRES_DB:-crm_2jmc}
+      PORT: 3001
+      # Variable de seguridad (puedes sobrescribirla en un archivo .env si lo necesitas)
+      JWT_SECRET: ${JWT_SECRET:-SuperSecretKeyPara2jmcMediosCRM}
+      NODE_ENV: production
+    ports:
+      # Solo si necesitas probar la API externamente, sino se puede omitir para forzar todo por Nginx
+      - "3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: crm-2jmcmedios-frontend
+    container_name: crm-2jmcmedios-prod-frontend
+    restart: always
+    ports:
+      # Exponemos el Nginx en el puerto 80 de la máquina host
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data_prod:
+  pgadmin_data_prod:

@@ -39,9 +39,11 @@ export async function getAllPautas() {
 
   const query = `
     SELECT p.*, 
-           c.nombre AS cliente_nombre 
+           c.nombre AS cliente_nombre,
+           u.primer_nombre || ' ' || u.primer_apellido AS vendedor_nombre
     FROM PAUTAS p
     LEFT JOIN CLIENTE c ON p.fk_cliente = c.id
+    LEFT JOIN USUARIOS u ON p.fk_vendedor = u.id
     ORDER BY p.id DESC
   `;
   const result = await pool.query(query);

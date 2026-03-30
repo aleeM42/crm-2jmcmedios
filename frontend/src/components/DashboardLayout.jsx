@@ -51,7 +51,7 @@ function DashboardLayout() {
   });
 
   return (
-    <div className="flex h-screen bg-[#EBF6F7] text-slate-900 antialiased overflow-hidden">
+    <div className="fixed inset-0 flex bg-[#EBF6F7] text-slate-900 antialiased overflow-hidden">
       <Toaster position="top-right" richColors toastOptions={{ className: 'font-display' }} />
       {/* ===================== SIDEBAR ===================== */}
       <aside className="w-[240px] bg-[#F4FAFB] border-r border-[#E0F0F2] flex flex-col fixed h-full z-10">

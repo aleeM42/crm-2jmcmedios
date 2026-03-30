@@ -30,6 +30,8 @@ import oportunidadRouter from './router/oportunidad.router.js';
 import gastoMarketingRouter from './router/gastoMarketing.router.js';
 
 const app = express();
+// Necesario para que express-rate-limit no falle detrás de Nginx en Docker
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3001;
 
 // ---- Seguridad HTTP Headers ----

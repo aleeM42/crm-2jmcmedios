@@ -14,7 +14,13 @@ export const findAll = async () => {
            u.estado, u.created_at,
            v.meta, v.tipo, v.fk_vendedor_jefe,
            j.primer_nombre AS jefe_nombre,
-           j.primer_apellido AS jefe_apellido
+           j.primer_apellido AS jefe_apellido,
+           COALESCE(
+             (SELECT SUM(hn.monto_negociacion)
+              FROM HISTORICO_NEGOCIACIONES hn
+              JOIN CLIENTE c ON hn.fk_cliente = c.id
+              WHERE c.fk_vendedor = u.id), 0
+           ) AS total_negociado
     FROM VENDEDORES v
     INNER JOIN USUARIOS u ON v.usuario_id = u.id
     LEFT JOIN USUARIOS j ON v.fk_vendedor_jefe = j.id
