@@ -186,7 +186,7 @@ create table ALIADOS_COMERCIALES(
 	nombre_emisora VARCHAR(50) UNIQUE NOT NULL,
 	rif VARCHAR(20) UNIQUE NOT NULL,
     frecuencia VARCHAR(20) UNIQUE NOT NULL,
-    categoria VARCHAR(30) NOT NULL,
+    categoria VARCHAR(255) NOT NULL,
     direccion VARCHAR(100) NOT NULL,
     estado VARCHAR(20) NOT NULL,
     fk_lugar INTEGER NOT NULL,
@@ -197,7 +197,6 @@ create table ALIADOS_COMERCIALES(
     CONSTRAINT fk_lugar_ac FOREIGN KEY (fk_lugar) REFERENCES LUGAR(id),
     CONSTRAINT fk_region_ac FOREIGN KEY (fk_region) REFERENCES LUGAR(id),
     CONSTRAINT fk_cobertura_ac FOREIGN KEY (fk_cobertura) REFERENCES COBERTURA(id),
-	CONSTRAINT check_AC_categoria CHECK (categoria IN ('multitarget', 'comunitaria', 'juvenil', 'adulto contemporáneo', 'popular', 'adulto', 'deportivo')),
 	CONSTRAINT check_AC_estado CHECK (estado IN ('activo','inactivo','cerrado')) 	
 );
 

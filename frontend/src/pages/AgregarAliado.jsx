@@ -93,7 +93,8 @@ function AgregarAliado() {
   const [coberturas, setCoberturas] = useState([]);
   const [categorias, setCategorias] = useState([
     { id: 'multitarget', nombre: 'Multitarget' },
-    { id: 'todo público', nombre: 'Todo Público' },
+    { id: 'comunitario', nombre: 'Comunitario' },
+    { id: 'deportivo', nombre: 'Deportivo' },
     { id: 'juvenil', nombre: 'Juvenil' },
     { id: 'adulto contemporáneo', nombre: 'Adulto Contemporáneo' },
     { id: 'popular', nombre: 'Popular' },
@@ -186,11 +187,19 @@ function AgregarAliado() {
     }
 
     const formData = new FormData(e.target);
+    const categoriasSeleccionadas = formData.getAll('categoria');
+
+    if (categoriasSeleccionadas.length === 0) {
+      setError('Debe seleccionar al menos una categoría.');
+      return;
+    }
+
     const data = Object.fromEntries(formData.entries());
 
     const payload = {
       ...data,
       rif,
+      categoria: categoriasSeleccionadas.join(', '),
       frecuencia: frecuencia.trim().toUpperCase(),
       fk_lugar: parseInt(data.lugar, 10) || null,
       fk_region: parseInt(data.region, 10) || null,
@@ -270,14 +279,16 @@ function AgregarAliado() {
                 />
                 {frecuenciaError && <p className="text-xs text-red-500 mt-1">{frecuenciaError}</p>}
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Categoría<span className="text-red-500 ml-0.5">*</span></label>
-                <select name="categoria" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
-                  <option value="">Seleccione una categoría</option>
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Categorías<span className="text-red-500 ml-0.5">*</span></label>
+                <div className="flex flex-wrap gap-2">
                   {categorias.map(cat => (
-                    <option key={cat.id || cat.nombre} value={cat.nombre.toLowerCase()}>{cat.nombre}</option>
+                    <label key={cat.id || cat.nombre} className="flex items-center gap-2 text-sm bg-white border border-slate-200 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
+                      <input type="checkbox" name="categoria" value={cat.nombre.toLowerCase()} className="text-primary rounded-md border-slate-300 focus:ring-primary w-4 h-4" />
+                      <span className="text-slate-700 font-medium">{cat.nombre}</span>
+                    </label>
                   ))}
-                </select>
+                </div>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado<span className="text-red-500 ml-0.5">*</span></label>

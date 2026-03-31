@@ -48,7 +48,7 @@ function AliadosComerciales() {
   const filteredEmisoras = EMISORAS.filter(e => {
     const matchesSearch = e.nombre_emisora?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       e.frecuencia?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter ? e.categoria === categoryFilter : true;
+    const matchesCategory = categoryFilter ? e.categoria?.toLowerCase().includes(categoryFilter.toLowerCase()) : true;
     const matchesStatus = statusFilter ? e.estado === statusFilter : true;
     return matchesSearch && matchesCategory && matchesStatus;
   });
@@ -105,7 +105,8 @@ function AliadosComerciales() {
         >
           <option value="">Todas las categorías</option>
           <option value="multitarget">Multitarget</option>
-          <option value="todo público">Todo Público</option>
+          <option value="comunitario">Comunitario</option>
+          <option value="deportivo">Deportivo</option>
           <option value="juvenil">Juvenil</option>
           <option value="adulto contemporáneo">Adulto Contemporáneo</option>
           <option value="popular">Popular</option>
