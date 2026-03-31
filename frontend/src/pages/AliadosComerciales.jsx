@@ -105,11 +105,12 @@ function AliadosComerciales() {
         >
           <option value="">Todas las categorías</option>
           <option value="multitarget">Multitarget</option>
-          <option value="todo público">Todo Público</option>
+          <option value="deportiva">Deportiva</option>
           <option value="juvenil">Juvenil</option>
           <option value="adulto contemporáneo">Adulto Contemporáneo</option>
           <option value="popular">Popular</option>
           <option value="adulto">Adulto</option>
+          <option value="comunitaria">Comunitaria</option>
         </select>
         <select
           className="bg-background-light border-none rounded-lg text-sm py-2 pl-4 pr-10 focus:ring-2 focus:ring-primary/50 cursor-pointer capitalize"
