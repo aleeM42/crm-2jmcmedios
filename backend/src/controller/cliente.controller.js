@@ -42,11 +42,7 @@ function validarContacto(c, idx) {
 
 function validarTelefonos(telefonos) {
   const errores = [];
-  if (!telefonos || telefonos.length === 0)
-    return ['Debe agregar al menos un número de teléfono con código de área y 7 dígitos.'];
-  const validos = telefonos.filter(t => t.codigo_area && t.numero);
-  if (validos.length === 0)
-    return ['Debe agregar al menos un número de teléfono con código de área y 7 dígitos.'];
+  if (!telefonos || telefonos.length === 0) return errores; // Teléfono es opcional
   telefonos.forEach((t, i) => {
     if (t.codigo_area || t.numero) {
       if (!t.codigo_area) errores.push(`Teléfono ${i + 1}: falta el código de área.`);
@@ -223,9 +219,9 @@ export const create = async (req, res, next) => {
     const { negociacion } = req.body;
     if (negociacion && negociacion.monto_negociacion && negociacion.fecha_inicio) {
       await client.query(
-        `INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, fk_cliente)
-         VALUES ($1, $2, $3, $4)`,
-        [negociacion.fecha_inicio, negociacion.fecha_fin || null, negociacion.monto_negociacion, newCliente.id]
+        `INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, total_cunas, fk_cliente)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [negociacion.fecha_inicio, negociacion.fecha_fin || null, negociacion.monto_negociacion, parseInt(negociacion.total_cunas, 10) || 0, newCliente.id]
       );
     }
 

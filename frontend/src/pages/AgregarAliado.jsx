@@ -114,7 +114,7 @@ function AgregarAliado() {
         if (resEstados.success) setEstados(resEstados.data);
         if (resCoberturas.success) setCoberturas(resCoberturas.data);
         if (resCategorias.success && resCategorias.data.length > 0) {
-           setCategorias(resCategorias.data);
+          setCategorias(resCategorias.data);
         }
       } catch (err) {
         console.error('Error fetching select options:', err);
@@ -221,9 +221,6 @@ function AgregarAliado() {
             <span className="text-slate-900">Nuevo Aliado</span>
           </nav>
           <h2 className="text-3xl font-bold text-slate-900 font-display">Agregar Aliado Comercial</h2>
-        </div>
-        <div className="flex gap-3 w-full sm:w-auto">
-          <Link to="/aliados-comerciales" className="flex-1 sm:flex-initial text-center px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all">Cancelar</Link>
         </div>
       </header>
 
@@ -333,13 +330,13 @@ function AgregarAliado() {
               </div>
             </div>
             <div className="space-y-1.5 md:w-1/2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Seleccione Cobertura<span className="text-red-500 ml-0.5">*</span></label>
-                <select name="cobertura" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
-                  <option value="">Seleccione una cobertura</option>
-                  {coberturas.map(cob => (
-                    <option key={cob.id} value={cob.id}>{cob.descripcion}</option>
-                  ))}
-                </select>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Seleccione Cobertura<span className="text-red-500 ml-0.5">*</span></label>
+              <select name="cobertura" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                <option value="">Seleccione una cobertura</option>
+                {coberturas.map(cob => (
+                  <option key={cob.id} value={cob.id}>{cob.descripcion}</option>
+                ))}
+              </select>
             </div>
           </section>
           {/* Section 3: Contacto de la Emisora */}
@@ -353,7 +350,7 @@ function AgregarAliado() {
                 <span className="material-symbols-outlined text-[18px]">add_circle</span>Agregar Contacto
               </button>
             </div>
-            
+
             <div className="space-y-8">
               {contactos.map((contacto, idx) => (
                 <div key={idx} className="relative bg-white border border-slate-100 p-6 rounded-xl shadow-sm">
@@ -450,8 +447,8 @@ function AgregarAliado() {
 
           {/* Action Footer */}
           <div className="pt-8 flex flex-col sm:flex-row justify-end gap-4 border-t border-slate-100">
-            <button className="px-6 py-2.5 text-slate-600 font-bold text-sm hover:underline" type="reset">Restaurar formulario</button>
-            <button className="px-10 py-2.5 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all" type="submit">Finalizar Registro</button>
+            <Link to="/aliados-comerciales" className="px-6 py-2.5 border border-red-400 text-red-500 rounded-lg font-bold text-sm bg-red-50 hover:bg-red-50 transition-all text-center">Cancelar</Link>
+            <button className="px-10 py-2.5 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all" type="submit">Finalizar Registro</button>
           </div>
         </form>
       </div>

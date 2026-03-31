@@ -169,11 +169,11 @@ export default function AgregarVisita() {
           <h2 className="text-3xl font-black text-slate-900 font-display">Registrar Visita</h2>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
-          <Link to="/actividad-comercial" className="flex-1 sm:flex-initial text-center px-6 py-2.5 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 transition-colors">Cancelar</Link>
+          <Link to="/actividad-comercial" className="flex-1 sm:flex-initial text-center px-6 py-2.5 border border-red-400 text-red-500 rounded-lg text-sm bg-red-50 font-bold shadow-lg shadow-red-400/10 hover:shadow-red-400/40 transition-colors">Cancelar</Link>
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 sm:flex-initial px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 disabled:opacity-60"
+            className="flex-1 sm:flex-initial px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:shadow-primary/40 transition-opacity shadow-lg shadow-primary/20 disabled:opacity-60"
           >
             {loading ? 'Guardando...' : 'Guardar Visita'}
           </button>

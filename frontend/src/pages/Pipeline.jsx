@@ -48,7 +48,7 @@ export default function Pipeline() {
     if (isAdmin) {
       api.get('/vendedores').then(res => {
         if (res.success) setVendedores(res.data.vendedores || res.data || []);
-      }).catch(() => {});
+      }).catch(() => { });
     }
   }, [fetchData]);
 
@@ -287,7 +287,7 @@ export default function Pipeline() {
                 <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} rows={3} className="rounded-lg border border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary resize-none" placeholder="Notas adicionales sobre la oportunidad..." />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-2.5 rounded-lg border border-slate-300 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all">Cancelar</button>
+                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-2.5 rounded-lg border border-red-400 text-red-500 font-bold text-sm px-8 py-3 rounded-lg border border-red-400 text-red-500 font-bold text-sm bg-red-50 shadow-lg shadow-red-400/10 hover:shadow-red-400/40 transition-all text-center">Cancelar</button>
                 <button type="submit" disabled={saving} className="px-8 py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all disabled:opacity-60">
                   {saving ? 'Guardando...' : (editingLead ? 'Actualizar' : 'Crear Lead')}
                 </button>

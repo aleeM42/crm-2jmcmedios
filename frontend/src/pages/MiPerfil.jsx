@@ -83,9 +83,8 @@ export default function MiPerfil() {
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Estado</p>
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-              perfil.estado === 'Activo' ? 'bg-accent-green/10 text-accent-green' : 'bg-slate-100 text-slate-400'
-            }`}>
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${perfil.estado === 'Activo' ? 'bg-accent-green/10 text-accent-green' : 'bg-slate-100 text-slate-400'
+              }`}>
               {perfil.estado}
             </span>
           </div>
@@ -116,7 +115,7 @@ export default function MiPerfil() {
         {/* Meta Mensual */}
         <div className="bg-[#F4FAFB] rounded-xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Meta Mensual</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Meta Anual</p>
             <h3 className="text-2xl font-bold text-slate-800">${meta.toLocaleString()}</h3>
           </div>
           <div className="w-10 h-10 rounded-lg bg-accent-light/30 flex items-center justify-center text-primary">
@@ -177,9 +176,8 @@ export default function MiPerfil() {
                     <td className="px-6 py-4 text-sm text-slate-600">{c.sector}</td>
                     <td className="px-6 py-4 text-sm text-slate-600">{c.clasificacion}</td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                        c.estado === 'Activo' ? 'bg-accent-green/10 text-accent-green' : 'bg-slate-100 text-slate-400'
-                      }`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${c.estado === 'Activo' ? 'bg-accent-green/10 text-accent-green' : 'bg-slate-100 text-slate-400'
+                        }`}>
                         {c.estado}
                       </span>
                     </td>

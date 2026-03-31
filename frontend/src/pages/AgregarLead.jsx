@@ -83,7 +83,7 @@ export default function AgregarLead() {
         </section>
 
         <div className="flex flex-col sm:flex-row justify-end gap-4 py-8">
-          <Link to="/pipeline" className="px-8 py-3 rounded-lg border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all">Cancelar</Link>
+          <Link to="/pipeline" className="px-8 py-3 rounded-lg border border-red-400 text-red-500 font-bold text-sm bg-red-50 shadow-lg shadow-red-400/10 hover:shadow-red-400/40 transition-all text-center">Cancelar</Link>
           <button className="px-12 py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all" type="submit">Guardar Lead</button>
         </div>
       </form>

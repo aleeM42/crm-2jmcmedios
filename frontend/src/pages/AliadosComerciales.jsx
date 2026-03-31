@@ -46,8 +46,8 @@ function AliadosComerciales() {
 
   // Filtrado
   const filteredEmisoras = EMISORAS.filter(e => {
-    const matchesSearch = e.nombre_emisora?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          e.frecuencia?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = e.nombre_emisora?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.frecuencia?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter ? e.categoria === categoryFilter : true;
     const matchesStatus = statusFilter ? e.estado === statusFilter : true;
     return matchesSearch && matchesCategory && matchesStatus;
@@ -90,15 +90,15 @@ function AliadosComerciales() {
       <div className="bg-[#F4FAFB] p-4 rounded-xl shadow-sm border border-slate-100 flex flex-wrap items-center gap-4 mb-8">
         <div className="flex-1 min-w-0 sm:min-w-[300px] relative">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-          <input 
-            className="w-full pl-10 pr-4 py-2 bg-background-light border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 placeholder:text-slate-400" 
-            placeholder="Buscar emisora o frecuencia..." 
-            type="text" 
+          <input
+            className="w-full pl-10 pr-4 py-2 bg-background-light border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 placeholder:text-slate-400"
+            placeholder="Buscar emisora o frecuencia..."
+            type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <select 
+        <select
           className="bg-background-light border-none rounded-lg text-sm py-2 pl-4 pr-10 focus:ring-2 focus:ring-primary/50 cursor-pointer capitalize"
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
@@ -111,7 +111,7 @@ function AliadosComerciales() {
           <option value="popular">Popular</option>
           <option value="adulto">Adulto</option>
         </select>
-        <select 
+        <select
           className="bg-background-light border-none rounded-lg text-sm py-2 pl-4 pr-10 focus:ring-2 focus:ring-primary/50 cursor-pointer capitalize"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}

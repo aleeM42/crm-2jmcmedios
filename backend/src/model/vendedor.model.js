@@ -20,10 +20,16 @@ export const findAll = async () => {
               FROM HISTORICO_NEGOCIACIONES hn
               JOIN CLIENTE c ON hn.fk_cliente = c.id
               WHERE c.fk_vendedor = u.id), 0
-           ) AS total_negociado
+           ) AS total_negociado,
+           t.codigo_area AS telefono_codigo,
+           t.numero AS telefono_numero
     FROM VENDEDORES v
     INNER JOIN USUARIOS u ON v.usuario_id = u.id
     LEFT JOIN USUARIOS j ON v.fk_vendedor_jefe = j.id
+    LEFT JOIN LATERAL (
+      SELECT codigo_area, numero FROM TELEFONOS
+      WHERE fk_usuario = u.id LIMIT 1
+    ) t ON true
     ORDER BY u.primer_nombre, u.primer_apellido
   `;
   const result = await pool.query(query);

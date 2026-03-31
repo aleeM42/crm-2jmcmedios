@@ -52,6 +52,7 @@ export default function AgregarCliente() {
   // --- NEGOCIACIÓN (HISTORICO_NEGOCIACIONES) ---
   const [negociacion, setNegociacion] = useState({
     monto_negociacion: '',
+    total_cunas: '',
     fecha_inicio: '',
     fecha_fin: '',
   });
@@ -59,6 +60,26 @@ export default function AgregarCliente() {
   const handleNegociacion = (e) => {
     const { name, value } = e.target;
     setNegociacion({ ...negociacion, [name]: value });
+  };
+
+  // --- ARCHIVO ADJUNTO (opcional, .pdf / .docx) ---
+  const [archivoAdjunto, setArchivoAdjunto] = useState(null);
+
+  const handleArchivoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return setArchivoAdjunto(null);
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['pdf', 'docx'].includes(ext)) {
+      setError('Solo se permiten archivos .pdf o .docx');
+      e.target.value = '';
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('El archivo no debe superar los 5 MB.');
+      e.target.value = '';
+      return;
+    }
+    setArchivoAdjunto(file);
   };
 
   // --- Sub-empresa vinculación ---
@@ -171,7 +192,7 @@ export default function AgregarCliente() {
 
   // ── Validaciones locales antes del submit ──────────────────────────────
   const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
-  const RIF_RE   = /^[JGVP]\d{9}$/;
+  const RIF_RE = /^[JGVP]\d{9}$/;
   const PHONE_RE = /^\d{7}$/;
 
   const handleSubmit = async (e) => {
@@ -216,10 +237,7 @@ export default function AgregarCliente() {
         return setError(`${label}: el correo "${c.correo}" no es válido (ej: nombre@dominio.com).`);
     }
 
-    // ── Validación de teléfonos ───────────────────────────
-    const telsFiltrados = telefonos.filter(t => t.codigo_area || t.numero);
-    if (telsFiltrados.length === 0)
-      return setError('Debe agregar al menos un teléfono con código de área y número completo.');
+    // ── Validación de teléfonos (opcional) ─────────────────
     for (let i = 0; i < telefonos.length; i++) {
       const t = telefonos[i];
       if (t.codigo_area || t.numero) {
@@ -230,6 +248,10 @@ export default function AgregarCliente() {
       }
     }
 
+    // ── Validación de negociación: total_cunas no negativo ─
+    if (negociacion.total_cunas !== '' && Number(negociacion.total_cunas) < 0)
+      return setError('El total de cuñas no puede ser un valor negativo.');
+
     setLoading(true);
     try {
       const payload = {
@@ -239,6 +261,7 @@ export default function AgregarCliente() {
           fk_cliente_padre: isSubEmpresa ? (cliente.fk_cliente_padre || null) : null,
           nombre_agencia: cliente.clasificacion === 'Agencia' ? cliente.nombre_agencia : null,
           fk_lugar: parseInt(cliente.fk_lugar, 10) || null,
+          archivo_adjunto: archivoAdjunto ? archivoAdjunto.name : null,
         },
         contactos: contactosActivos,
         telefonos: telefonos.filter(t => t.codigo_area && t.numero),
@@ -272,16 +295,7 @@ export default function AgregarCliente() {
           </nav>
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-display">Agregar Cliente</h2>
         </div>
-        <div className="flex gap-4 w-full sm:w-auto">
-          <Link to="/clientes" className="flex-1 sm:flex-initial text-center px-6 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-all">Cancelar</Link>
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="flex-1 sm:flex-initial px-8 py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-semibold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all disabled:opacity-60"
-          >
-            {loading ? 'Guardando...' : 'Guardar'}
-          </button>
-        </div>
+
       </header>
 
       {/* Messages */}
@@ -524,7 +538,7 @@ export default function AgregarCliente() {
                 {telefonos.map((tel, i) => (
                   <div key={i} className="flex gap-3 items-end">
                     <div className="w-24 flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Cód. Área <span className="text-red-500">*</span></label>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">Cód. Área</label>
                       <select value={tel.codigo_area} onChange={(e) => handleTelefono(i, 'codigo_area', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
                         <option value="">—</option>
                         <option value="0412">0412</option>
@@ -536,7 +550,7 @@ export default function AgregarCliente() {
                       </select>
                     </div>
                     <div className="flex-1 flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Número <span className="text-red-500">*</span></label>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">Número</label>
                       <input value={tel.numero} onChange={(e) => handleTelefono(i, 'numero', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0000000" type="tel" maxLength="7" pattern="[0-9]{7}" title="Debe tener exactamente 7 dígitos" />
                     </div>
                     <button type="button" onClick={() => removeTelefono(i)} className="bg-slate-50 border border-slate-200 p-3 rounded-lg hover:bg-slate-100 text-primary">
@@ -584,6 +598,10 @@ export default function AgregarCliente() {
               <input name="monto_negociacion" value={negociacion.monto_negociacion} onChange={handleNegociacion} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0.00" type="number" step="0.01" min="0" />
             </div>
             <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total de Cuñas <span className="text-red-500">*</span></label>
+              <input name="total_cunas" value={negociacion.total_cunas} onChange={handleNegociacion} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0" type="number" min="0" step="1" />
+            </div>
+            <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fecha de Inicio <span className="text-red-500">*</span></label>
               <input name="fecha_inicio" value={negociacion.fecha_inicio} onChange={handleNegociacion} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
             </div>
@@ -595,8 +613,36 @@ export default function AgregarCliente() {
           <p className="text-[10px] text-slate-400 mt-4 italic">Los campos marcados con * son obligatorios para registrar la negociación. Si se dejan vacíos, no se creará un registro de negociación.</p>
         </section>
 
+        {/* ═══ Archivo Adjunto (opcional) ═══ */}
+        <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 p-8">
+          <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 text-slate-800">
+            <span className="material-symbols-outlined text-primary">attach_file</span>
+            <h3 className="text-lg font-bold font-display">Archivo Adjunto</h3>
+            <span className="text-[10px] text-slate-400 ml-auto italic">Opcional — .pdf o .docx (máx. 5 MB)</span>
+          </div>
+          <div className="flex flex-col gap-3">
+            <label className="flex flex-col items-center justify-center gap-3 p-6 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+              <span className="material-symbols-outlined text-3xl text-slate-400 group-hover:text-primary transition-colors">cloud_upload</span>
+              <span className="text-sm font-medium text-slate-500 group-hover:text-primary transition-colors">
+                {archivoAdjunto ? archivoAdjunto.name : 'Haz clic para seleccionar un archivo'}
+              </span>
+              <input type="file" accept=".pdf,.docx" onChange={handleArchivoChange} className="hidden" />
+            </label>
+            {archivoAdjunto && (
+              <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                <span className="material-symbols-outlined text-primary">description</span>
+                <span className="text-sm font-medium text-slate-700 flex-1 truncate">{archivoAdjunto.name}</span>
+                <span className="text-[10px] text-slate-400">{(archivoAdjunto.size / 1024).toFixed(1)} KB</span>
+                <button type="button" onClick={() => setArchivoAdjunto(null)} className="text-slate-400 hover:text-red-500 transition-colors">
+                  <span className="material-symbols-outlined text-lg">close</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+
         <div className="flex flex-col sm:flex-row justify-end gap-4 py-8">
-          <Link to="/clientes" className="px-8 py-3 rounded-lg border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all">Cancelar Cambios</Link>
+          <Link to="/clientes" className="px-8 py-3 rounded-lg border border-red-400 text-red-500 font-bold text-sm bg-red-50 shadow-lg shadow-red-400/10 hover:shadow-red-400/40 transition-all text-center">Cancelar</Link>
           <button
             className="px-12 py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all disabled:opacity-60"
             type="submit"

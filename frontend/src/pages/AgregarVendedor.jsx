@@ -151,12 +151,9 @@ export default function AgregarVendedor() {
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-display">Agregar Vendedor</h2>
         </div>
         <div className="flex items-center gap-4 w-full sm:w-auto">
-          <Link to="/equipo-ventas" className="flex-1 sm:flex-initial text-center px-6 py-2.5 rounded-full border border-slate-300 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-all">
+          <Link to="/equipo-ventas" className="flex-1 sm:flex-initial text-center  rounded-xl px-6 py-2.5 rounded-full border border-red-400 text-red-500 font-semibold text-sm bg-red-50 shadow-lg shadow-red-400/10 hover:shadow-red-400/40 transition-all">
             Cancelar
           </Link>
-          <button onClick={handleSubmit} disabled={loading} className="flex-1 sm:flex-initial px-8 py-2.5 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all disabled:opacity-60">
-            {loading ? 'Guardando...' : 'Guardar'}
-          </button>
         </div>
       </header>
 
@@ -365,8 +362,8 @@ export default function AgregarVendedor() {
               <span className="text-red-500 font-bold">*</span> Campos obligatorios para el registro en el sistema
             </p>
             <div className="flex gap-4">
-              <button className="px-6 py-2 text-sm font-semibold text-slate-400 hover:text-slate-600 transition-colors" type="reset">Limpiar</button>
-              <button className="px-10 py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/25 hover:bg-secondary transition-all flex items-center disabled:opacity-60" type="submit" disabled={loading}>
+              <button className="px-6 py-2 text-sm font rounded-xl bg-slate-200  shadow-lg shadow-slate-300/50 text-slate-800 hover:shadow-slate-400/80 hover:text-slate-600 transition-colors" type="reset">Limpiar</button>
+              <button className="px-10 py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/50 hover:bg-secondary transition-all flex items-center disabled:opacity-60" type="submit" disabled={loading}>
                 <span className="material-symbols-outlined mr-2">save_as</span>
                 {loading ? 'Registrando...' : 'Finalizar Registro'}
               </button>

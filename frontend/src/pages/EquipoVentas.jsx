@@ -116,10 +116,10 @@ export default function EquipoVentas() {
               const initials = `${v.primer_nombre[0]}${v.primer_apellido[0]}`;
               const color = CARD_COLORS[i % CARD_COLORS.length];
               const CardWrapper = canManage ? Link : 'div';
-              const cardProps = canManage 
-                ? { to: `/equipo-ventas/${v.id}`, className: "bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 hover:shadow-md transition-shadow group block" } 
+              const cardProps = canManage
+                ? { to: `/equipo-ventas/${v.id}`, className: "bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 hover:shadow-md transition-shadow group block" }
                 : { className: "bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 block" };
-              
+
               return (
                 <CardWrapper key={v.id} {...cardProps}>
                   <div className="flex items-center gap-4 mb-4">
@@ -140,28 +140,25 @@ export default function EquipoVentas() {
                   {/* Progress bar — meta */}
                   <div className="mb-4">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Meta</span>
+                      <span className="text-[10px] font-bold text-primary uppercase">Meta</span>
                       <span className="text-xs font-bold text-slate-700">
-                        ${Number(v.total_negociado || 0).toLocaleString()} / ${v.meta?.toLocaleString() || 0}
+                        {Math.min(Math.round((Number(v.total_negociado || 0) / (v.meta || 1)) * 100), 100)}%
                       </span>
                     </div>
                     <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${Math.min((Number(v.total_negociado || 0) / (v.meta || 1)) * 100, 100)}%` }}></div>
                     </div>
-                    <p className="text-[10px] text-slate-500 text-right mt-1">
-                      Falta: ${Math.max((v.meta || 0) - Number(v.total_negociado || 0), 0).toLocaleString()}
-                    </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase">Correo</p>
-                      <p className="text-xs text-slate-600 truncate">{v.correo}</p>
+                      <p className="text-[10px] font-bold text-accent-green uppercase">Correo</p>
+                      <p className="text-xs text-slate-600 break-all pr-8">{v.correo}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase">Jefe</p>
+                      <p className="text-[10px] font-bold text-accent-green uppercase">Teléfono</p>
                       <p className="text-xs text-slate-600 truncate">
-                        {v.jefe_nombre ? `${v.jefe_nombre} ${v.jefe_apellido}` : '—'}
+                        {v.telefono_codigo && v.telefono_numero ? `${v.telefono_codigo}-${v.telefono_numero}` : '—'}
                       </p>
                     </div>
                   </div>

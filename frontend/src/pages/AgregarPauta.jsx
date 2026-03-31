@@ -262,7 +262,7 @@ export default function AgregarPauta() {
           <h2 className="text-3xl font-black text-slate-900 font-display">Registrar Pauta</h2>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
-          <Link to="/pautas" className="flex-1 sm:flex-initial text-center px-6 py-2.5 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 transition-colors">Cancelar</Link>
+          <Link to="/pautas" className="flex-1 sm:flex-initial text-center px-6 py-2.5 border border-red-400 text-red-500 rounded-lg text-sm bg-red-50 font-bold shadow-lg shadow-red-400/10 hover:shadow-red-400/40 transition-colors">Cancelar</Link>
           <button type="submit" className="flex-1 sm:flex-initial px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">Guardar Pauta</button>
         </div>
       </div>
