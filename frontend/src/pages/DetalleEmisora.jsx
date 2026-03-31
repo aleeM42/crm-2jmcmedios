@@ -110,7 +110,7 @@ export default function DetalleEmisora() {
               </div>
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Categoría</p>
-                <p className="text-sm font-semibold text-slate-700">{emisora.categoria || '-'}</p>
+                <p className="text-sm font-semibold text-slate-700 capitalize">{emisora.categoria || '-'}</p>
               </div>
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Dirección</p>

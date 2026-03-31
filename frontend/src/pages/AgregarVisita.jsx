@@ -14,9 +14,14 @@ import {
   getContactosByAliado,
 } from '../services/visita.service.js';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
+import { getCurrentUser } from '../services/auth.service.js';
 
 export default function AgregarVisita() {
   const navigate = useNavigate();
+
+  // Usuario autenticado y restricción de rol
+  const currentUser = getCurrentUser();
+  const isVendedor = currentUser?.rol === 'Vendedor';
 
   // --- Form state (mapeo a VISITAS) ---
   const [formData, setFormData] = useState({
@@ -69,7 +74,12 @@ export default function AgregarVisita() {
         }
         if (venRes.success) {
           const d = venRes.data;
-          setVendedores(Array.isArray(d) ? d : (d?.vendedores || []));
+          const lista = Array.isArray(d) ? d : (d?.vendedores || []);
+          setVendedores(lista);
+          // Si es Vendedor, preseleccionar su propio ID
+          if (isVendedor && currentUser?.id) {
+            setFkVendedor(currentUser.id);
+          }
         }
       } catch { /* silently handle */ }
     };
@@ -206,15 +216,32 @@ export default function AgregarVisita() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Vendedor */}
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Vendedor</label>
-                <select value={fkVendedor} onChange={(e) => setFkVendedor(e.target.value)} className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                  <option value="">Seleccionar vendedor...</option>
-                  {vendedores.map((v) => (
-                    <option key={v.usuario_id || v.id} value={v.usuario_id || v.id}>
-                      {v.primer_nombre || v.nombre} {v.primer_apellido || v.apellido}
-                    </option>
-                  ))}
-                </select>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                  Vendedor{isVendedor && <span className="ml-2 text-[9px] font-bold text-primary/70 normal-case tracking-normal bg-primary/10 px-1.5 py-0.5 rounded">Asignado automáticamente</span>}
+                </label>
+                {isVendedor ? (
+                  // Para rol Vendedor: campo bloqueado sólo con su nombre
+                  <div className="w-full h-12 px-4 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-500 flex items-center gap-2 cursor-not-allowed select-none">
+                    <span className="material-symbols-outlined text-[16px] text-slate-400">lock</span>
+                    <span className="font-medium">
+                      {currentUser?.primer_nombre || currentUser?.nombre} {currentUser?.primer_apellido || currentUser?.apellido}
+                    </span>
+                  </div>
+                ) : (
+                  // Para Director/Administrador: selector completo
+                  <select
+                    value={fkVendedor}
+                    onChange={(e) => setFkVendedor(e.target.value)}
+                    className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  >
+                    <option value="">Seleccionar vendedor...</option>
+                    {vendedores.map((v) => (
+                      <option key={v.usuario_id || v.id} value={v.usuario_id || v.id}>
+                        {v.primer_nombre || v.nombre} {v.primer_apellido || v.apellido}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               {/* Visitado: radio */}
