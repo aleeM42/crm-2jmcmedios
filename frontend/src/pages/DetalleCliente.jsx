@@ -166,21 +166,29 @@ export default function DetalleCliente() {
           </section>
 
           {/* ═══ MARCAS ═══ */}
-          {c.marcas && c.marcas.length > 0 && (
-            <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-50 bg-slate-50/50">
-                <h3 className="font-bold text-slate-800 font-display flex items-center gap-2">
-                  <span className="material-symbols-outlined text-accent-green">sell</span>
-                  Marcas
-                </h3>
-              </div>
-              <div className="p-6 flex flex-wrap gap-2">
-                {c.marcas.map(m => (
+          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+              <h3 className="font-bold text-slate-800 font-display flex items-center gap-2">
+                <span className="material-symbols-outlined text-accent-green">sell</span>
+                Marcas
+              </h3>
+              <Link to={`/clientes/${c.id}/marca`} className="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
+                <span className="material-symbols-outlined text-sm">add_circle</span>Agregar Marca
+              </Link>
+            </div>
+            <div className="p-6 flex flex-wrap gap-2">
+              {c.marcas && c.marcas.length > 0 ? (
+                c.marcas.map(m => (
                   <span key={m.id} className="px-3 py-1 bg-accent-light/30 text-slate-700 text-xs font-bold rounded-lg border border-accent-light/50">{m.nombre}</span>
-                ))}
-              </div>
-            </section>
-          )}
+                ))
+              ) : (
+                <div className="text-center w-full py-2">
+                  <span className="material-symbols-outlined text-slate-300 text-3xl mb-1 block">sell</span>
+                  <p className="text-xs font-medium text-slate-500">No hay marcas asociadas a este cliente.</p>
+                </div>
+              )}
+            </div>
+          </section>
 
           {/* ═══ SUB-EMPRESAS ═══ */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">

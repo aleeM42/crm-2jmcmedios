@@ -75,15 +75,23 @@ export default function AgregarVendedor() {
     // ── Validaciones locales ─────────────────────────────
     const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
     const PHONE_RE = /^\d{7}$/;
+    const NAME_RE = /^[A-Za-zÁ-Úá-úñÑ\s]+$/;
 
     if (!formData.primer_nombre?.trim())
       return setError('El primer nombre es obligatorio.');
+    if (!NAME_RE.test(formData.primer_nombre.trim()))
+      return setError('El primer nombre debe contener únicamente letras, sin números ni caracteres especiales.');
+
     if (!formData.primer_apellido?.trim())
       return setError('El primer apellido es obligatorio.');
+    if (!NAME_RE.test(formData.primer_apellido.trim()))
+      return setError('El primer apellido debe contener únicamente letras, sin números ni caracteres especiales.');
+
     if (!formData.correo?.trim())
       return setError('El correo electrónico es obligatorio.');
-    if (!EMAIL_RE.test(formData.correo))
-      return setError('El correo electrónico no tiene un formato válido. Ej: vendedor@empresa.com');
+    if (!EMAIL_RE.test(formData.correo.trim()))
+      return setError('El correo electrónico no tiene un formato válido (debe ser del tipo usuario@dominio.com).');
+
     if (!formData.nombre_usuario?.trim())
       return setError('El nombre de usuario es obligatorio.');
     if (!formData.password?.trim())
@@ -91,16 +99,18 @@ export default function AgregarVendedor() {
 
     const metaNum = parseFloat(formData.meta);
     if (formData.meta !== '' && (isNaN(metaNum) || metaNum < 0))
-      return setError('La meta anual no puede ser un número negativo.');
+      return setError('La meta anual debe ser un valor numérico mayor o igual a cero.');
 
     // Teléfonos: todos los que se hayan iniciado deben estar completos
     for (let i = 0; i < formData.telefonos.length; i++) {
       const tel = formData.telefonos[i];
       if (tel.codigo_area || tel.numero) {
         if (!tel.codigo_area)
-          return setError(`Teléfono ${i + 1}: debe seleccionar el código de área.`);
+          return setError(`Teléfono ${i + 1}: Por favor, seleccione un código de área.`);
+        if (!tel.numero)
+          return setError(`Teléfono ${i + 1}: El cuerpo del teléfono es obligatorio.`);
         if (!PHONE_RE.test(tel.numero))
-          return setError(`Teléfono ${i + 1}: el número debe tener exactamente 7 dígitos.`);
+          return setError(`Teléfono ${i + 1}: El número telefónico debe tener exactamente 7 dígitos numéricos, sin letras ni espacios.`);
       }
     }
 
@@ -362,7 +372,7 @@ export default function AgregarVendedor() {
               <span className="text-red-500 font-bold">*</span> Campos obligatorios para el registro en el sistema
             </p>
             <div className="flex gap-4">
-              <button className="px-6 py-2 text-sm font rounded-xl bg-slate-200  border border-slate-200 shadow-lg shadow-slate-300/50 text-slate-800 hover:shadow-slate-400/80 hover:text-slate-600 transition-colors" type="reset">Limpiar</button>
+              <button className="px-6 py-2 text-sm font rounded-xl  border border-slate-300 shadow-lg shadow-slate-300/50 text-slate-800 hover:shadow-slate-400/80 hover:text-slate-600 transition-colors" type="reset">Limpiar</button>
               <button className="px-10 py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/50 hover:bg-secondary transition-all flex items-center disabled:opacity-60" type="submit" disabled={loading}>
                 <span className="material-symbols-outlined mr-2">save_as</span>
                 {loading ? 'Registrando...' : 'Finalizar Registro'}

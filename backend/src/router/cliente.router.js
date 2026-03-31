@@ -45,4 +45,12 @@ router.post(
   ClienteCtrl.create
 );
 
+// POST /api/clientes/:id/marcas — Crear una marca para un cliente
+router.post(
+  '/:id/marcas',
+  authenticate,
+  authorize(...ROLES_CLIENTES),
+  ClienteCtrl.createMarca
+);
+
 export default router;

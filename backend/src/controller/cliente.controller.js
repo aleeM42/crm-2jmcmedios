@@ -239,3 +239,29 @@ export const create = async (req, res, next) => {
     client.release();
   }
 };
+
+/**
+ * POST /api/clientes/:id/marcas
+ * Crea una marca individual para un cliente existente.
+ */
+export const createMarca = async (req, res, next) => {
+  try {
+    const clienteId = req.params.id;
+    const { nombre, observaciones } = req.body;
+
+    if (!nombre?.trim()) {
+      return res.status(400).json({ success: false, error: 'El nombre de la marca es obligatorio.' });
+    }
+
+    // Verificar que el cliente existe
+    const cliente = await ClienteModel.findById(clienteId);
+    if (!cliente) {
+      return res.status(404).json({ success: false, error: 'Cliente no encontrado.' });
+    }
+
+    const nuevaMarca = await MarcaModel.createOne(clienteId, { nombre: nombre.trim(), observaciones });
+    return res.status(201).json({ success: true, data: nuevaMarca });
+  } catch (err) {
+    next(err);
+  }
+};

@@ -60,3 +60,12 @@ export const getLugares = async (params = {}) => {
 export const getVendedores = async () => {
   return api.get('/vendedores');
 };
+
+/**
+ * Crea una marca para un cliente existente.
+ * @param {number} clienteId - ID del cliente
+ * @param {{ nombre: string, observaciones?: string }} data
+ */
+export const crearMarca = async (clienteId, data) => {
+  return api.post(`/clientes/${clienteId}/marcas`, data);
+};

@@ -41,3 +41,19 @@ export const findByClienteId = async (clienteId) => {
   const result = await pool.query(query, [clienteId]);
   return result.rows;
 };
+
+/**
+ * Inserta una marca individual para un cliente.
+ * @param {number} clienteId - ID del cliente
+ * @param {{ nombre: string, observaciones?: string }} marca
+ */
+export const createOne = async (clienteId, marca) => {
+  const query = `
+    INSERT INTO MARCA_INTER (nombre, observaciones, fk_cliente)
+    VALUES ($1, $2, $3)
+    RETURNING *
+  `;
+  const values = [marca.nombre, marca.observaciones || null, clienteId];
+  const result = await pool.query(query, values);
+  return result.rows[0];
+};

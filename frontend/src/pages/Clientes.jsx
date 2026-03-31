@@ -162,7 +162,7 @@ export default function Clientes() {
                 <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Clasificación</th>
                 <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Estado</th>
                 <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Tipo</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Acciones</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-accent-green uppercase tracking-widest">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -212,7 +212,7 @@ export default function Clientes() {
                       </td>
                       <td className="px-6 py-4 text-xs text-slate-500 capitalize">{c.tipo}</td>
                       <td className="px-6 py-4">
-                        <Link to={`/clientes/${c.id}`} className="text-slate-400 hover:text-primary transition-colors">
+                        <Link to={`/clientes/${c.id}`} className="text-slate-400 hover:text-accent-green transition-colors">
                           <span className="material-symbols-outlined text-lg">visibility</span>
                         </Link>
                       </td>

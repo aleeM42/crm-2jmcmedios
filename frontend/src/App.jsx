@@ -29,6 +29,7 @@ import Clientes from './pages/Clientes';
 import AgregarCliente from './pages/AgregarCliente';
 import DetalleCliente from './pages/DetalleCliente';
 import AgregarSubEmpresa from './pages/AgregarSubEmpresa';
+import AgregarMarca from './pages/AgregarMarca';
 import GastosLista from './pages/GastosLista';
 import AgregarGasto from './pages/AgregarGasto';
 import ReportesDirectorio from './pages/ReportesDirectorio';
@@ -93,6 +94,7 @@ export default function App() {
           <Route path="/clientes/agregar" element={<AgregarCliente />} />
           <Route path="/clientes/:id" element={<DetalleCliente />} />
           <Route path="/clientes/:clienteId/sub-empresa" element={<AgregarSubEmpresa />} />
+          <Route path="/clientes/:clienteId/marca" element={<AgregarMarca />} />
 
           {/* Reportes */}
           <Route path="/reportes" element={<ReportesDirectorio />} />
