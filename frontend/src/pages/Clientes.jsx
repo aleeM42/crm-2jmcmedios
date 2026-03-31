@@ -60,10 +60,10 @@ export default function Clientes() {
           <p className="text-slate-500 text-sm mt-1">Gestión integral de cartera de clientes</p>
         </div>
         <div className="flex items-center gap-4 w-full sm:w-auto">
-          <button className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all">
+          {/*<button className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all">
             <span className="material-symbols-outlined text-lg">file_download</span>
             <span className="text-xs font-bold uppercase tracking-wider">Exportar</span>
-          </button>
+          </button>*/}
           <Link to="/clientes/agregar" className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-2 flex-1 sm:flex-initial justify-center">
             <span className="material-symbols-outlined">add</span>Agregar Cliente
           </Link>

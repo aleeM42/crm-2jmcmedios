@@ -94,21 +94,21 @@ function AgregarAliado() {
   const [categorias, setCategorias] = useState([
     { id: 'multitarget', nombre: 'Multitarget' },
     { id: 'comunitario', nombre: 'Comunitario' },
-    { id: 'deportivo', nombre: 'Deportivo' },
     { id: 'juvenil', nombre: 'Juvenil' },
     { id: 'adulto contemporáneo', nombre: 'Adulto Contemporáneo' },
     { id: 'popular', nombre: 'Popular' },
     { id: 'adulto', nombre: 'Adulto' },
+    { id: 'deportivo', nombre: 'Deportivo' },
   ]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [resRegiones, resEstados, resCoberturas, resCategorias] = await Promise.all([
-          api.get('/lugares?tipo=Region'),
-          api.get('/lugares?tipo=Estado'),
-          api.get('/coberturas'),
-          api.get('/categorias'),
+          api.get('/lugares?tipo=Region').catch(err => ({ success: false })),
+          api.get('/lugares?tipo=Estado').catch(err => ({ success: false })),
+          api.get('/coberturas').catch(err => ({ success: false })),
+          api.get('/categorias').catch(err => ({ success: false })),
         ]);
 
         if (resRegiones.success) setRegiones(resRegiones.data);
@@ -174,8 +174,6 @@ function AgregarAliado() {
     }
 
     // ── Validar teléfonos ────────────────────────────────
-    if (!telefonos.some(t => t.codigo_area && t.numero))
-      return setError('Debe agregar al menos un teléfono con código de área y número completo.');
     for (let i = 0; i < telefonos.length; i++) {
       const t = telefonos[i];
       if (t.codigo_area || t.numero) {
@@ -431,8 +429,8 @@ function AgregarAliado() {
               {telefonos.map((tel, idx) => (
                 <div key={idx} className="flex gap-3 items-end bg-white border border-slate-100 p-4 rounded-xl shadow-sm relative">
                   <div className="w-24 flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.*</label>
-                    <select value={tel.codigo_area} onChange={(e) => handleTelefonoChange(idx, 'codigo_area', e.target.value)} required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.</label>
+                    <select value={tel.codigo_area} onChange={(e) => handleTelefonoChange(idx, 'codigo_area', e.target.value)} className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
                       <option value="">—</option>
                       <option value="0412">0412</option>
                       <option value="0422">0422</option>
@@ -443,8 +441,8 @@ function AgregarAliado() {
                     </select>
                   </div>
                   <div className="flex-1 flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Número <span className="text-red-500 ml-0.5">*</span></label>
-                    <input value={tel.numero} onChange={(e) => handleTelefonoChange(idx, 'numero', e.target.value)} required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="1234567" type="tel" maxLength="7" pattern="[0-9]{7}" title="Debe tener exactamente 7 dígitos" />
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Número</label>
+                    <input value={tel.numero} onChange={(e) => handleTelefonoChange(idx, 'numero', e.target.value)} className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="1234567" type="tel" maxLength="7" pattern="[0-9]{7}" title="Debe tener exactamente 7 dígitos" />
                   </div>
                   {telefonos.length > 1 && (
                     <button type="button" onClick={() => removeTelefono(idx)} className="bg-slate-50 border border-slate-200 p-2.5 rounded-lg hover:bg-red-50 hover:text-red-500 text-slate-400 mb-[1px] transition-colors">

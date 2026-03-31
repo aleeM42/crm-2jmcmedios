@@ -178,7 +178,7 @@ function ActividadComercial() {
           <div className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100">
             <h3 className="text-lg font-bold text-slate-800 font-display">Registro de Visitas</h3>
             <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-              <Link to="/actividad-comercial/gastos/agregar" className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-200 transition-all border border-slate-200 text-center flex-1 sm:flex-initial">Agregar Gasto</Link>
+              <Link to="/actividad-comercial/gastos/agregar" className="px-4 py-2 bg-accent-green text-slate-50 rounded-lg text-sm font-bold hover:bg-accent-green/70 transition-all border border-slate-200  text-center flex-1 sm:flex-initial">Agregar Gasto</Link>
               <Link to="/actividad-comercial/visita" className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg text-sm font-bold hover:opacity-90 shadow-md transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial">
                 <span className="material-symbols-outlined text-base">add</span>Agregar Visita
               </Link>
