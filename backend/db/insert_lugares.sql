@@ -11,6 +11,9 @@ INSERT INTO LUGAR (nombre, tipo, descripcion, fk_lugar) VALUES
 ('Los Llanos', 'Region', 'Región de Los Llanos', NULL), 
 ('Oriental', 'Region', 'Región Oriental', NULL),
 ('Zuliana', 'Region', 'Región Zuliana', NULL);
+
+INSERT INTO LUGAR (nombre, tipo, descripcion, fk_lugar) 
+VALUES ('No Especificado', 'Region', 'Lugar genérico para coberturas N/T', NULL);
 -- 2. ESTADOS (Hijos de las Regiones)
 -- Región Capital (1)
 INSERT INTO LUGAR (nombre, tipo, descripcion, fk_lugar) VALUES
@@ -149,6 +152,13 @@ INSERT INTO LUGAR (nombre, tipo, descripcion, fk_lugar) VALUES
 ('Ciudad Ojeda', 'Ciudad', 'Ciudad de Ciudad Ojeda', (SELECT id FROM LUGAR WHERE nombre = 'Zulia' AND tipo = 'Estado')),
 ('Caja Seca', 'Ciudad', 'Ciudad de Caja Seca', (SELECT id FROM LUGAR WHERE nombre = 'Zulia' AND tipo = 'Estado')),
 ('Santa Bárbara del Zulia', 'Ciudad', 'Ciudad de Santa Bárbara del Zulia', (SELECT id FROM LUGAR WHERE nombre = 'Zulia' AND tipo = 'Estado'));
+
+INSERT INTO LUGAR (nombre, tipo, descripcion, fk_lugar) VALUES
+('Altagracia de Orituco', 'Ciudad', 'Ciudad de Altagracia de Orituco', (SELECT id FROM LUGAR WHERE nombre = 'Guárico' AND tipo = 'Estado')),
+('Ocumare del Tuy', 'Ciudad', 'Ciudad de Ocumare del Tuy', (SELECT id FROM LUGAR WHERE nombre = 'Miranda' AND tipo = 'Estado'));
+
+INSERT INTO LUGAR (nombre, tipo, descripcion, fk_lugar) VALUES
+('Tinaquillo', 'Ciudad', 'Ciudad de Tinaquillo', (SELECT id FROM LUGAR WHERE nombre = 'Cojedes' AND tipo = 'Estado'));
 
 --COBERTURAS 
 
@@ -302,3 +312,6 @@ INSERT INTO COBERTURA (descripcion, fk_lugar) VALUES
 ('Colón, Catatumbo, Francisco Javier Pulgar, Obispo Ramos de Lora, y parte de Jesús María Semprum. Zona baja de la carretera Panamericana', (SELECT id FROM LUGAR WHERE nombre ILIKE '%Zulia%' AND tipo ILIKE 'Estado' LIMIT 1)),
 ('Eje Panamericano del sur del Lago de Maracaibo. Zulia, Mérida y Trujillo', (SELECT id FROM LUGAR WHERE nombre ILIKE '%Zulia%' AND tipo ILIKE 'Estado' LIMIT 1)),
 ('Zulia y los Municipios Tulio Febres Cordero, Justo Briceño y Julio Cesar Salas de Mérida', (SELECT id FROM LUGAR WHERE nombre ILIKE '%Zulia%' AND tipo ILIKE 'Estado' LIMIT 1));
+
+INSERT INTO COBERTURA (descripcion, fk_lugar) 
+VALUES ('N/T', (SELECT id FROM LUGAR WHERE nombre = 'No Especificado' LIMIT 1));

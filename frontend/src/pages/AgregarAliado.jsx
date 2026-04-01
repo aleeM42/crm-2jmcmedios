@@ -93,12 +93,12 @@ function AgregarAliado() {
   const [coberturas, setCoberturas] = useState([]);
   const [categorias, setCategorias] = useState([
     { id: 'multitarget', nombre: 'Multitarget' },
-    { id: 'comunitario', nombre: 'Comunitario' },
+    { id: 'comunitaria', nombre: 'Comunitaria' },
     { id: 'juvenil', nombre: 'Juvenil' },
-    { id: 'adulto contemporáneo', nombre: 'Adulto Contemporáneo' },
+    { id: 'adulto joven', nombre: 'Adulto joven' },
     { id: 'popular', nombre: 'Popular' },
     { id: 'adulto', nombre: 'Adulto' },
-    { id: 'deportivo', nombre: 'Deportivo' },
+    { id: 'deportiva', nombre: 'Deportiva' },
   ]);
 
   useEffect(() => {

@@ -183,21 +183,24 @@ CREATE TABLE TELEFONOS (
 create table ALIADOS_COMERCIALES(
 	id SERIAL PRIMARY KEY,
 	razon_social VARCHAR(150) NOT NULL,
-	nombre_emisora VARCHAR(150) UNIQUE NOT NULL,
-	rif VARCHAR(20) UNIQUE NOT NULL,
-    frecuencia VARCHAR(20) UNIQUE NOT NULL,
+	nombre_emisora VARCHAR(150) NOT NULL,
+	rif VARCHAR(20) NOT NULL,
+    frecuencia VARCHAR(20) NOT NULL,
     categoria VARCHAR(255) NOT NULL,
     direccion VARCHAR(255) NOT NULL,
     estado VARCHAR(20) NOT NULL,
     fk_lugar INTEGER NOT NULL,
+    fk_ciudad INTEGER NOT NULL,
     fk_region INTEGER NOT NULL,
     fk_cobertura INTEGER NOT NULL, 
 
 	-- Constraints
+    CONSTRAINT fk_ciudad_ac FOREIGN KEY (fk_ciudad) REFERENCES LUGAR(id),
     CONSTRAINT fk_lugar_ac FOREIGN KEY (fk_lugar) REFERENCES LUGAR(id),
     CONSTRAINT fk_region_ac FOREIGN KEY (fk_region) REFERENCES LUGAR(id),
     CONSTRAINT fk_cobertura_ac FOREIGN KEY (fk_cobertura) REFERENCES COBERTURA(id),
-	CONSTRAINT check_AC_estado CHECK (estado IN ('activo','inactivo','cerrado')) 	
+	CONSTRAINT check_AC_estado CHECK (estado IN ('activo','inactivo','cerrado')),
+    CONSTRAINT check_ac_categoria CHECK (categoria IN ('deportiva','multitarget','popular','juvenil','comunitaria', 'adulto', 'adulto joven')) 	
 );
 
 CREATE TABLE A_CONTACT(

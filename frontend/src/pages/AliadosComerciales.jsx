@@ -105,8 +105,8 @@ function AliadosComerciales() {
         >
           <option value="">Todas las categorías</option>
           <option value="multitarget">Multitarget</option>
-          <option value="comunitario">Comunitario</option>
-          <option value="deportivo">Deportivo</option>
+          <option value="comunitaria">Comunitaria</option>
+          <option value="deportiva">Deportiva</option>
           <option value="juvenil">Juvenil</option>
           <option value="adulto contemporáneo">Adulto Contemporáneo</option>
           <option value="popular">Popular</option>
