@@ -46,8 +46,10 @@ export default function PautasLista() {
       const sTerm = search.toLowerCase();
       const matchSearch =
         (p.numero_ot?.toLowerCase().includes(sTerm)) ||
+        (p.numero_oc?.toLowerCase().includes(sTerm)) ||
         (p.cliente_nombre?.toLowerCase().includes(sTerm)) ||
-        (p.marca?.toLowerCase().includes(sTerm));
+        (p.marca?.toLowerCase().includes(sTerm)) ||
+        (p.emisora_nombre?.toLowerCase().includes(sTerm));
       if (!matchSearch) return false;
     }
 
@@ -165,22 +167,23 @@ export default function PautasLista() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50/50">
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Nro OT</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Nro OC</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Nro OT</th>
                 <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Cliente</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Emisora</th>
                 <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Marca</th>
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Tipo Compra</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Tipo</th>
                 <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Vigencia</th>
                 <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Estado</th>
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Cuñas</th>
                 <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Progreso</th>
                 <th className="text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Monto OC</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan="9" className="text-center py-4 text-slate-500">Cargando pautas...</td></tr>
+                <tr><td colSpan="10" className="text-center py-4 text-slate-500">Cargando pautas...</td></tr>
               ) : filteredPautas.length === 0 ? (
-                <tr><td colSpan="9" className="text-center py-4 text-slate-500">No hay pautas que coincidan con los filtros.</td></tr>
+                <tr><td colSpan="10" className="text-center py-4 text-slate-500">No hay pautas que coincidan con los filtros.</td></tr>
               ) : (
                 filteredPautas.map((p) => {
                   // Calcular progreso real basado en fechas
@@ -188,19 +191,20 @@ export default function PautasLista() {
 
                   return (
                     <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                      <td className="py-3 px-6">
+                      <td className="py-3 px-6 text-xs font-medium text-slate-500">{p.numero_oc}</td>
+                      <td className="py-3 px-5">
                         <Link to={`/pautas/${p.id}`} className="font-bold text-primary hover:underline">{p.numero_ot}</Link>
                       </td>
                       <td className="py-3 px-5 font-medium text-slate-700">{p.cliente_nombre || 'Sin cliente'}</td>
+                      <td className="py-3 px-5 text-slate-600 text-xs">{p.emisora_nombre || '—'}</td>
                       <td className="py-3 px-5 text-slate-600">{p.marca}</td>
-                      <td className="py-3 px-5 text-slate-600 capitalize">{p.tipo_compra}</td>
+                      <td className="py-3 px-5 text-slate-600 capitalize text-xs">{p.tipo_compra}</td>
                       <td className="py-3 px-5 text-xs text-slate-500 whitespace-nowrap">
                         {new Date(p.fecha_inicio).toLocaleDateString()} → {new Date(p.fecha_fin).toLocaleDateString()}
                       </td>
                       <td className="py-3 px-5">
                         <span className={`px-3 py-1 rounded-full text-[10px] font-bold capitalize ${STATUS_STYLE[p.estado] || 'bg-slate-100 text-slate-500'}`}>{p.estado}</span>
                       </td>
-                      <td className="py-3 px-5 text-slate-600">{p.cantidad_cunas}</td>
                       <td className="py-3 px-5">
                         <div className="flex items-center gap-3">
                           <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">

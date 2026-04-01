@@ -13,6 +13,10 @@ const STATUS_STYLE = {
   'suspendida': 'bg-red-100 text-red-500',
 };
 
+const DIAS_MAP = {
+  L: 'Lun', M: 'Mar', X: 'Mié', J: 'Jue', V: 'Vie', S: 'Sáb', D: 'Dom'
+};
+
 export default function DetallePauta() {
   const { id } = useParams();
   const [pauta, setPauta] = useState(null);
@@ -48,7 +52,6 @@ export default function DetallePauta() {
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    // Evitar desfase horario al mostrar la fecha
     const [y, m, d] = dateString.split('T')[0].split('-');
     return new Date(y, m - 1, d).toLocaleDateString();
   };
@@ -60,6 +63,14 @@ export default function DetallePauta() {
   const totalNegociacion = Number(pauta.monto_total_negociacion) || 0;
   
   const progresoOC = totalNegociacion > 0 ? Math.min(Math.round((montoOC / totalNegociacion) * 100), 100) : 0;
+
+  // Días de semana
+  const diasSemana = pauta.dias_semana ? pauta.dias_semana.split(',') : [];
+
+  // Distribución OC — sumar monto OT de todas las emisoras de la misma OC
+  const otrasEmisoras = pauta.otras_emisoras_oc || [];
+  const montoAsignadoTotal = montoOT + otrasEmisoras.reduce((sum, e) => sum + Number(e.monto_ot || 0), 0);
+  const montoDisponibleOC = montoOC - montoAsignadoTotal;
 
   return (
     <>
@@ -103,18 +114,38 @@ export default function DetallePauta() {
                 { label: 'Marca', value: pauta.marca },
                 { label: 'Agencia', value: pauta.cliente_agencia || 'Directo' },
                 { label: 'Coordinadora', value: pauta.coordinadora },
+                { label: 'Número OC', value: pauta.numero_oc },
                 { label: 'Tipo de Compra', value: pauta.tipo_compra },
                 { label: 'Fecha de Emisión', value: formatDate(pauta.fecha_emision) },
                 { label: 'Programa', value: pauta.programa || 'N/A' },
                 { label: 'Presentadora', value: pauta.presentadora || 'N/A' },
                 { label: 'Horario', value: pauta.horario || 'N/A' },
-                { label: 'Observaciones', value: pauta.observaciones || '---' },
               ].map((item) => (
-                <div key={item.label} className={item.label === 'Observaciones' ? 'col-span-2' : ''}>
+                <div key={item.label}>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
                   <p className="text-sm font-medium text-slate-700">{item.value}</p>
                 </div>
               ))}
+
+              {/* Días de emisión */}
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Días de Emisión</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {diasSemana.length > 0 ? diasSemana.map(d => (
+                    <span key={d} className="px-2.5 py-1 bg-primary/10 text-primary text-xs font-bold rounded-md">
+                      {DIAS_MAP[d] || d}
+                    </span>
+                  )) : (
+                    <span className="text-sm text-slate-400 italic">No especificado</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Observaciones */}
+              <div className="col-span-2">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Observaciones</p>
+                <p className="text-sm font-medium text-slate-700">{pauta.observaciones || '---'}</p>
+              </div>
             </div>
           </section>
 
@@ -167,37 +198,77 @@ export default function DetallePauta() {
             </div>
           </section>
 
-          {/* EMISORAS ASOCIADAS */}
+          {/* EMISORA ASOCIADA */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">radio</span>
-              Emisoras Asociadas
+              Emisora Asociada
             </h3>
-            <div className="space-y-3">
-              {pauta.emisoras?.length > 0 ? (
-                pauta.emisoras.map((e, index) => (
-                  <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
-                    <div className="flex items-center gap-4 flex-1">
-                      <span className="material-symbols-outlined text-primary">radio</span>
-                      <div>
-                        <span className="text-sm font-bold text-slate-800 block mb-1">{e.nombre_emisora}</span>
-                        <div className="flex flex-wrap items-center gap-2 text-[10px] font-medium text-slate-500">
-                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.region_nombre || 'Sin Región'}</span>
-                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.estado_nombre || 'Sin Estado'}</span>
-                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.ciudad_nombre || 'Sin Ciudad'}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <span className="w-2 h-2 rounded-full bg-accent-green"></span>
+            {pauta.nombre_emisora ? (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
+                <div className="flex items-center gap-4 flex-1">
+                  <span className="material-symbols-outlined text-primary">radio</span>
+                  <div>
+                    <span className="text-sm font-bold text-slate-800 block mb-1">{pauta.nombre_emisora}</span>
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-medium text-slate-500">
+                      <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{pauta.region_nombre || 'Sin Región'}</span>
+                      <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{pauta.estado_nombre || 'Sin Estado'}</span>
+                      <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{pauta.ciudad_nombre || 'Sin Ciudad'}</span>
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="text-sm text-slate-500 italic">No hay emisoras asociadas registradas.</div>
-              )}
-            </div>
+                </div>
+                <span className="w-2 h-2 rounded-full bg-accent-green"></span>
+              </div>
+            ) : (
+              <div className="text-sm text-slate-500 italic">No hay emisora asociada registrada.</div>
+            )}
           </section>
+
+          {/* OTRAS EMISORAS EN ESTA OC */}
+          {otrasEmisoras.length > 0 && (
+            <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
+              <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
+                <span className="material-symbols-outlined text-primary">hub</span>
+                Otras Emisoras en OC: {pauta.numero_oc}
+              </h3>
+              <div className="space-y-3">
+                {otrasEmisoras.map((e) => (
+                  <Link
+                    key={e.id}
+                    to={`/pautas/${e.id}`}
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-white rounded-lg border border-slate-200 shadow-sm hover:border-primary/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-4 flex-1">
+                      <span className="material-symbols-outlined text-slate-400">radio</span>
+                      <div>
+                        <span className="text-sm font-bold text-slate-800 block">{e.nombre_emisora || 'Sin emisora'}</span>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase">OT: {e.numero_ot}</span>
+                      </div>
+                    </div>
+                    <span className="text-sm font-bold text-slate-700">${formatCurrency(e.monto_ot)}</span>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Resumen distribución OC */}
+              <div className="mt-4 p-4 bg-white rounded-lg border border-slate-200">
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-slate-500">Total asignado ({otrasEmisoras.length + 1} emisoras)</span>
+                  <span className="font-bold text-slate-800">${formatCurrency(montoAsignadoTotal)}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-500">Monto OC</span>
+                  <span className="font-bold text-slate-800">${formatCurrency(montoOC)}</span>
+                </div>
+                <div className="flex justify-between text-xs mt-2 pt-2 border-t border-slate-100">
+                  <span className="text-slate-500 font-bold">Disponible</span>
+                  <span className={`font-black ${montoDisponibleOC >= 0 ? 'text-accent-green' : 'text-red-500'}`}>
+                    ${formatCurrency(montoDisponibleOC)}
+                  </span>
+                </div>
+              </div>
+            </section>
+          )}
         </div>
 
         {/* RIGHT COLUMN */}
@@ -220,7 +291,7 @@ export default function DetallePauta() {
             </div>
           </section>
 
-          {/* MONTOS ADICIONALES */}
+          {/* MONTOS */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">payments</span>
@@ -250,4 +321,3 @@ export default function DetallePauta() {
     </>
   );
 }
-

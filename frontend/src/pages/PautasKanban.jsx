@@ -85,7 +85,13 @@ export default function PautasKanban() {
                           <span className="text-[10px] font-bold text-slate-400 uppercase capitalize">{p.tipo_compra}</span>
                         </div>
                         <p className="text-sm font-bold text-slate-800 mb-1">{p.cliente_nombre || 'Sin cliente'}</p>
-                        <p className="text-xs text-slate-500 mb-3">{p.marca}</p>
+                        <p className="text-xs text-slate-500">{p.marca}</p>
+                        {p.emisora_nombre && (
+                          <p className="text-[10px] text-primary font-medium mt-1 flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[12px]">radio</span>
+                            {p.emisora_nombre}
+                          </p>
+                        )}
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-500">{p.cantidad_cunas} cuñas</span>
                           <span className="font-bold text-slate-700">${Number(p.monto_oc).toLocaleString()}</span>

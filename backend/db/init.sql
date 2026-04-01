@@ -313,6 +313,7 @@ create table PAUTAS(
     programa VARCHAR(100),
     presentadora VARCHAR(50),
     horario VARCHAR(50),
+    dias_semana VARCHAR(20),
 	fk_vendedor UUID, 
 	fk_cliente INTEGER,
 	
@@ -326,7 +327,8 @@ create table PAUTAS(
         OR 
         (tipo_compra = 'rotativa' AND presentadora IS NULL AND programa IS NULL AND horario IS NULL)
       ),
-	CONSTRAINT check_estado CHECK(estado IN ('programada','en transmision','suspendida','finalizada'))
+	CONSTRAINT check_estado CHECK(estado IN ('programada','en transmision','suspendida','finalizada')),
+	CONSTRAINT check_monto_oc_gt_ot CHECK (monto_OC > monto_OT)
 );
 
 create table CUNAS (
