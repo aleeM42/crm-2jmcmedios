@@ -30,20 +30,21 @@ async function syncPautasEstados() {
 }
 
 /**
- * Obtiene todas las pautas con el nombre del cliente relacionado.
- * No se aplica filtro de rol, todos pueden ver todas las pautas.
+ * Obtiene todas las pautas con cliente, vendedor y emisora asociada.
  */
 export async function getAllPautas() {
-  // Sincronizar estados antes de consultar
   await syncPautasEstados();
 
   const query = `
     SELECT p.*, 
            c.nombre AS cliente_nombre,
-           u.primer_nombre || ' ' || u.primer_apellido AS vendedor_nombre
+           u.primer_nombre || ' ' || u.primer_apellido AS vendedor_nombre,
+           ac.nombre_emisora AS emisora_nombre
     FROM PAUTAS p
     LEFT JOIN CLIENTE c ON p.fk_cliente = c.id
     LEFT JOIN USUARIOS u ON p.fk_vendedor = u.id
+    LEFT JOIN DETALLE_PAUTA dp ON dp.fk_pauta = p.id
+    LEFT JOIN ALIADOS_COMERCIALES ac ON dp.fk_aliado = ac.id
     ORDER BY p.id DESC
   `;
   const result = await pool.query(query);
@@ -51,44 +52,50 @@ export async function getAllPautas() {
 }
 
 /**
- * Obtiene una pauta por su ID, con datos de Emisoras y Negociación Total
+ * Obtiene una pauta por su ID, con datos de la emisora y negociación total.
  */
 export async function getPautaById(id) {
-  // Sincronizar estados antes de consultar
   await syncPautasEstados();
 
-  // get pauta
+  // Pauta principal + emisora asociada
   const queryPauta = `
     SELECT p.*,
            c.nombre AS cliente_nombre,
            c.clasificacion AS cliente_clasificacion,
-           c.nombre_agencia AS cliente_agencia
+           c.nombre_agencia AS cliente_agencia,
+           ac.id AS aliado_id,
+           ac.nombre_emisora,
+           ac.frecuencia,
+           l.nombre AS ciudad_nombre,
+           lp.nombre AS estado_nombre,
+           r.nombre AS region_nombre
     FROM PAUTAS p
     LEFT JOIN CLIENTE c ON p.fk_cliente = c.id
+    LEFT JOIN DETALLE_PAUTA dp ON dp.fk_pauta = p.id
+    LEFT JOIN ALIADOS_COMERCIALES ac ON dp.fk_aliado = ac.id
+    LEFT JOIN LUGAR l ON ac.fk_lugar = l.id
+    LEFT JOIN LUGAR lp ON l.fk_lugar = lp.id
+    LEFT JOIN LUGAR r ON ac.fk_region = r.id
     WHERE p.id = $1
   `;
   const resultPauta = await pool.query(queryPauta, [id]);
   if (resultPauta.rows.length === 0) return null;
   const pauta = resultPauta.rows[0];
 
-  // get emisoras
-  const queryEmisoras = `
-    SELECT ac.nombre_emisora, dp.cantidad_emisoras, l.nombre as ciudad_nombre, lp.nombre as estado_nombre, r.nombre as region_nombre
-    FROM DETALLE_PAUTA dp
-    JOIN ALIADOS_COMERCIALES ac ON dp.fk_aliado = ac.id
-    LEFT JOIN LUGAR l ON ac.fk_lugar = l.id
-    LEFT JOIN LUGAR lp ON l.fk_lugar = lp.id
-    LEFT JOIN LUGAR r ON ac.fk_region = r.id
-    WHERE dp.fk_pauta = $1
+  // Otras emisoras con la misma OC (para distribución de monto)
+  const queryOtrasEmisoras = `
+    SELECT p2.id, p2.numero_ot, p2.monto_ot,
+           ac2.nombre_emisora
+    FROM PAUTAS p2
+    LEFT JOIN DETALLE_PAUTA dp2 ON dp2.fk_pauta = p2.id
+    LEFT JOIN ALIADOS_COMERCIALES ac2 ON dp2.fk_aliado = ac2.id
+    WHERE p2.numero_oc = $1 AND p2.id != $2
+    ORDER BY p2.id
   `;
-  const resultEmisoras = await pool.query(queryEmisoras, [id]);
-  if (resultEmisoras.rows.length > 0) {
-      pauta.emisoras = resultEmisoras.rows;
-  } else {
-      pauta.emisoras = [];
-  }
+  const resultOtras = await pool.query(queryOtrasEmisoras, [pauta.numero_oc, id]);
+  pauta.otras_emisoras_oc = resultOtras.rows;
 
-  // get historico negociaciones total para monto total negociacion
+  // Histórico de negociaciones total
   const queryHistorico = `
     SELECT COALESCE(SUM(monto_negociacion), 0) AS total_negociacion
     FROM HISTORICO_NEGOCIACIONES
@@ -101,30 +108,29 @@ export async function getPautaById(id) {
 }
 
 /**
- * Crea una pauta en la BD, incluyendo inserciones en tablas relacionadas (CUNAS, DETALLE_PAUTA, HISTORICO).
- * Requiere transacción para asegurar consistencia.
+ * Crea una pauta con 1 emisora asociada.
+ * Inserta en PAUTAS, CUNAS, DETALLE_PAUTA e HISTORICO_NEGOCIACIONES.
  */
 export async function createPauta(data) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
     
-    // Convertir el tipo de compra al ENUM o string esperado por la BD
     const tipoCompraBD = data.tipoCompra === 'en_vivo' ? 'en vivo' : 'rotativa';
     
     const queryPauta = `
       INSERT INTO PAUTAS (
-        numero_ot, fecha_emision, marca, coordinadora, fecha_inicio, fecha_fin,
+        numero_ot, numero_oc, fecha_emision, marca, coordinadora, fecha_inicio, fecha_fin,
         cantidad_cunas, costo_cunas, monto_oc, monto_ot, tipo_compra, estado,
-        observaciones, programa, presentadora, horario, fk_vendedor, fk_cliente
+        observaciones, programa, presentadora, horario, dias_semana, fk_vendedor, fk_cliente
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
       ) RETURNING id
     `;
     
-    // Variables asegurando nulos correctos
     const valuesPauta = [
       data.numeroOt,
+      data.numeroOc,
       data.fechaEmision,
       data.marca,
       data.coordinadora || null,
@@ -140,6 +146,7 @@ export async function createPauta(data) {
       data.programa || null,
       data.presentadora || null,
       data.horario || null,
+      data.diasSemana || null,
       data.vendedorId,
       data.clienteId
     ];
@@ -147,30 +154,34 @@ export async function createPauta(data) {
     const resultPauta = await client.query(queryPauta, valuesPauta);
     const pautaId = resultPauta.rows[0].id;
 
-    // Tabla CUNAS (Cortina y mensaje como '-' si no vienen en front)
+    // CUNAS
     const queryCuna = `
       INSERT INTO CUNAS (duracion, cortina, mensaje, fk_pauta)
       VALUES ($1, $2, $3, $4)
     `;
     await client.query(queryCuna, [data.duracionCuna, '-', '-', pautaId]);
 
-    // Tabla DETALLE_PAUTA (emisoras asociadas)
-    if (data.emisorasAsoc && data.emisorasAsoc.length > 0) {
+    // DETALLE_PAUTA — una sola emisora
+    if (data.aliadoId) {
       const queryDetalle = `
         INSERT INTO DETALLE_PAUTA (fk_pauta, fk_aliado, cantidad_emisoras)
-        VALUES ($1, $2, $3)
+        VALUES ($1, $2, 1)
       `;
-      for (const emisora of data.emisorasAsoc) {
-        await client.query(queryDetalle, [pautaId, emisora.id, emisora.cantidad_emisoras]);
-      }
+      await client.query(queryDetalle, [pautaId, data.aliadoId]);
     }
 
-    // Tabla HISTORICO_NEGOCIACIONES
+    // HISTORICO_NEGOCIACIONES
     const queryHistorico = `
       INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, total_cunas, fk_cliente)
       VALUES ($1, $2, $3, $4, $5)
     `;
-    await client.query(queryHistorico, [data.fechaInicio, data.fechaFin, data.montoOT || 0, parseInt(data.cantidadCunas, 10) || 0, data.clienteId]);
+    await client.query(queryHistorico, [
+      data.fechaInicio,
+      data.fechaFin,
+      data.montoOT || 0,
+      parseInt(data.cantidadCunas, 10) || 0,
+      data.clienteId
+    ]);
 
     await client.query('COMMIT');
     return pautaId;
@@ -180,4 +191,59 @@ export async function createPauta(data) {
   } finally {
     client.release();
   }
+}
+
+/**
+ * Obtiene todas las pautas que comparten el mismo numero_OC.
+ */
+export async function getPautasByOC(numeroOC) {
+  const query = `
+    SELECT p.id, p.numero_ot, p.numero_oc, p.monto_oc, p.monto_ot, p.estado,
+           ac.nombre_emisora,
+           c.nombre AS cliente_nombre
+    FROM PAUTAS p
+    LEFT JOIN DETALLE_PAUTA dp ON dp.fk_pauta = p.id
+    LEFT JOIN ALIADOS_COMERCIALES ac ON dp.fk_aliado = ac.id
+    LEFT JOIN CLIENTE c ON p.fk_cliente = c.id
+    WHERE p.numero_oc = $1
+    ORDER BY p.id
+  `;
+  const result = await pool.query(query, [numeroOC]);
+  return result.rows;
+}
+
+/**
+ * Calcula el monto disponible restante de una OC.
+ * Retorna: { montoOC, montoAsignado, montoDisponible, emisoras: [] }
+ */
+export async function getMontoDisponibleOC(numeroOC) {
+  const query = `
+    SELECT p.monto_oc, p.monto_ot, ac.nombre_emisora, p.numero_ot
+    FROM PAUTAS p
+    LEFT JOIN DETALLE_PAUTA dp ON dp.fk_pauta = p.id
+    LEFT JOIN ALIADOS_COMERCIALES ac ON dp.fk_aliado = ac.id
+    WHERE p.numero_oc = $1
+    ORDER BY p.id
+  `;
+  const result = await pool.query(query, [numeroOC]);
+
+  if (result.rows.length === 0) {
+    return { montoOC: 0, montoAsignado: 0, montoDisponible: 0, emisoras: [] };
+  }
+
+  // El monto_OC es el mismo para todas las pautas con la misma OC
+  const montoOC = parseFloat(result.rows[0].monto_oc);
+  const montoAsignado = result.rows.reduce((sum, r) => sum + parseFloat(r.monto_ot || 0), 0);
+  const montoDisponible = montoOC - montoAsignado;
+
+  return {
+    montoOC,
+    montoAsignado,
+    montoDisponible,
+    emisoras: result.rows.map(r => ({
+      nombreEmisora: r.nombre_emisora,
+      numeroOt: r.numero_ot,
+      montoOt: parseFloat(r.monto_ot)
+    }))
+  };
 }

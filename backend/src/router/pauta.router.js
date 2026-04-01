@@ -10,6 +10,10 @@ const router = Router();
 // Todas las rutas protegidas por JWT
 router.use(authenticate);
 
+// Rutas específicas primero (antes de /:id para evitar conflicto de matching)
+router.get('/oc/:numeroOC', PautaController.getByOC);
+router.get('/oc/:numeroOC/monto', PautaController.getMontoDisponible);
+
 router.post('/', PautaController.create);
 router.get('/', PautaController.getAll);
 router.get('/:id', PautaController.getById);

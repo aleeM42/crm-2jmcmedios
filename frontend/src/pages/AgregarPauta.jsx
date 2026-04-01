@@ -1,13 +1,23 @@
 // ==============================================
 // AgregarPauta.jsx — Formulario para Agregar Pauta
 // ==============================================
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { toast } from 'sonner';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 const COORDINADORAS = ['Oriana Mendoza', 'Ysabel Pérez'];
+
+const DIAS_SEMANA = [
+  { key: 'L', label: 'Lun' },
+  { key: 'M', label: 'Mar' },
+  { key: 'X', label: 'Mié' },
+  { key: 'J', label: 'Jue' },
+  { key: 'V', label: 'Vie' },
+  { key: 'S', label: 'Sáb' },
+  { key: 'D', label: 'Dom' },
+];
 
 export default function AgregarPauta() {
   const navigate = useNavigate();
@@ -20,13 +30,14 @@ export default function AgregarPauta() {
   const [marcas, setMarcas] = useState([]);
   const [loadingMarcas, setLoadingMarcas] = useState(false);
 
-  // Estados del formulario general
+  // Datos generales
   const [clienteId, setClienteId] = useState('');
   const [vendedorId, setVendedorId] = useState('');
   const [tipoCompra, setTipoCompra] = useState('');
   const [estado, setEstado] = useState('programada');
   const [marca, setMarca] = useState('');
   const [numeroOt, setNumeroOt] = useState('');
+  const [numeroOc, setNumeroOc] = useState('');
   const [coordinadora, setCoordinadora] = useState('');
   const [fechaEmision, setFechaEmision] = useState('');
   const [observaciones, setObservaciones] = useState('');
@@ -40,14 +51,18 @@ export default function AgregarPauta() {
   const [programa, setPrograma] = useState('');
   const [presentadora, setPresentadora] = useState('');
   const [horario, setHorario] = useState('');
+  const [diasSeleccionados, setDiasSeleccionados] = useState([]);
 
   // Montos
   const [montoOC, setMontoOC] = useState('');
   const [montoOT, setMontoOT] = useState('');
 
-  // Emisoras Asociadas
-  const [selectedAliadoId, setSelectedAliadoId] = useState('');
-  const [emisorasAsoc, setEmisorasAsoc] = useState([]);
+  // Emisora (una sola)
+  const [aliadoId, setAliadoId] = useState('');
+
+  // Distribución OC
+  const [distribucionOC, setDistribucionOC] = useState(null);
+  const [loadingDistribucion, setLoadingDistribucion] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,7 +94,40 @@ export default function AgregarPauta() {
     fetchData();
   }, []);
 
-  // Cuando cambia el cliente: auto-rellenar vendedor y cargar marcas
+  // Consultar distribución de monto cuando cambia el numero OC
+  const fetchDistribucionOC = useCallback(async (oc) => {
+    if (!oc || oc.trim() === '') {
+      setDistribucionOC(null);
+      return;
+    }
+    setLoadingDistribucion(true);
+    try {
+      const res = await api.get(`/pautas/oc/${encodeURIComponent(oc)}/monto`);
+      if (res.success && res.data.emisoras.length > 0) {
+        setDistribucionOC(res.data);
+        // Auto-rellenar monto OC si ya existe
+        if (res.data.montoOC > 0 && !montoOC) {
+          setMontoOC(res.data.montoOC.toString());
+        }
+      } else {
+        setDistribucionOC(null);
+      }
+    } catch {
+      setDistribucionOC(null);
+    } finally {
+      setLoadingDistribucion(false);
+    }
+  }, [montoOC]);
+
+  // Debounce para la consulta OC
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchDistribucionOC(numeroOc);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [numeroOc, fetchDistribucionOC]);
+
+  // Auto-rellenar vendedor y cargar marcas al cambiar cliente
   const handleClienteChange = async (newClienteId) => {
     setClienteId(newClienteId);
     setMarca('');
@@ -90,7 +138,6 @@ export default function AgregarPauta() {
       return;
     }
 
-    // Auto-fill vendedor
     const clienteObj = clientes.find((c) => c.id.toString() === newClienteId);
     if (clienteObj?.fk_vendedor) {
       setVendedorId(clienteObj.fk_vendedor.toString());
@@ -98,7 +145,6 @@ export default function AgregarPauta() {
       setVendedorId('');
     }
 
-    // Fetch marcas del cliente
     setLoadingMarcas(true);
     try {
       const res = await api.get(`/clientes/${newClienteId}/marcas`);
@@ -112,46 +158,29 @@ export default function AgregarPauta() {
     }
   };
 
-  // Seleccionar coordinadora (single select)
   const handleCoordinadoraSelect = (nombre) => {
     setCoordinadora(nombre);
   };
 
+  const toggleDia = (dia) => {
+    setDiasSeleccionados(prev =>
+      prev.includes(dia) ? prev.filter(d => d !== dia) : [...prev, dia]
+    );
+  };
+
   const esEnVivo = tipoCompra === 'en_vivo' || tipoCompra === 'en vivo';
 
-  // Computed data based on selections
   const selectedCliente = clientes.find((c) => c.id.toString() === clienteId) || null;
   const nombreAgencia = selectedCliente?.clasificacion === 'Agencia' ? selectedCliente.nombre_agencia : 'Cliente directo';
-
-  // Vendedor display (for read-only field)
   const selectedVendedor = vendedores.find((v) => v.id.toString() === vendedorId) || null;
-
-  const selectedAliado = aliados.find((a) => a.id.toString() === selectedAliadoId) || null;
-
-  const handleAddEmisora = () => {
-    if (!selectedAliado) return;
-    if (emisorasAsoc.some(e => e.id === selectedAliado.id)) {
-      alert('Esta emisora ya está agregada.');
-      return;
-    }
-    const newAddition = {
-      ...selectedAliado,
-      cantidad_emisoras: 1
-    };
-    setEmisorasAsoc([...emisorasAsoc, newAddition]);
-    setSelectedAliadoId('');
-  };
-
-  const handleRemoveEmisora = (idToRemove) => {
-    setEmisorasAsoc(emisorasAsoc.filter(e => e.id !== idToRemove));
-  };
+  const selectedAliado = aliados.find((a) => a.id.toString() === aliadoId) || null;
 
   const handleSave = async (e) => {
     e.preventDefault();
 
     // ── Validaciones de negocio ────────────────────────────
-    if (emisorasAsoc.length === 0) {
-      toast.error('Debe agregar al menos una emisora asociada.');
+    if (!aliadoId) {
+      toast.error('Debe seleccionar una emisora.');
       return;
     }
 
@@ -165,19 +194,16 @@ export default function AgregarPauta() {
       return;
     }
 
-    // Fecha inicio cuña debe ser >= fecha de emisión de la pauta
     if (new Date(fechaInicio) < new Date(fechaEmision)) {
       toast.error('La fecha de inicio de la cuña debe ser igual o posterior a la fecha de emisión de la pauta.');
       return;
     }
 
-    // Fecha inicio debe ser antes que fecha fin
     if (new Date(fechaInicio) > new Date(fechaFin)) {
       toast.error('La fecha de inicio no puede ser posterior a la fecha de fin de la cuña.');
       return;
     }
 
-    // Montos positivos
     if (Number(montoOC) <= 0) {
       toast.error('El monto OC debe ser un valor positivo mayor a cero.');
       return;
@@ -187,13 +213,20 @@ export default function AgregarPauta() {
       return;
     }
 
-    // Monto OT debe ser mayor al monto OC
-    if (Number(montoOT) <= Number(montoOC)) {
-      toast.error('El monto OT debe ser mayor al monto OC.');
+    // Monto OC debe ser mayor al monto OT
+    if (Number(montoOC) <= Number(montoOT)) {
+      toast.error('El monto OC debe ser mayor al monto OT.');
       return;
     }
 
-    // Cantidad de cuñas y costo por cuña positivos
+    // Validar monto disponible si la OC ya existe
+    if (distribucionOC && distribucionOC.emisoras.length > 0) {
+      if (Number(montoOT) > distribucionOC.montoDisponible) {
+        toast.error(`El monto OT supera el disponible de esta OC ($${distribucionOC.montoDisponible.toFixed(2)}).`);
+        return;
+      }
+    }
+
     if (Number(cantidadCunas) <= 0) {
       toast.error('La cantidad de cuñas debe ser mayor a cero.');
       return;
@@ -208,6 +241,21 @@ export default function AgregarPauta() {
       return;
     }
 
+    if (!numeroOt) {
+      toast.error('El número OT es obligatorio.');
+      return;
+    }
+
+    if (!numeroOc) {
+      toast.error('El número OC es obligatorio.');
+      return;
+    }
+
+    if (diasSeleccionados.length === 0) {
+      toast.error('Debe seleccionar al menos un día de la semana.');
+      return;
+    }
+
     const payload = {
       clienteId,
       vendedorId,
@@ -215,6 +263,7 @@ export default function AgregarPauta() {
       estado,
       marca,
       numeroOt,
+      numeroOc,
       coordinadora,
       fechaEmision,
       observaciones,
@@ -226,9 +275,10 @@ export default function AgregarPauta() {
       programa: tipoCompra === 'en_vivo' ? programa : null,
       presentadora: tipoCompra === 'en_vivo' ? presentadora : null,
       horario: tipoCompra === 'en_vivo' ? horario : null,
+      diasSemana: diasSeleccionados.join(','),
       montoOC,
       montoOT,
-      emisorasAsoc
+      aliadoId
     };
 
     try {
@@ -289,7 +339,7 @@ export default function AgregarPauta() {
                 </select>
               </div>
 
-              {/* Marca — select dinámico según cliente */}
+              {/* Marca */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Marca<span className="text-red-500 ml-0.5">*</span></label>
                 {loadingMarcas ? (
@@ -324,7 +374,7 @@ export default function AgregarPauta() {
                 </select>
               </div>
 
-              {/* Vendedor — auto-rellenado y de solo lectura */}
+              {/* Vendedor */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Vendedor<span className="text-red-500 ml-0.5">*</span></label>
                 <div className="relative">
@@ -339,7 +389,6 @@ export default function AgregarPauta() {
                     <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-primary">check_circle</span>
                   )}
                 </div>
-                {/* Hidden input to keep the value in form state */}
                 <input type="hidden" value={vendedorId} required />
               </div>
 
@@ -353,6 +402,14 @@ export default function AgregarPauta() {
                 </div>
               )}
 
+              {/* Número OC */}
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Número OC<span className="text-red-500 ml-0.5">*</span></label>
+                <input 
+                  type="text" value={numeroOc} onChange={(e) => setNumeroOc(e.target.value)} required
+                  placeholder="Ej: OC-00100" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+              </div>
+
               {/* Número OT */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Número OT<span className="text-red-500 ml-0.5">*</span></label>
@@ -361,7 +418,7 @@ export default function AgregarPauta() {
                   placeholder="Ej: OT-00125" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
 
-              {/* Coordinadora — multi-select tipo checkbox */}
+              {/* Coordinadora */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
                   Coordinadora<span className="text-red-500 ml-0.5">*</span>
@@ -463,13 +520,40 @@ export default function AgregarPauta() {
                   value={duracionCuna} onChange={(e) => setDuracionCuna(e.target.value)} required
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                   <option value="">Seleccionar...</option>
-                  <option value="15">15 segundos</option>
+                  <option value="10">10 segundos</option>
                   <option value="20">20 segundos</option>
                   <option value="30">30 segundos</option>
-                  <option value="45">45 segundos</option>
+                  <option value="40">40 segundos</option>
                   <option value="60">60 segundos</option>
                 </select>
               </div>
+
+              {/* DÍAS DE LA SEMANA */}
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                  Días de Emisión<span className="text-red-500 ml-0.5">*</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {DIAS_SEMANA.map(({ key, label }) => {
+                    const isActive = diasSeleccionados.includes(key);
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => toggleDia(key)}
+                        className={`w-11 h-11 rounded-lg text-xs font-bold border-2 transition-all ${
+                          isActive
+                            ? 'bg-primary border-primary text-white shadow-md shadow-primary/20'
+                            : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-primary/40 hover:text-primary'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Programa{esEnVivo && <span className="text-red-500 ml-0.5">*</span>}</label>
                 <input 
@@ -505,7 +589,8 @@ export default function AgregarPauta() {
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Monto OC ($)<span className="text-red-500 ml-0.5">*</span></label>
                 <input 
                   type="number" step="0.01" min="0" value={montoOC} onChange={(e) => setMontoOC(e.target.value)} required
-                  placeholder="0.00" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                  readOnly={distribucionOC?.emisoras.length > 0}
+                  placeholder="0.00" className={`w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none ${distribucionOC?.emisoras.length > 0 ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50'}`} />
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Monto OT ($)<span className="text-red-500 ml-0.5">*</span></label>
@@ -513,48 +598,66 @@ export default function AgregarPauta() {
                   type="number" step="0.01" min="0" value={montoOT} onChange={(e) => setMontoOT(e.target.value)} required
                   placeholder="0.00" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
+
+              {/* Panel de distribución OC */}
+              {loadingDistribucion && (
+                <div className="text-xs text-slate-400 text-center py-2">Consultando distribución OC...</div>
+              )}
+              {distribucionOC && distribucionOC.emisoras.length > 0 && (
+                <div className="bg-white rounded-lg border border-slate-200 p-4 space-y-3">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Distribución OC</p>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-500">Monto OC Total</span>
+                    <span className="font-bold text-slate-800">${distribucionOC.montoOC.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-500">Ya asignado</span>
+                    <span className="font-bold text-amber-600">${distribucionOC.montoAsignado.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between text-xs border-t border-slate-100 pt-2">
+                    <span className="text-slate-500 font-bold">Disponible</span>
+                    <span className="font-black text-accent-green">${distribucionOC.montoDisponible.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="space-y-1 mt-2">
+                    <p className="text-[9px] font-bold text-slate-400 uppercase">Emisoras asignadas:</p>
+                    {distribucionOC.emisoras.map((em, i) => (
+                      <div key={i} className="flex justify-between text-[11px] text-slate-500">
+                        <span>{em.nombreEmisora} ({em.numeroOt})</span>
+                        <span className="font-bold">${em.montoOt.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
-          {/* EMISORAS ASOCIADAS */}
+          {/* EMISORA ASOCIADA */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">radio</span>
-              Añadir Emisoras
+              Emisora
             </h3>
             <div className="space-y-4">
-              <div className="flex flex-col gap-2">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Seleccionar Emisora<span className="text-red-500 ml-0.5">*</span></label>
                 <select 
-                  value={selectedAliadoId} onChange={(e) => setSelectedAliadoId(e.target.value)}
+                  value={aliadoId} onChange={(e) => setAliadoId(e.target.value)} required
                   className="w-full h-12 px-4 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                   <option value="">Selecciona emisora...</option>
                   {aliados.map(a => <option key={a.id} value={a.id}>{a.nombre_emisora}</option>)}
                 </select>
-                <button onClick={handleAddEmisora} type="button" className="w-full py-2.5 flex items-center justify-center gap-2 border border-dashed border-slate-200 hover:border-primary text-slate-400 hover:text-primary rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors mb-2">
-                  <span className="material-symbols-outlined text-[16px]">add_circle</span>
-                  Agregar Emisora
-                </button>
               </div>
 
-              {/* Lista de emisoras asociadas */}
-              {emisorasAsoc.length > 0 && (
-                <div className="space-y-3 mt-4">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Emisoras agregadas:</p>
-                  {emisorasAsoc.map((e) => (
-                    <div key={e.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white rounded-lg border border-slate-200 shadow-sm gap-4">
-                      <div className="flex-1">
-                        <span className="text-sm font-bold text-slate-800 block mb-1">{e.nombre_emisora}</span>
-                        <div className="flex flex-wrap items-center gap-2 text-[10px] font-medium text-slate-500">
-                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.region_nombre || 'Sin Región'}</span>
-                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.estado_nombre || 'Sin Estado'}</span>
-                          <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{e.ciudad_nombre || 'Sin Ciudad'}</span>
-                        </div>
-                      </div>
-                      <button type="button" onClick={() => handleRemoveEmisora(e.id)} className="text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors p-2 rounded-md">
-                        <span className="material-symbols-outlined text-[18px] block">delete</span>
-                      </button>
-                    </div>
-                  ))}
+              {/* Detalle de la emisora seleccionada */}
+              {selectedAliado && (
+                <div className="p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
+                  <span className="text-sm font-bold text-slate-800 block mb-2">{selectedAliado.nombre_emisora}</span>
+                  <div className="flex flex-wrap items-center gap-2 text-[10px] font-medium text-slate-500">
+                    <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{selectedAliado.region_nombre || 'Sin Región'}</span>
+                    <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{selectedAliado.estado_nombre || 'Sin Estado'}</span>
+                    <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{selectedAliado.ciudad_nombre || 'Sin Ciudad'}</span>
+                  </div>
                 </div>
               )}
             </div>
