@@ -32,9 +32,9 @@ function DashboardLayout() {
     // Director General / Director: Ve todo
     if (rolAuth === 'director general' || rolAuth === 'director') return true;
 
-    // Pauta: Solo ve su módulo y reportes/dashboard
-    if (rolAuth === 'pauta') {
-      return item.to === '/dashboard' || item.to === '/pautas' || item.to === '/reportes';
+    // Gestor de Pautas: Solo ve su módulo de pautas y Mi Perfil (opcional, pero el usuario dijo "unicamente el modulo de pautas")
+    if (rolAuth === 'gestor de pautas') {
+      return item.to === '/pautas';
     }
 
     // Invitado: Solo ve Dashboard y lectura general si se le habilita

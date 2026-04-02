@@ -13,7 +13,7 @@ export default function PautasCalendario() {
   const [loading, setLoading] = useState(true);
 
   const user = getCurrentUser();
-  const canCreatePauta = ['Administrador', 'Director General', 'Pauta'].includes(user?.rol);
+  const canCreatePauta = ['Administrador', 'Director General', 'Gestor de Pautas'].includes(user?.rol);
 
   // Estado para la navegación de meses
   const actualDate = new Date();

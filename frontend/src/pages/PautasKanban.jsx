@@ -19,7 +19,7 @@ export default function PautasKanban() {
   const [loading, setLoading] = useState(true);
 
   const user = getCurrentUser();
-  const canCreatePauta = ['Administrador', 'Director General', 'Pauta'].includes(user?.rol);
+  const canCreatePauta = ['Administrador', 'Director General', 'Gestor de Pautas'].includes(user?.rol);
 
   useEffect(() => {
     api.get('/pautas')

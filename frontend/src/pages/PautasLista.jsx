@@ -25,7 +25,7 @@ export default function PautasLista() {
   const [vendedorFilter, setVendedorFilter] = useState('');
 
   const user = getCurrentUser();
-  const canCreatePauta = ['Administrador', 'Director General', 'Pauta'].includes(user?.rol);
+  const canCreatePauta = ['Administrador', 'Director General', 'Gestor de Pautas'].includes(user?.rol);
 
   useEffect(() => {
     api.get('/pautas')

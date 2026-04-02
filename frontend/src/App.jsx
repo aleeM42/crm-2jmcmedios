@@ -60,7 +60,7 @@ export default function App() {
         {/* ===================== DASHBOARD (protegido + sidebar) ===================== */}
         <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/mi-perfil" element={<ProtectedRoute allowedRoles={['Director General', 'Director', 'Vendedor', 'Pauta', 'Invitado']}><MiPerfil /></ProtectedRoute>} />
+          <Route path="/mi-perfil" element={<ProtectedRoute allowedRoles={['Director General', 'Director', 'Vendedor', 'Gestor de Pautas', 'Invitado']}><MiPerfil /></ProtectedRoute>} />
 
           {/* Equipo de Ventas */}
           <Route path="/equipo-ventas" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor']}><EquipoVentas /></ProtectedRoute>} />
@@ -71,7 +71,7 @@ export default function App() {
           <Route path="/pautas" element={<PautasLista />} />
           <Route path="/pautas/kanban" element={<PautasKanban />} />
           <Route path="/pautas/calendario" element={<PautasCalendario />} />
-          <Route path="/pautas/agregar" element={<ProtectedRoute allowedRoles={['Administrador', 'Pauta']}><AgregarPauta /></ProtectedRoute>} />
+          <Route path="/pautas/agregar" element={<ProtectedRoute allowedRoles={['Administrador', 'Gestor de Pautas']}><AgregarPauta /></ProtectedRoute>} />
           <Route path="/pautas/:id" element={<DetallePauta />} />
 
           {/* Aliados Comerciales */}
