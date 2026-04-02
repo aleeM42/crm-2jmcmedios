@@ -87,11 +87,11 @@ function AliadosComerciales() {
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-[#F4FAFB] p-4 rounded-xl shadow-sm border border-slate-100 flex flex-wrap items-center gap-4 mb-8">
-        <div className="flex-1 min-w-0 sm:min-w-[300px] relative">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+      <div className="flex flex-wrap items-center gap-4 mb-6">
+        <div className="relative flex-1 min-w-0 max-w-full sm:max-w-xs">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
           <input
-            className="w-full pl-10 pr-4 py-2 bg-background-light border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 placeholder:text-slate-400"
+            className="w-full h-10 pl-10 pr-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm focus:ring-primary focus:border-primary outline-none placeholder:text-slate-400"
             placeholder="Buscar emisora o frecuencia..."
             type="text"
             value={searchTerm}
@@ -99,7 +99,7 @@ function AliadosComerciales() {
           />
         </div>
         <select
-          className="bg-background-light border-none rounded-lg text-sm py-2 pl-4 pr-10 focus:ring-2 focus:ring-primary/50 cursor-pointer capitalize"
+          className="h-10 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none cursor-pointer capitalize"
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
@@ -111,10 +111,9 @@ function AliadosComerciales() {
           <option value="adulto contemporáneo">Adulto Contemporáneo</option>
           <option value="popular">Popular</option>
           <option value="adulto">Adulto</option>
-          <option value="comunitaria">Comunitaria</option>
         </select>
         <select
-          className="bg-background-light border-none rounded-lg text-sm py-2 pl-4 pr-10 focus:ring-2 focus:ring-primary/50 cursor-pointer capitalize"
+          className="h-10 px-4 pr-8 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none cursor-pointer capitalize"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >

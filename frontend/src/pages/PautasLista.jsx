@@ -166,17 +166,17 @@ export default function PautasLista() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/50">
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Nro OC</th>
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Nro OT</th>
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Cliente</th>
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Emisora</th>
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Marca</th>
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Tipo</th>
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Vigencia</th>
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Estado</th>
-                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Progreso</th>
-                <th className="text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Monto OC</th>
+              <tr className="border-b border-slate-100 bg-primary">
+                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Nro OC</th>
+                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Nro OT</th>
+                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Cliente</th>
+                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Emisora</th>
+                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Marca</th>
+                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Tipo</th>
+                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Vigencia</th>
+                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Estado</th>
+                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Progreso</th>
+                <th className="text-right text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Monto OC</th>
               </tr>
             </thead>
             <tbody>

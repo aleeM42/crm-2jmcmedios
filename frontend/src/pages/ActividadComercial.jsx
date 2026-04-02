@@ -188,7 +188,7 @@ function ActividadComercial() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                <tr className="bg-primary text-slate-100 text-[11px] font-bold uppercase tracking-wider">
                   <th className="px-6 py-4">Fecha</th>
                   <th className="px-6 py-4">Hora</th>
                   <th className="px-6 py-4">Vendedor</th>

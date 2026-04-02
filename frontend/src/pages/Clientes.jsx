@@ -107,19 +107,24 @@ export default function Clientes() {
       </div>
 
       {/* Filter bar */}
-      <div className="bg-[#F4FAFB] p-4 rounded-xl shadow-sm mb-6 flex flex-wrap items-center gap-4">
-        <div className="relative flex-1 min-w-0 sm:min-w-[300px]">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+      <div className="flex flex-wrap items-center gap-4 mb-6">
+        <div className="relative flex-1 min-w-0 max-w-full sm:max-w-xs">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
           <input
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg border-slate-200 text-sm focus:ring-primary focus:border-primary transition-all"
-            placeholder="Buscar por nombre, RIF fiscal o razón social..."
+            className="w-full h-10 pl-10 pr-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm focus:ring-primary focus:border-primary outline-none placeholder:text-slate-400"
+            placeholder="Buscar por nombre, RIF..."
             type="text"
             name="search"
             value={filters.search}
             onChange={handleFilter}
           />
         </div>
-        <select name="sector" value={filters.sector} onChange={handleFilter} className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
+        <select
+          name="sector"
+          value={filters.sector}
+          onChange={handleFilter}
+          className="h-10 px-4 pr-8 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none cursor-pointer"
+        >
           <option value="">Sector: Todos</option>
           <option value="Salud">Salud</option>
           <option value="Alimentacion">Alimentación</option>
@@ -129,12 +134,22 @@ export default function Clientes() {
           <option value="Aerolinea">Aerolínea</option>
           <option value="Otro">Otro</option>
         </select>
-        <select name="estado" value={filters.estado} onChange={handleFilter} className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
+        <select
+          name="estado"
+          value={filters.estado}
+          onChange={handleFilter}
+          className="h-10 px-4 pr-8 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none cursor-pointer"
+        >
           <option value="">Estado: Todos</option>
           <option value="Activo">Activo</option>
           <option value="Inactivo">Inactivo</option>
         </select>
-        <select name="clasificacion" value={filters.clasificacion} onChange={handleFilter} className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
+        <select
+          name="clasificacion"
+          value={filters.clasificacion}
+          onChange={handleFilter}
+          className="h-10 px-4 pr-8 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary outline-none cursor-pointer"
+        >
           <option value="">Clasificación: Todas</option>
           <option value="Agencia">Agencia</option>
           <option value="Cliente directo">Cliente Directo</option>
@@ -154,15 +169,15 @@ export default function Clientes() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Nombre</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Razón Social</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">RIF Fiscal</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Sector</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Clasificación</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Estado</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Tipo</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-accent-green uppercase tracking-widest">Acciones</th>
+              <tr className="bg-primary border-b border-slate-100 ">
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Nombre</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Razón Social</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">RIF Fiscal</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Sector</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Clasificación</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Estado</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Tipo</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">

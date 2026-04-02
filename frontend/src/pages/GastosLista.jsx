@@ -122,13 +122,13 @@ export default function GastosLista() {
       <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/50">
-              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Asociado a</th>
-              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Concepto</th>
-              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Fecha</th>
-              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Monto</th>
-              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Tipo</th>
-              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6"></th>
+            <tr className="border-b border-slate-100 bg-primary">
+              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Asociado a</th>
+              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Concepto</th>
+              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Fecha</th>
+              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Monto</th>
+              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Tipo</th>
+              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6"></th>
             </tr>
           </thead>
           <tbody>

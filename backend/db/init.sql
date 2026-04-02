@@ -169,15 +169,20 @@ CREATE TABLE CONTACTOS (
 ); 
 
 CREATE TABLE TELEFONOS ( 
-    codigo_area VARCHAR(4) NOT NULL, 
-    numero VARCHAR(7) NOT NULL, 
-    fk_usuario UUID NOT NULL, 
+    codigo_area NUMERIC(4) NOT NULL, 
+    numero NUMERIC(7) NOT NULL, 
+    fk_usuario UUID, 
     fk_contacto INTEGER, 
     
     -- Constraints
     CONSTRAINT pk_telefono PRIMARY KEY (codigo_area, numero),
     CONSTRAINT fk_usuario_tel FOREIGN KEY (fk_usuario) REFERENCES USUARIOS(id) ON DELETE CASCADE,
-    CONSTRAINT fk_contacto_tel FOREIGN KEY (fk_contacto) REFERENCES CONTACTOS(id) ON DELETE CASCADE
+    CONSTRAINT fk_contacto_tel FOREIGN KEY (fk_contacto) REFERENCES CONTACTOS(id) ON DELETE CASCADE, 
+
+     CONSTRAINT arco_exclusivo_telefonos CHECK (
+        (fk_usuario IS NOT NULL AND fk_contacto IS NULL) OR
+        (fk_usuario IS NULL AND fk_contacto IS NOT NULL)
+    )
 );
 
 create table ALIADOS_COMERCIALES(
