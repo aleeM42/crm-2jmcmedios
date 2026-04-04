@@ -232,7 +232,7 @@ export default function AgregarGasto() {
           {/* RESUMEN */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary">summarize</span>
+              <span className="material-symbols-outlined text-accent-green">summarize</span>
               Resumen
             </h3>
             <div className="space-y-3">
@@ -250,7 +250,7 @@ export default function AgregarGasto() {
               </div>
               <div className="flex justify-between py-2">
                 <span className="text-xs font-bold text-slate-700">Monto</span>
-                <span className="text-sm font-black text-primary">${formData.monto ? parseFloat(formData.monto).toFixed(2) : '0.00'}</span>
+                <span className="text-sm font-black text-accent-green">${formData.monto ? parseFloat(formData.monto).toFixed(2) : '0.00'}</span>
               </div>
             </div>
           </section>

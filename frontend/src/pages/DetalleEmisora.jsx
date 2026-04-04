@@ -45,7 +45,7 @@ export default function DetalleEmisora() {
   // Cálculos rápidos para KPIs a partir de las pautas asociadas
   const pautasActivasCount = emisora.kpis?.campanas_activas || 0;
   const facturacionTotal = emisora.pautas?.reduce((sum, p) => sum + Number(p.monto_ot), 0) || 0;
-  
+
   // Estado dinámico: Es Activa si su estado en BD es Activa Y además tiene pautas asociadas
   const esActivaEnBD = emisora.estado?.toLowerCase() === 'activo' || emisora.estado?.toLowerCase() === 'activa';
   const estadoMostrar = (esActivaEnBD && emisora.pautas?.length > 0) ? 'Activo' : 'Inactivo';
@@ -86,7 +86,7 @@ export default function DetalleEmisora() {
         {/* LEFT COLUMN */}
         <div className="lg:col-span-8 space-y-8">
           {/* INFORMACIÓN GENERAL */}
-          <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+          <section className="bg-[#F4FAFB] rounded-2xl p-6 shadow-sm border border-slate-100">
             <div className="flex items-center gap-2 mb-6">
               <span className="material-symbols-outlined text-primary">info</span>
               <h3 className="text-lg font-bold text-slate-800 font-display">Información General</h3>
@@ -121,7 +121,7 @@ export default function DetalleEmisora() {
 
           {/* COBERTURA Y UBICACIÓN */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+            <section className="bg-[#F4FAFB] rounded-2xl p-6 shadow-sm border border-slate-100">
               <div className="flex items-center gap-2 mb-6">
                 <span className="material-symbols-outlined text-primary">radar</span>
                 <h3 className="text-lg font-bold text-slate-800 font-display">Cobertura</h3>
@@ -135,7 +135,7 @@ export default function DetalleEmisora() {
               </div>
             </section>
 
-            <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+            <section className="bg-[#F4FAFB] rounded-2xl p-6 shadow-sm border border-slate-100">
               <div className="flex items-center gap-2 mb-6">
                 <span className="material-symbols-outlined text-primary">location_on</span>
                 <h3 className="text-lg font-bold text-slate-800 font-display">Ubicación</h3>
@@ -158,7 +158,7 @@ export default function DetalleEmisora() {
           </div>
 
           {/* PAUTAS ASOCIADAS */}
-          <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+          <section className="bg-[#F4FAFB] rounded-2xl p-6 shadow-sm border border-slate-100">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">list_alt</span>
@@ -202,9 +202,9 @@ export default function DetalleEmisora() {
         {/* RIGHT COLUMN */}
         <div className="lg:col-span-4 space-y-8">
           {/* CONTACTOS */}
-          <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+          <section className="bg-[#F4FAFB] rounded-2xl p-6 shadow-sm border border-slate-100">
             <div className="flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary">person</span>
+              <span className="material-symbols-outlined text-accent-green">person</span>
               <h3 className="text-lg font-bold text-slate-800 font-display">Contacto Principal</h3>
             </div>
             {emisora.contactos && emisora.contactos.length > 0 ? (
@@ -214,11 +214,11 @@ export default function DetalleEmisora() {
                   return (
                     <div key={contacto.id} className={idx > 0 ? 'pt-6 border-t border-slate-100' : ''}>
                       <div className="text-center mb-6">
-                        <div className="w-20 h-20 rounded-full bg-primary mx-auto mb-3 flex items-center justify-center border-2 border-primary/20 text-white font-bold text-2xl tracking-tighter">
+                        <div className="w-20 h-20 rounded-full bg-accent-green/10 mx-auto mb-3 flex items-center justify-center border-2 border-accent-green/20 text-accent-green font-bold text-2xl tracking-tighter">
                           {initials}
                         </div>
                         <h4 className="font-bold text-lg text-slate-800">{contacto.pri_nombre} {contacto.pri_apellido}</h4>
-                        <span className="inline-block mt-1 px-3 py-0.5 bg-accent-light/30 text-primary text-[10px] font-black rounded-lg uppercase tracking-widest border border-primary/10">{contacto.rol || 'Contacto'}</span>
+                        <span className="inline-block mt-1 px-3 py-0.5 bg-accent-green/10 text-accent-green text-[10px] font-black rounded-lg uppercase tracking-widest border border-primary/10">{contacto.rol || 'Contacto'}</span>
                       </div>
                       <div className="space-y-4">
                         <div className="flex items-center gap-3">
@@ -254,9 +254,9 @@ export default function DetalleEmisora() {
           </section>
 
           {/* ESTADÍSTICAS */}
-          <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+          <section className="bg-[#F4FAFB] rounded-2xl p-6 shadow-sm border border-slate-100">
             <div className="flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary">analytics</span>
+              <span className="material-symbols-outlined text-accent-green">analytics</span>
               <h3 className="text-lg font-bold text-slate-800 font-display">Estadísticas</h3>
             </div>
             <div className="space-y-6">
@@ -265,21 +265,21 @@ export default function DetalleEmisora() {
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Facturación Aprox.</p>
                   <p className="text-2xl font-black text-slate-900">${facturacionTotal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
                 </div>
-                <span className="material-symbols-outlined text-secondary text-3xl">payments</span>
+                <span className="material-symbols-outlined text-accent-green text-3xl">payments</span>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pautas Históricas</p>
                   <p className="text-2xl font-black text-slate-900">{emisora.pautas?.length || 0}</p>
                 </div>
-                <span className="material-symbols-outlined text-primary text-3xl">receipt_long</span>
+                <span className="material-symbols-outlined text-accent-green text-3xl">receipt_long</span>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pautas Activas</p>
                   <p className="text-2xl font-black text-slate-900">{pautasActivasCount}</p>
                 </div>
-                <span className="material-symbols-outlined text-accent-medium text-3xl">pending_actions</span>
+                <span className="material-symbols-outlined text-accent-green text-3xl">pending_actions</span>
               </div>
             </div>
           </section>

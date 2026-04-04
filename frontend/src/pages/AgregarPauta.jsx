@@ -331,7 +331,7 @@ export default function AgregarPauta() {
               {/* Cliente */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cliente<span className="text-red-500 ml-0.5">*</span></label>
-                <select 
+                <select
                   value={clienteId} onChange={(e) => handleClienteChange(e.target.value)} required
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                   <option value="">Seleccionar cliente...</option>
@@ -395,9 +395,9 @@ export default function AgregarPauta() {
               {selectedCliente?.clasificacion === 'Agencia' && (
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Nombre Agencia</label>
-                  <input 
-                    type="text" value={nombreAgencia} readOnly 
-                    placeholder="Se asigna según clasificación del cliente" 
+                  <input
+                    type="text" value={nombreAgencia} readOnly
+                    placeholder="Se asigna según clasificación del cliente"
                     className="w-full h-12 px-4 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-500" />
                 </div>
               )}
@@ -405,7 +405,7 @@ export default function AgregarPauta() {
               {/* Número OC */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Número OC<span className="text-red-500 ml-0.5">*</span></label>
-                <input 
+                <input
                   type="text" value={numeroOc} onChange={(e) => setNumeroOc(e.target.value)} required
                   placeholder="Ej: OC-00100" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
@@ -413,7 +413,7 @@ export default function AgregarPauta() {
               {/* Número OT */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Número OT<span className="text-red-500 ml-0.5">*</span></label>
-                <input 
+                <input
                   type="text" value={numeroOt} onChange={(e) => setNumeroOt(e.target.value)} required
                   placeholder="Ej: OT-00125" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
@@ -433,9 +433,8 @@ export default function AgregarPauta() {
                         className={`flex items-center gap-3 cursor-pointer select-none rounded-md px-2 py-1.5 transition-colors ${selected ? 'bg-primary/10' : 'hover:bg-slate-100'}`}
                       >
                         <span
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-                            selected ? 'border-primary' : 'border-slate-300 bg-white'
-                          }`}
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${selected ? 'border-primary' : 'border-slate-300 bg-white'
+                            }`}
                         >
                           {selected && (
                             <span className="w-2.5 h-2.5 rounded-full bg-primary block" />
@@ -455,7 +454,7 @@ export default function AgregarPauta() {
               {/* Fecha de Emisión */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Fecha de Emisión<span className="text-red-500 ml-0.5">*</span></label>
-                <input 
+                <input
                   type="date" value={fechaEmision} onChange={(e) => setFechaEmision(e.target.value)} required
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
@@ -463,7 +462,7 @@ export default function AgregarPauta() {
               {/* Estado */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Estado<span className="text-red-500 ml-0.5">*</span></label>
-                <select 
+                <select
                   value={estado} onChange={(e) => setEstado(e.target.value)} required
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                   <option value="programada">Programada</option>
@@ -476,7 +475,7 @@ export default function AgregarPauta() {
               {/* Observaciones */}
               <div className="col-span-2">
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Observaciones</label>
-                <textarea 
+                <textarea
                   value={observaciones} onChange={(e) => setObservaciones(e.target.value)}
                   rows={2} placeholder="Notas sobre la pauta..." className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none" />
               </div>
@@ -492,31 +491,31 @@ export default function AgregarPauta() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Fecha Inicio<span className="text-red-500 ml-0.5">*</span></label>
-                <input 
+                <input
                   type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Fecha Fin<span className="text-red-500 ml-0.5">*</span></label>
-                <input 
+                <input
                   type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cantidad de Cuñas<span className="text-red-500 ml-0.5">*</span></label>
-                <input 
+                <input
                   type="number" min="1" value={cantidadCunas} onChange={(e) => setCantidadCunas(e.target.value)} required
                   placeholder="0" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Costo por Cuña ($)<span className="text-red-500 ml-0.5">*</span></label>
-                <input 
+                <input
                   type="number" step="0.01" min="0" value={costoCuna} onChange={(e) => setCostoCuna(e.target.value)} required
                   placeholder="0.00" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Duración de Cuña<span className="text-red-500 ml-0.5">*</span></label>
-                <select 
+                <select
                   value={duracionCuna} onChange={(e) => setDuracionCuna(e.target.value)} required
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                   <option value="">Seleccionar...</option>
@@ -541,11 +540,10 @@ export default function AgregarPauta() {
                         key={key}
                         type="button"
                         onClick={() => toggleDia(key)}
-                        className={`w-11 h-11 rounded-lg text-xs font-bold border-2 transition-all ${
-                          isActive
-                            ? 'bg-primary border-primary text-white shadow-md shadow-primary/20'
-                            : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-primary/40 hover:text-primary'
-                        }`}
+                        className={`w-11 h-11 rounded-lg text-xs font-bold border-2 transition-all ${isActive
+                          ? 'bg-primary border-primary text-white shadow-md shadow-primary/20'
+                          : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-primary/40 hover:text-primary'
+                          }`}
                       >
                         {label}
                       </button>
@@ -556,19 +554,19 @@ export default function AgregarPauta() {
 
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Programa{esEnVivo && <span className="text-red-500 ml-0.5">*</span>}</label>
-                <input 
+                <input
                   type="text" value={programa} onChange={(e) => setPrograma(e.target.value)} required={esEnVivo}
                   placeholder="Nombre del programa" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Presentadora{esEnVivo && <span className="text-red-500 ml-0.5">*</span>}</label>
-                <input 
+                <input
                   type="text" value={presentadora} onChange={(e) => setPresentadora(e.target.value)} required={esEnVivo}
                   placeholder="Nombre de la presentadora" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
               <div className="col-span-2">
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Horario{esEnVivo && <span className="text-red-500 ml-0.5">*</span>}</label>
-                <input 
+                <input
                   type="text" value={horario} onChange={(e) => setHorario(e.target.value)} required={esEnVivo}
                   placeholder="Ej: 06:00 - 10:00 AM" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
@@ -581,20 +579,20 @@ export default function AgregarPauta() {
           {/* MONTOS */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary">payments</span>
+              <span className="material-symbols-outlined text-accent-green">payments</span>
               Montos
             </h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Monto OC ($)<span className="text-red-500 ml-0.5">*</span></label>
-                <input 
+                <input
                   type="number" step="0.01" min="0" value={montoOC} onChange={(e) => setMontoOC(e.target.value)} required
                   readOnly={distribucionOC?.emisoras.length > 0}
                   placeholder="0.00" className={`w-full h-12 px-4 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none ${distribucionOC?.emisoras.length > 0 ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50'}`} />
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Monto OT ($)<span className="text-red-500 ml-0.5">*</span></label>
-                <input 
+                <input
                   type="number" step="0.01" min="0" value={montoOT} onChange={(e) => setMontoOT(e.target.value)} required
                   placeholder="0.00" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
@@ -635,15 +633,15 @@ export default function AgregarPauta() {
           {/* EMISORA ASOCIADA */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary">radio</span>
+              <span className="material-symbols-outlined text-accent-green">radio</span>
               Emisora
             </h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Seleccionar Emisora<span className="text-red-500 ml-0.5">*</span></label>
-                <select 
+                <select
                   value={aliadoId} onChange={(e) => setAliadoId(e.target.value)} required
-                  className="w-full h-12 px-4 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                  className="w-full h-12 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                   <option value="">Selecciona emisora...</option>
                   {aliados.map(a => <option key={a.id} value={a.id}>{a.nombre_emisora}</option>)}
                 </select>
@@ -651,12 +649,12 @@ export default function AgregarPauta() {
 
               {/* Detalle de la emisora seleccionada */}
               {selectedAliado && (
-                <div className="p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
+                <div className="p-4 bg-[#F4FAFB] rounded-lg border border-slate-200 shadow-sm">
                   <span className="text-sm font-bold text-slate-800 block mb-2">{selectedAliado.nombre_emisora}</span>
                   <div className="flex flex-wrap items-center gap-2 text-[10px] font-medium text-slate-500">
-                    <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{selectedAliado.region_nombre || 'Sin Región'}</span>
-                    <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{selectedAliado.estado_nombre || 'Sin Estado'}</span>
-                    <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{selectedAliado.ciudad_nombre || 'Sin Ciudad'}</span>
+                    <span className="bg-accent-green/10 px-2 py-1 rounded border border-slate-200">{selectedAliado.region_nombre || 'Sin Región'}</span>
+                    <span className="bg-accent-green/10 px-2 py-1 rounded border border-slate-200">{selectedAliado.estado_nombre || 'Sin Estado'}</span>
+                    <span className="bg-accent-green/10 px-2 py-1 rounded border border-slate-200">{selectedAliado.ciudad_nombre || 'Sin Ciudad'}</span>
                   </div>
                 </div>
               )}

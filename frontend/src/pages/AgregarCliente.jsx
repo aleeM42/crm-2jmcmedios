@@ -333,7 +333,7 @@ export default function AgregarCliente() {
             {isSubEmpresa && (
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Seleccionar Empresa Padre <span className="text-red-500">*</span></label>
-                <select name="fk_cliente_padre" value={cliente.fk_cliente_padre || ''} onChange={handleCliente} className="w-full rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
+                <select name="fk_cliente_padre" value={cliente.fk_cliente_padre || ''} onChange={handleCliente} className="w-full rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
                   <option value="">Buscar empresa...</option>
                   {empresas.map(emp => (
                     <option key={emp.id} value={emp.id}>{emp.razon_social}</option>
@@ -353,19 +353,19 @@ export default function AgregarCliente() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nombre <span className="text-red-500">*</span></label>
-              <input name="nombre" value={cliente.nombre} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Comercial" type="text" required />
+              <input name="nombre" value={cliente.nombre} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Comercial" type="text" required />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Razón Social <span className="text-red-500">*</span></label>
-              <input name="razon_social" value={cliente.razon_social} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Legal Completo" type="text" required />
+              <input name="razon_social" value={cliente.razon_social} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Legal Completo" type="text" required />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">RIF Fiscal <span className="text-red-500">*</span></label>
-              <input name="rif_fiscal" value={cliente.rif_fiscal} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="J123456789" type="text" maxLength="10" required />
+              <input name="rif_fiscal" value={cliente.rif_fiscal} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="J123456789" type="text" maxLength="10" required />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Ubicación (Estado) <span className="text-red-500">*</span></label>
-              <select name="fk_lugar" value={cliente.fk_lugar} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
+              <select name="fk_lugar" value={cliente.fk_lugar} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
                 <option value="">Seleccione estado</option>
                 {lugares.map(l => (
                   <option key={l.id} value={l.id}>{l.nombre}</option>
@@ -374,11 +374,11 @@ export default function AgregarCliente() {
             </div>
             <div className="flex flex-col gap-1.5 md:col-span-2">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Dirección <span className="text-red-500">*</span></label>
-              <input name="direccion" value={cliente.direccion} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Dirección completa del cliente" type="text" required />
+              <input name="direccion" value={cliente.direccion} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Dirección completa del cliente" type="text" required />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Clasificación <span className="text-red-500">*</span></label>
-              <select name="clasificacion" value={cliente.clasificacion} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
+              <select name="clasificacion" value={cliente.clasificacion} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
                 <option value="">Seleccione</option>
                 <option value="Cliente directo">Cliente Directo</option>
                 <option value="Agencia">Agencia</option>
@@ -386,11 +386,11 @@ export default function AgregarCliente() {
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nombre de Agencia {cliente.clasificacion === 'Agencia' && <span className="text-red-500">*</span>}</label>
-              <input name="nombre_agencia" value={cliente.nombre_agencia} onChange={handleCliente} disabled={cliente.clasificacion !== 'Agencia'} className={`rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary ${cliente.clasificacion !== 'Agencia' ? 'bg-slate-50 opacity-60' : ''}`} placeholder="Solo si clasificación es Agencia" type="text" />
+              <input name="nombre_agencia" value={cliente.nombre_agencia} onChange={handleCliente} disabled={cliente.clasificacion !== 'Agencia'} className={`rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary ${cliente.clasificacion !== 'Agencia' ? 'bg-slate-50 opacity-60' : ''}`} placeholder="Solo si clasificación es Agencia" type="text" />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sector <span className="text-red-500">*</span></label>
-              <select name="sector" value={cliente.sector} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
+              <select name="sector" value={cliente.sector} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
                 <option value="">Seleccione sector</option>
                 <option value="Salud">Salud</option>
                 <option value="Alimentacion">Alimentación</option>
@@ -398,19 +398,22 @@ export default function AgregarCliente() {
                 <option value="Fabricacion">Fabricación</option>
                 <option value="Bancario">Bancario</option>
                 <option value="Aerolinea">Aerolínea</option>
+                <option value="Moda">Moda</option>
+                <option value="Automotriz">Automotriz</option>
+                <option value="Envíos">Envíos</option>
                 <option value="Otro">Otro</option>
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Estado <span className="text-red-500">*</span></label>
-              <select name="estado" value={cliente.estado} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
+              <select name="estado" value={cliente.estado} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
                 <option value="Activo">Activo</option>
                 <option value="Inactivo">Inactivo</option>
               </select>
             </div>
             <div className="flex flex-col gap-1.5 md:col-span-2">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Observación</label>
-              <textarea name="observacion" value={cliente.observacion} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Comentarios generales sobre la empresa..." rows="3"></textarea>
+              <textarea name="observacion" value={cliente.observacion} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Comentarios generales sobre la empresa..." rows="3"></textarea>
             </div>
           </div>
         </section>
@@ -422,7 +425,7 @@ export default function AgregarCliente() {
             <h3 className="text-lg font-bold font-display">Gestión de Marcas</h3>
           </div>
           <div className="space-y-4">
-            <div className="flex flex-wrap gap-2 p-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg min-h-[60px]">
+            <div className="flex flex-wrap gap-2 p-4 bg-[#F4FAFB] border border-dashed border-slate-300 rounded-lg min-h-[60px]">
               {marcas.length === 0 && <span className="text-xs text-slate-400 italic">Agregue al menos una marca</span>}
               {marcas.map((m, i) => (
                 <span key={i} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-accent-light/30 text-primary border border-primary/20 gap-2">
@@ -434,7 +437,7 @@ export default function AgregarCliente() {
               ))}
             </div>
             <div className="flex gap-3">
-              <input type="text" value={nuevaMarca} onChange={(e) => setNuevaMarca(e.target.value)} placeholder="Nombre de la marca" className="flex-1 rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addMarca())} />
+              <input type="text" value={nuevaMarca} onChange={(e) => setNuevaMarca(e.target.value)} placeholder="Nombre de la marca" className="flex-1 rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addMarca())} />
               <button type="button" onClick={addMarca} className="px-4 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-xs font-bold flex items-center gap-1">
                 <span className="material-symbols-outlined text-sm">add_circle</span>Agregar
               </button>
@@ -483,38 +486,38 @@ export default function AgregarCliente() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Nombre <span className="text-red-500">*</span></label>
-                      <input name="pri_nombre" value={contacto.pri_nombre} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                      <input name="pri_nombre" value={contacto.pri_nombre} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Segundo Nombre</label>
-                      <input name="seg_nombre" value={contacto.seg_nombre} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                      <input name="seg_nombre" value={contacto.seg_nombre} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Apellido <span className="text-red-500">*</span></label>
-                    <input name="pri_apellido" value={contacto.pri_apellido} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                    <input name="pri_apellido" value={contacto.pri_apellido} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Departamento <span className="text-red-500">*</span></label>
-                      <input name="departamento" value={contacto.departamento} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Mercadeo" type="text" />
+                      <input name="departamento" value={contacto.departamento} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Mercadeo" type="text" />
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rol <span className="text-red-500">*</span></label>
-                      <input name="rol" value={contacto.rol} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Decisor, Operativo..." type="text" />
+                      <input name="rol" value={contacto.rol} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Decisor, Operativo..." type="text" />
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Correo <span className="text-red-500">*</span></label>
-                    <input name="correo" value={contacto.correo} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="email@dominio.com" type="email" />
+                    <input name="correo" value={contacto.correo} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="email@dominio.com" type="email" />
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fecha de Nacimiento</label>
-                    <input name="fecha_nac" value={contacto.fecha_nac} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
+                    <input name="fecha_nac" value={contacto.fecha_nac} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Anotaciones Especiales</label>
-                    <textarea name="anotac_especiales" value={contacto.anotac_especiales} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Preferencias de contacto..." rows="2"></textarea>
+                    <textarea name="anotac_especiales" value={contacto.anotac_especiales} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Preferencias de contacto..." rows="2"></textarea>
                   </div>
 
                   {/* Divisoria entre contactos múltiples */}
@@ -539,7 +542,7 @@ export default function AgregarCliente() {
                   <div key={i} className="flex gap-3 items-end">
                     <div className="w-24 flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-500 uppercase">Cód. Área</label>
-                      <select value={tel.codigo_area} onChange={(e) => handleTelefono(i, 'codigo_area', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
+                      <select value={tel.codigo_area} onChange={(e) => handleTelefono(i, 'codigo_area', e.target.value)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
                         <option value="">—</option>
                         <option value="0412">0412</option>
                         <option value="0422">0422</option>
@@ -551,7 +554,7 @@ export default function AgregarCliente() {
                     </div>
                     <div className="flex-1 flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-500 uppercase">Número</label>
-                      <input value={tel.numero} onChange={(e) => handleTelefono(i, 'numero', e.target.value)} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0000000" type="tel" maxLength="7" pattern="[0-9]{7}" title="Debe tener exactamente 7 dígitos" />
+                      <input value={tel.numero} onChange={(e) => handleTelefono(i, 'numero', e.target.value)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0000000" type="tel" maxLength="7" pattern="[0-9]{7}" title="Debe tener exactamente 7 dígitos" />
                     </div>
                     <button type="button" onClick={() => removeTelefono(i)} className="bg-slate-50 border border-slate-200 p-3 rounded-lg hover:bg-slate-100 text-primary">
                       <span className="material-symbols-outlined">delete</span>
@@ -572,7 +575,7 @@ export default function AgregarCliente() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Vendedor Asignado <span className="text-red-500">*</span></label>
-                <select name="fk_vendedor" value={cliente.fk_vendedor} onChange={handleCliente} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
+                <select name="fk_vendedor" value={cliente.fk_vendedor} onChange={handleCliente} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
                   <option value="">Seleccione un vendedor</option>
                   {vendedores.map(v => (
                     <option key={v.usuario_id || v.id} value={v.usuario_id || v.id}>
@@ -595,19 +598,19 @@ export default function AgregarCliente() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Monto de Negociación <span className="text-red-500">*</span></label>
-              <input name="monto_negociacion" value={negociacion.monto_negociacion} onChange={handleNegociacion} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0.00" type="number" step="0.01" min="0" />
+              <input name="monto_negociacion" value={negociacion.monto_negociacion} onChange={handleNegociacion} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0.00" type="number" step="0.01" min="0" />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total de Cuñas <span className="text-red-500">*</span></label>
-              <input name="total_cunas" value={negociacion.total_cunas} onChange={handleNegociacion} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0" type="number" min="0" step="1" />
+              <input name="total_cunas" value={negociacion.total_cunas} onChange={handleNegociacion} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="0" type="number" min="0" step="1" />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fecha de Inicio <span className="text-red-500">*</span></label>
-              <input name="fecha_inicio" value={negociacion.fecha_inicio} onChange={handleNegociacion} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
+              <input name="fecha_inicio" value={negociacion.fecha_inicio} onChange={handleNegociacion} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fecha Fin</label>
-              <input name="fecha_fin" value={negociacion.fecha_fin} onChange={handleNegociacion} className="rounded-lg border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
+              <input name="fecha_fin" value={negociacion.fecha_fin} onChange={handleNegociacion} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="date" />
             </div>
           </div>
           <p className="text-[10px] text-slate-400 mt-4 italic">Los campos marcados con * son obligatorios para registrar la negociación. Si se dejan vacíos, no se creará un registro de negociación.</p>

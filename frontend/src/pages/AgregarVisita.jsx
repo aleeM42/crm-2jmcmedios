@@ -390,7 +390,7 @@ export default function AgregarVisita() {
           {/* GASTOS ASOCIADOS */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary">receipt_long</span>
+              <span className="material-symbols-outlined text-accent-green">receipt_long</span>
               Gastos Asociados
             </h3>
             <div className="space-y-3">
@@ -402,7 +402,7 @@ export default function AgregarVisita() {
                     <p className="text-xs text-slate-400 capitalize">{g.categoria}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-primary">${g.monto.toFixed(2)}</span>
+                    <span className="text-sm font-bold text-accent-green">${g.monto.toFixed(2)}</span>
                     <button type="button" onClick={() => removeGasto(i)} className="text-red-400 hover:text-red-600 transition-colors">
                       <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
@@ -415,18 +415,18 @@ export default function AgregarVisita() {
                 <input
                   type="text" placeholder="Concepto" value={gastoTemp.concepto}
                   onChange={(e) => setGastoTemp((p) => ({ ...p, concepto: e.target.value }))}
-                  className="flex-1 h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  className="flex-1 h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-accent-green focus:border-accent-green outline-none"
                 />
                 <input
                   type="number" placeholder="$0" step="0.01" min="0" value={gastoTemp.monto}
                   onChange={(e) => setGastoTemp((p) => ({ ...p, monto: e.target.value }))}
-                  className="w-24 h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  className="w-24 h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-accent-green focus:border-accent-green outline-none"
                 />
               </div>
               <select
                 value={gastoTemp.categoria}
                 onChange={(e) => setGastoTemp((p) => ({ ...p, categoria: e.target.value }))}
-                className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-accent-green focus:border-accent-green outline-none"
               >
                 <option value="">Categoría del gasto...</option>
                 <option value="transporte">Transporte</option>
@@ -437,7 +437,7 @@ export default function AgregarVisita() {
                 <option value="atencion">Atención</option>
                 <option value="otros">Otros</option>
               </select>
-              <button type="button" onClick={addGasto} className="w-full py-2.5 flex items-center justify-center gap-2 border border-dashed border-slate-200 hover:border-primary text-slate-400 hover:text-primary rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors">
+              <button type="button" onClick={addGasto} className="w-full py-2.5 flex items-center justify-center gap-2 border border-dashed border-slate-200 hover:border-accent-green text-slate-400 hover:text-accent-green rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors">
                 <span className="material-symbols-outlined text-[16px]">add_circle</span>
                 Agregar Gasto
               </button>
@@ -446,7 +446,7 @@ export default function AgregarVisita() {
               {gastos.length > 0 && (
                 <div className="flex justify-between pt-3 border-t border-slate-100">
                   <span className="text-xs font-bold text-slate-600">Total Gastos</span>
-                  <span className="text-sm font-black text-primary">${gastos.reduce((s, g) => s + g.monto, 0).toFixed(2)}</span>
+                  <span className="text-sm font-black text-accent-green">${gastos.reduce((s, g) => s + g.monto, 0).toFixed(2)}</span>
                 </div>
               )}
             </div>
@@ -455,10 +455,10 @@ export default function AgregarVisita() {
           {/* ARCHIVOS */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary">attach_file</span>
+              <span className="material-symbols-outlined text-accent-green">attach_file</span>
               Archivos Adjuntos
             </h3>
-            <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-primary transition-colors cursor-pointer">
+            <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-accent-green transition-colors cursor-pointer">
               <span className="material-symbols-outlined text-4xl text-slate-300 mb-3">cloud_upload</span>
               <p className="text-xs font-medium text-slate-400">Arrastra o selecciona archivos</p>
               <p className="text-[10px] text-slate-300 mt-1">PDF, JPG, PNG hasta 10MB</p>

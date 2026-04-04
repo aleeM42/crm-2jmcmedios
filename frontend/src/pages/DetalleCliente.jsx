@@ -75,32 +75,32 @@ export default function DetalleCliente() {
       {/* ═══ KPI CARDS ═══ */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-[#F4FAFB] rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow">
-           <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
-              <span className="material-symbols-outlined text-primary text-2xl relative left-[1px]">campaign</span>
-           </div>
-           <span className="text-3xl font-black text-slate-800">{c.kpis?.pautas_activas || 0}</span>
-           <span className="text-[10px] mt-1 uppercase font-bold text-slate-400 tracking-wider">Pautas Activas</span>
+          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+            <span className="material-symbols-outlined text-primary text-2xl relative left-[1px]">campaign</span>
+          </div>
+          <span className="text-3xl font-black text-slate-800">{c.kpis?.pautas_activas || 0}</span>
+          <span className="text-[10px] mt-1 uppercase font-bold text-slate-400 tracking-wider">Pautas Activas</span>
         </div>
         <div className="bg-[#F4FAFB] rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow">
-           <div className="w-12 h-12 bg-accent-green/10 rounded-full flex items-center justify-center mb-3">
-              <span className="material-symbols-outlined text-accent-green text-2xl relative left-[1px]">payments</span>
-           </div>
-           <span className="text-3xl font-black text-slate-800">${parseFloat(c.kpis?.monto_total || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-           <span className="text-[10px] mt-1 uppercase font-bold text-slate-400 tracking-wider">Monto Total</span>
+          <div className="w-12 h-12 bg-accent-green/10 rounded-full flex items-center justify-center mb-3">
+            <span className="material-symbols-outlined text-accent-green text-2xl relative left-[1px]">payments</span>
+          </div>
+          <span className="text-3xl font-black text-slate-800">${parseFloat(c.kpis?.monto_total || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+          <span className="text-[10px] mt-1 uppercase font-bold text-slate-400 tracking-wider">Monto Total</span>
         </div>
         <div className="bg-[#F4FAFB] rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow">
-           <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mb-3">
-              <span className="material-symbols-outlined text-purple-600 text-2xl">event_available</span>
-           </div>
-           <span className="text-xl font-black text-slate-800 mt-2 mb-[3px]">{c.kpis?.ultima_visita ? new Date(c.kpis.ultima_visita).toLocaleDateString() : '--'}</span>
-           <span className="text-[10px] mt-1 uppercase font-bold text-slate-400 tracking-wider">Última Visita</span>
+          <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mb-3">
+            <span className="material-symbols-outlined text-purple-600 text-2xl">event_available</span>
+          </div>
+          <span className="text-xl font-black text-slate-800 mt-2 mb-[3px]">{c.kpis?.ultima_visita ? new Date(c.kpis.ultima_visita).toLocaleDateString() : '--'}</span>
+          <span className="text-[10px] mt-1 uppercase font-bold text-slate-400 tracking-wider">Última Visita</span>
         </div>
         <div className="bg-[#F4FAFB] rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow">
-           <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mb-3">
-              <span className="material-symbols-outlined text-orange-600 text-2xl">cell_tower</span>
-           </div>
-           <span className="text-3xl font-black text-slate-800">{c.kpis?.emisoras_presencia || 0}</span>
-           <span className="text-[10px] mt-1 uppercase font-bold text-slate-400 tracking-wider">Emisoras c/ Presencia</span>
+          <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mb-3">
+            <span className="material-symbols-outlined text-orange-600 text-2xl">cell_tower</span>
+          </div>
+          <span className="text-3xl font-black text-slate-800">{c.kpis?.emisoras_presencia || 0}</span>
+          <span className="text-[10px] mt-1 uppercase font-bold text-slate-400 tracking-wider">Emisoras c/ Presencia</span>
         </div>
       </div>
 
@@ -250,13 +250,13 @@ export default function DetalleCliente() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                       <tr className="bg-slate-50/50 border-b border-slate-100 text-[10px] uppercase tracking-widest text-slate-400">
-                          <th className="px-6 py-3 font-bold whitespace-nowrap">N° Orden</th>
-                          <th className="px-6 py-3 font-bold">Marca</th>
-                          <th className="px-6 py-3 font-bold whitespace-nowrap">Periodo</th>
-                          <th className="px-6 py-3 font-bold">Monto OT</th>
-                          <th className="px-6 py-3 font-bold">Estado</th>
-                       </tr>
+                      <tr className="bg-slate-50/50 border-b border-slate-100 text-[10px] uppercase tracking-widest text-slate-400">
+                        <th className="px-6 py-3 font-bold whitespace-nowrap">N° Orden</th>
+                        <th className="px-6 py-3 font-bold">Marca</th>
+                        <th className="px-6 py-3 font-bold whitespace-nowrap">Periodo</th>
+                        <th className="px-6 py-3 font-bold">Monto OT</th>
+                        <th className="px-6 py-3 font-bold">Estado</th>
+                      </tr>
                     </thead>
                     <tbody className="text-xs divide-y divide-slate-50">
                       {c.pautas.map(p => (
@@ -270,11 +270,10 @@ export default function DetalleCliente() {
                           </td>
                           <td className="px-6 py-4 font-bold text-slate-700 whitespace-nowrap">${parseFloat(p.monto_ot).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide ${
-                              p.estado === 'programada' ? 'bg-blue-100 text-blue-600' :
+                            <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide ${p.estado === 'programada' ? 'bg-blue-100 text-blue-600' :
                               p.estado === 'en transmision' ? 'bg-accent-green/20 text-accent-green' :
-                              p.estado === 'suspendida' ? 'bg-orange-100 text-orange-600' : 'bg-slate-200 text-slate-600'
-                            }`}>{p.estado}</span>
+                                p.estado === 'suspendida' ? 'bg-orange-100 text-orange-600' : 'bg-slate-200 text-slate-600'
+                              }`}>{p.estado}</span>
                           </td>
                         </tr>
                       ))}
@@ -283,8 +282,8 @@ export default function DetalleCliente() {
                 </div>
               ) : (
                 <div className="text-center py-10">
-                   <span className="material-symbols-outlined text-slate-300 text-5xl mb-3 block">assignment_late</span>
-                   <p className="text-sm font-medium text-slate-500">No hay pautas asociadas a este cliente.</p>
+                  <span className="material-symbols-outlined text-slate-300 text-5xl mb-3 block">assignment_late</span>
+                  <p className="text-sm font-medium text-slate-500">No hay pautas asociadas a este cliente.</p>
                 </div>
               )}
             </div>
@@ -329,8 +328,8 @@ export default function DetalleCliente() {
                 </div>
               ) : (
                 <div className="text-center py-10">
-                   <span className="material-symbols-outlined text-slate-300 text-5xl mb-3 block">pending_actions</span>
-                   <p className="text-sm font-medium text-slate-500">No hay registro de actividad con este cliente aún.</p>
+                  <span className="material-symbols-outlined text-slate-300 text-5xl mb-3 block">pending_actions</span>
+                  <p className="text-sm font-medium text-slate-500">No hay registro de actividad con este cliente aún.</p>
                 </div>
               )}
             </div>
@@ -340,62 +339,58 @@ export default function DetalleCliente() {
         {/* RIGHT COLUMN */}
         <div className="lg:col-span-4 space-y-8">
           {/* ═══ CONTACTO PRINCIPAL ═══ */}
-          <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-50 bg-slate-50/50">
-              <h3 className="font-bold text-slate-800 font-display flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">contact_page</span>
-                Contacto Principal
-              </h3>
+          <section className="bg-[#F4FAFB] rounded-2xl p-6 shadow-sm border border-slate-100">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="material-symbols-outlined text-accent-green">person</span>
+              <h3 className="text-lg font-bold text-slate-800 font-display">Contacto Principal</h3>
             </div>
             {contactoPrincipal ? (
-              <div className="p-6 space-y-4">
-                <div className="flex items-center gap-4 mb-2">
-                  <div className="w-12 h-12 rounded-full bg-accent-light/20 flex items-center justify-center text-primary font-black text-xl font-display">
+              <div>
+                <div className="text-center mb-6">
+                  <div className="w-20 h-20 rounded-full bg-accent-green/10 mx-auto mb-3 flex items-center justify-center border-2 border-accent-green/20 text-accent-green font-bold text-2xl tracking-tighter">
                     {contactoPrincipal.pri_nombre?.[0]}{contactoPrincipal.pri_apellido?.[0]}
                   </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-800 font-display">{contactoPrincipal.pri_nombre} {contactoPrincipal.pri_apellido}</h4>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{contactoPrincipal.departamento}</p>
-                  </div>
+                  <h4 className="font-bold text-lg text-slate-800">{contactoPrincipal.pri_nombre} {contactoPrincipal.pri_apellido}</h4>
+
+                  <span className="inline-block mt-2 px-3 py-0.5 bg-accent-green/10 text-accent-green text-[10px] font-black rounded-lg uppercase tracking-widest border border-primary/10">
+                    {contactoPrincipal.rol}
+                  </span>
                 </div>
-                <div className="grid grid-cols-1 gap-4 mt-4">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Correo</span>
-                    <span className="text-xs font-semibold text-slate-700 break-all">{contactoPrincipal.correo}</span>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-slate-400 text-lg">mail</span>
+                    <a href={`mailto:${contactoPrincipal.correo}`} className="text-sm font-semibold text-slate-700 hover:text-primary transition-colors break-all">
+                      {contactoPrincipal.correo}
+                    </a>
                   </div>
                   {contactoPrincipal.telefonos && contactoPrincipal.telefonos.length > 0 && (
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Teléfono</span>
-                      <span className="text-xs font-semibold text-slate-700">
-                        {contactoPrincipal.telefonos.map(t => `${t.codigo_area}-${t.numero}`).join(', ')}
-                      </span>
+                    <div className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-slate-400 text-lg">call</span>
+                      <div className="flex flex-col gap-1">
+                        {contactoPrincipal.telefonos.map(t => (
+                          <p key={`${t.codigo_area}-${t.numero}`} className="text-sm font-semibold text-slate-700">
+                            {t.codigo_area}-{t.numero}
+                          </p>
+                        ))}
+                      </div>
                     </div>
                   )}
                   {contactoPrincipal.fecha_nac && (
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Fecha Nacimiento</span>
-                      <span className="text-xs font-semibold text-slate-700">{new Date(contactoPrincipal.fecha_nac).toLocaleDateString()}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-slate-400 text-lg">cake</span>
+                      <span className="text-sm font-semibold text-slate-700">{new Date(contactoPrincipal.fecha_nac).toLocaleDateString()}</span>
                     </div>
                   )}
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Rol</span>
-                    <div className="mt-1">
-                      <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-black rounded uppercase">{contactoPrincipal.rol}</span>
-                    </div>
-                  </div>
                   {contactoPrincipal.anotac_especiales && (
-                    <div className="flex flex-col p-3 bg-white border border-slate-100 rounded-lg mt-2">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase mb-1">Anotaciones Especiales</span>
-                      <p className="text-[10px] italic text-slate-500">{contactoPrincipal.anotac_especiales}</p>
+                    <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl mt-4">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Notas de Contacto</p>
+                      <p className="text-xs italic text-slate-600 dark:text-slate-400">{contactoPrincipal.anotac_especiales}</p>
                     </div>
                   )}
                 </div>
               </div>
             ) : (
-              <div className="p-8 text-center flex flex-col items-center">
-                 <span className="material-symbols-outlined text-slate-300 text-4xl mb-2 block">person_off</span>
-                 <p className="text-xs font-medium text-slate-500">No hay contactos registrados.</p>
-              </div>
+              <p className="text-sm text-slate-500 text-center py-4 bg-slate-50 rounded-lg border border-slate-100 border-dashed">No hay contactos registrados.</p>
             )}
           </section>
 

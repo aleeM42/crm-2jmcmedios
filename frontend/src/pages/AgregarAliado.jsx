@@ -237,7 +237,7 @@ function AgregarAliado() {
         <form className="p-8 space-y-12" onSubmit={handleSubmit}>
           {/* Section 1: Datos de la Emisora */}
           <section>
-            <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
+            <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-4">
               <span className="material-symbols-outlined text-primary">radio</span>
               <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Datos de la Emisora</h3>
             </div>
@@ -277,12 +277,14 @@ function AgregarAliado() {
                 />
                 {frecuenciaError && <p className="text-xs text-red-500 mt-1">{frecuenciaError}</p>}
               </div>
+
+              {/*Categorias*/}
               <div className="space-y-1.5 md:col-span-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Categorías<span className="text-red-500 ml-0.5">*</span></label>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Categoría<span className="text-red-500 ml-0.5">*</span></label>
                 <div className="flex flex-wrap gap-2">
                   {categorias.map(cat => (
-                    <label key={cat.id || cat.nombre} className="flex items-center gap-2 text-sm bg-white border border-slate-200 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
-                      <input type="checkbox" name="categoria" value={cat.nombre.toLowerCase()} className="text-primary rounded-md border-slate-300 focus:ring-primary w-4 h-4" />
+                    <label key={cat.id || cat.nombre} className="flex items-center gap-2 text-sm bg-[#F4FAFB] border border-slate-200 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
+                      <input type="radio" name="categoria" value={cat.nombre.toLowerCase()} className="text-primary rounded-full border-slate-300 focus:ring-primary w-4 h-4" />
                       <span className="text-slate-700 font-medium">{cat.nombre}</span>
                     </label>
                   ))}
@@ -332,7 +334,7 @@ function AgregarAliado() {
 
           {/* Section 2: Cobertura */}
           <section>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6 border-b border-slate-100 pb-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6 border-b border-slate-200 pb-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">broadcast_on_home</span>
                 <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Cobertura</h3>
@@ -350,7 +352,7 @@ function AgregarAliado() {
           </section>
           {/* Section 3: Contacto de la Emisora */}
           <section>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6 border-b border-slate-100 pb-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6 border-b border-slate-200 pb-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">person</span>
                 <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Contactos de la Emisora</h3>
@@ -362,7 +364,7 @@ function AgregarAliado() {
 
             <div className="space-y-8">
               {contactos.map((contacto, idx) => (
-                <div key={idx} className="relative bg-white border border-slate-100 p-6 rounded-xl shadow-sm">
+                <div key={idx} className="relative bg-[#F4FAFB] border border-slate-300 p-6 rounded-xl shadow-sm">
                   {contactos.length > 1 && (
                     <button type="button" onClick={() => removeContacto(idx)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors">
                       <span className="material-symbols-outlined">delete</span>
@@ -416,7 +418,7 @@ function AgregarAliado() {
 
           {/* Section 4: Teléfonos */}
           <section>
-            <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
+            <div className="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">call</span>
                 <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Teléfonos</h3>
@@ -427,7 +429,7 @@ function AgregarAliado() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
               {telefonos.map((tel, idx) => (
-                <div key={idx} className="flex gap-3 items-end bg-white border border-slate-100 p-4 rounded-xl shadow-sm relative">
+                <div key={idx} className="flex gap-3 items-end bg-[#F4FAFB] border border-slate-300 p-4 rounded-xl shadow-sm relative">
                   <div className="w-24 flex flex-col gap-1.5">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.</label>
                     <select value={tel.codigo_area} onChange={(e) => handleTelefonoChange(idx, 'codigo_area', e.target.value)} className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
