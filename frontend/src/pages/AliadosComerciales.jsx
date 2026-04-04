@@ -134,7 +134,7 @@ function AliadosComerciales() {
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">{e.frecuencia}</span>
-              <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full capitalize">{e.categoria}</span>
+              <span className="px-3 py-1 bg-accent-green/10 text-accent-green text-xs font-semibold rounded-full capitalize">{e.categoria}</span>
             </div>
             <div className="flex items-center gap-2 mb-4 text-slate-600">
               <span className="material-symbols-outlined text-base">business</span>

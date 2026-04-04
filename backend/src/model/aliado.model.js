@@ -7,12 +7,12 @@ export async function getAllAliados() {
   const query = `
     SELECT 
       ac.*,
-      l.nombre as ciudad_nombre,
-      lp.nombre as estado_nombre,
+      c.nombre as ciudad_nombre,
+      e.nombre as estado_nombre,
       r.nombre as region_nombre
     FROM ALIADOS_COMERCIALES ac
-    LEFT JOIN LUGAR l ON ac.fk_lugar = l.id
-    LEFT JOIN LUGAR lp ON l.fk_lugar = lp.id
+    LEFT JOIN LUGAR c ON ac.fk_ciudad = c.id
+    LEFT JOIN LUGAR e ON ac.fk_lugar = e.id
     LEFT JOIN LUGAR r ON ac.fk_region = r.id
     ORDER BY ac.nombre_emisora ASC
   `;
@@ -24,13 +24,13 @@ export async function getAliadoById(id) {
   const query = `
     SELECT 
       ac.*,
-      l.nombre as ciudad_nombre,
-      lp.nombre as estado_nombre,
+      c.nombre as ciudad_nombre,
+      e.nombre as estado_nombre,
       r.nombre as region_nombre,
       cob.descripcion as cobertura_nombre
     FROM ALIADOS_COMERCIALES ac
-    LEFT JOIN LUGAR l ON ac.fk_lugar = l.id
-    LEFT JOIN LUGAR lp ON l.fk_lugar = lp.id
+    LEFT JOIN LUGAR c ON ac.fk_ciudad = c.id
+    LEFT JOIN LUGAR e ON ac.fk_lugar = e.id
     LEFT JOIN LUGAR r ON ac.fk_region = r.id
     LEFT JOIN COBERTURA cob ON ac.fk_cobertura = cob.id
     WHERE ac.id = $1
