@@ -142,7 +142,7 @@ CREATE TABLE CLIENTE (
     CONSTRAINT chk_no_autociclo CHECK (id != fk_cliente_padre),
     CONSTRAINT chk_clasificacion CHECK (clasificacion IN ('Agencia', 'Cliente directo')), 
     CONSTRAINT chk_tipo CHECK (tipo IN ('Empresa', 'Subempresa')),
-    CONSTRAINT chk_sector CHECK (sector IN ('Salud', 'Alimentacion', 'Telematica', 'Fabricacion', 'Bancario', 'Aerolinea', 'Otro')), -- [cite: 63, 64, 65]
+    CONSTRAINT chk_sector CHECK (sector IN ('Salud', 'Alimentación', 'Telemática', 'Ferretería', 'Bancario', 'Aerolínea','Moda','Automotriz', 'Envíos','Otro')), 
     CONSTRAINT agencia_nom CHECK (
         (clasificacion = 'Agencia' AND nombre_agencia IS NOT NULL) 
         OR 

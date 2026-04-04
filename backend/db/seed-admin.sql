@@ -108,5 +108,5 @@ SELECT id, 0, 'Vendedor' FROM nuevo_vendedor;
 
 INSERT INTO TELEFONOS (codigo_area, numero, fk_usuario)
 VALUES 
-    ('0424', '2926003', (SELECT id FROM USUARIOS WHERE primer_nombre = 'Adriana' AND primer_apellido = 'Sabino')),
-    ('0412', '3888053', (SELECT id FROM USUARIOS WHERE primer_nombre = 'Yossuel' AND primer_apellido = 'Marcano'));
+    (0424, 2926003, (SELECT id FROM USUARIOS WHERE primer_nombre = 'Adriana' AND primer_apellido = 'Sabino')),
+    (0412, 3888053, (SELECT id FROM USUARIOS WHERE primer_nombre = 'Yossuel' AND primer_apellido = 'Marcano'));
