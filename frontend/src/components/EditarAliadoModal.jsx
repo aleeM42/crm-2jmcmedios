@@ -306,7 +306,8 @@ export default function EditarAliadoModal({ emisora: emisoraOriginal, onClose, o
         categoria: aliado.categoria,
         estado: aliado.estado || 'activo',
         direccion: aliado.direccion,
-        fk_lugar: parseInt(aliado.fk_lugar, 10) || null,
+        fk_ciudad: parseInt(aliado.fk_lugar, 10) || null, // Ciudad (en el estado se llama fk_lugar)
+        fk_lugar: parseInt(selectedEstado, 10) || null,  // Estado (valor del select superior)
         fk_region: parseInt(aliado.fk_region, 10) || null,
         fk_cobertura: parseInt(aliado.fk_cobertura, 10) || null,
         contactos: contactosPayload,

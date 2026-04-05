@@ -2,7 +2,7 @@
 // DetalleEmisora.jsx — Detalle de Aliado Comercial
 // ==============================================
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { getCurrentUser } from '../services/auth.service';
 import EditarAliadoModal from '../components/EditarAliadoModal';
@@ -18,7 +18,10 @@ export default function DetalleEmisora() {
   const [emisora, setEmisora] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const navigate = useNavigate();
 
   const user = getCurrentUser();
   const rol = user?.rol || '';
@@ -50,7 +53,28 @@ export default function DetalleEmisora() {
     fetchEmisora();
   }, [id]);
 
-  if (loading) return <div className="p-8 text-center text-slate-500">Cargando...</div>;
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const response = await api.delete(`/aliados/${id}`);
+      if (response.success) {
+        setSuccessMsg('Aliado eliminado exitosamente. Redirigiendo...');
+        setShowDelete(false);
+        setTimeout(() => {
+          navigate('/aliados-comerciales');
+        }, 1500);
+      } else {
+        alert(response.error || 'Error al eliminar el aliado');
+      }
+    } catch (error) {
+      console.error('Error deleting aliado:', error);
+      alert('Error de conexión al intentar eliminar');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  if (loading) return <div className="p-8 text-center text-slate-500 font-medium">Cargando...</div>;
   if (!emisora) return <div className="p-8 text-center text-slate-500">Emisora no encontrada</div>;
 
   const STATUS_STYLE = {
@@ -93,7 +117,10 @@ export default function DetalleEmisora() {
         <div className="flex gap-3 w-full sm:w-auto mt-4 sm:mt-0">
           {/* Solo Admin, Director General y Director pueden eliminar aliados */}
           {(rol === 'Administrador' || rol === 'Director General' || rol === 'Director') && (
-            <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
+            <button
+              onClick={() => setShowDelete(true)}
+              className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors"
+            >
               <span className="material-symbols-outlined text-lg">delete</span> Eliminar
             </button>
           )}
@@ -275,9 +302,9 @@ export default function DetalleEmisora() {
                           </div>
                         )}
                         {contacto.anotac_especiales && (
-                          <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl mt-4">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Notas de Contacto</p>
-                            <p className="text-xs italic text-slate-600 dark:text-slate-400">{contacto.anotac_especiales}</p>
+                          <div className="p-3 bg-accent-green/100 rounded-xl mt-4">
+                            <p className="text-[10px] font-bold text-slate-100 uppercase tracking-widest mb-1">Notas de Contacto</p>
+                            <p className="text-xs italic text-slate-100 dark:text-slate-100">{contacto.anotac_especiales}</p>
                           </div>
                         )}
                       </div>
@@ -330,6 +357,44 @@ export default function DetalleEmisora() {
           onClose={() => setShowEdit(false)}
           onSuccess={handleEditSuccess}
         />
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {showDelete && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 animate-[zoomIn_0.2s_ease-out]">
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="material-symbols-outlined text-red-500 text-3xl">warning</span>
+            </div>
+            <h3 className="text-xl font-black text-slate-900 text-center mb-2 font-display">Confirmar eliminación</h3>
+            <p className="text-slate-500 text-center text-sm mb-8 leading-relaxed">
+              ¿Estás seguro de que deseas eliminar a <span className="font-bold text-slate-800">{emisora.nombre_emisora || emisora.razon_social}</span>? Esta acción no se puede deshacer.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="w-full py-3 bg-red-500 text-white rounded-xl font-bold text-sm hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    Eliminando...
+                  </>
+                ) : (
+                  'Sí, eliminar definitivamente'
+                )}
+              </button>
+              <button
+                onClick={() => setShowDelete(false)}
+                disabled={isDeleting}
+                className="w-full py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

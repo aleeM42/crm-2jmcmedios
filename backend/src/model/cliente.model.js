@@ -341,3 +341,14 @@ export const update = async (id, data, client) => {
   const result = await dbClient.query(query, values);
   return result.rows[0];
 };
+
+/**
+ * Elimina un cliente por ID.
+ * Las tablas dependientes (MARCA_INTER, TELEFONOS, etc.) usan ON DELETE CASCADE.
+ * @param {number} id - ID del cliente
+ */
+export const deleteById = async (id) => {
+  const query = `DELETE FROM CLIENTE WHERE id = $1 RETURNING id`;
+  const result = await pool.query(query, [id]);
+  return result.rows[0] || null;
+};

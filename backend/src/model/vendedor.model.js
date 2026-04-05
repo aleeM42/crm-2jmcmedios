@@ -215,3 +215,15 @@ export const update = async (id, userData, vendedorData, client) => {
     ...vendedorResult.rows[0],
   };
 };
+
+/**
+ * Elimina un vendedor.
+ * Por integridad referencial, eliminamos en USUARIOS y la BD hace ON DELETE CASCADE
+ * a VENDEDORES y TELEFONOS (Equivalente seguro a DELETE FROM VENDEDORES WHERE id = $X)
+ * @param {string} id - UUID del usuario_id
+ */
+export const remove = async (id) => {
+  const query = 'DELETE FROM USUARIOS WHERE id = $1 RETURNING *';
+  const result = await pool.query(query, [id]);
+  return result.rows[0];
+};

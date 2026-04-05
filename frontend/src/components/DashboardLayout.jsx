@@ -51,10 +51,19 @@ function DashboardLayout() {
   });
 
   return (
-    <div className="fixed inset-0 flex bg-[#EBF6F7] text-slate-900 antialiased overflow-hidden">
+    <div className="fixed inset-0 flex text-slate-900 antialiased overflow-hidden">
       <Toaster position="top-right" richColors toastOptions={{ className: 'font-display' }} />
+
+      {/* ===================== LIQUID GLASS BACKGROUND ===================== */}
+      <div className="liquid-bg">
+        <div className="blob blob-1"></div>
+        <div className="blob blob-2"></div>
+        <div className="blob blob-3"></div>
+        <div className="blob blob-4"></div>
+      </div>
+
       {/* ===================== SIDEBAR ===================== */}
-      <aside className="w-[240px] bg-[#F4FAFB] border-r border-[#E0F0F2] flex flex-col fixed h-full z-10">
+      <aside className="w-[240px] glass-sidebar flex flex-col fixed h-full z-10">
         <div className="p-6">
           <h1 className="text-primary text-xl font-bold leading-tight tracking-tight font-display">CRM 2JMC</h1>
           <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mt-1">{user?.rol || 'Director'}</p>
@@ -68,7 +77,7 @@ function DashboardLayout() {
               className={({ isActive }) =>
                 isActive || location.pathname.startsWith(to + '/')
                   ? 'flex items-center gap-3 px-4 py-2.5 bg-primary/10 text-primary rounded-lg font-bold transition-all'
-                  : 'flex items-center gap-3 px-4 py-2.5 text-slate-600 hover:bg-[#E0F0F2] hover:text-slate-900 rounded-lg font-medium transition-all'
+                  : 'flex items-center gap-3 px-4 py-2.5 text-slate-600 hover:bg-white/40 hover:text-slate-900 rounded-lg font-medium transition-all'
               }
             >
               <span className="material-symbols-outlined text-[22px]">{icon}</span>
@@ -77,11 +86,11 @@ function DashboardLayout() {
           ))}
         </nav>
 
-        <div className="p-4 mt-auto border-t border-[#E0F0F2] space-y-1">
+        <div className="p-4 mt-auto border-t border-white/30 space-y-1">
           {/* Ayuda */}
           <button
             onClick={() => setShowHelp(true)}
-            className="flex items-center gap-3 w-full px-3 py-2.5 text-[#16B1B8] hover:bg-[#E0F0F2] rounded-lg transition-colors"
+            className="flex items-center gap-3 w-full px-3 py-2.5 text-[#16B1B8] hover:bg-white/30 rounded-lg transition-colors"
           >
             <span className="material-symbols-outlined text-[22px]">help</span>
             <span className="text-sm font-medium">Ayuda</span>
@@ -90,7 +99,7 @@ function DashboardLayout() {
           {/* Cerrar Sesión */}
           <NavLink
             to="/login"
-            className="flex items-center gap-3 w-full px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+            className="flex items-center gap-3 w-full px-3 py-2.5 text-red-500 hover:bg-red-50/50 rounded-lg transition-colors"
           >
             <span className="material-symbols-outlined text-[22px]">logout</span>
             <span className="text-sm font-medium">Cerrar Sesión</span>
@@ -102,7 +111,7 @@ function DashboardLayout() {
       </aside>
 
       {/* ===================== MAIN CONTENT ===================== */}
-      <main className="flex-1 ml-[240px] p-8 overflow-y-auto min-h-0 min-w-0 w-full">
+      <main className="flex-1 ml-[240px] p-8 overflow-y-auto min-h-0 min-w-0 w-full relative">
         <Outlet />
       </main>
     </div>

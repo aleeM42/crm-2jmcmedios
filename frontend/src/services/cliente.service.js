@@ -78,3 +78,11 @@ export const crearMarca = async (clienteId, data) => {
 export const actualizarCliente = async (id, data) => {
   return api.put(`/clientes/${id}`, data);
 };
+
+/**
+ * Elimina un cliente por ID.
+ * @param {number} id - ID del cliente
+ */
+export const eliminarCliente = async (id) => {
+  return api.delete(`/clientes/${id}`);
+};

@@ -45,3 +45,16 @@ export async function update(req, res, next) {
     next(error);
   }
 }
+
+export async function remove(req, res, next) {
+  try {
+    const { id } = req.params;
+    const eliminado = await AliadoModel.deleteAliado(id);
+    if (!eliminado) {
+      return res.status(404).json({ success: false, error: 'Aliado no encontrado' });
+    }
+    res.json({ success: true, message: 'Aliado eliminado correctamente' });
+  } catch (error) {
+    next(error);
+  }
+}

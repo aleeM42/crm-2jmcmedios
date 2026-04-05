@@ -107,14 +107,14 @@ export async function createAliado(data) {
     const query = `
       INSERT INTO ALIADOS_COMERCIALES (
         razon_social, nombre_emisora, rif, frecuencia, categoria,
-        estado, direccion, fk_lugar, fk_region, fk_cobertura
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        estado, direccion, fk_lugar, fk_region, fk_ciudad, fk_cobertura
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *
     `;
     const values = [
       data.razon_social, data.nombre_emisora, data.rif, data.frecuencia,
       data.categoria, data.estado || 'activo', data.direccion,
-      data.fk_lugar, data.fk_region, data.fk_cobertura
+      data.fk_lugar, data.fk_region, data.fk_ciudad, data.fk_cobertura
     ];
     const result = await client.query(query, values);
     const nuevoAliado = result.rows[0];
@@ -191,14 +191,14 @@ export async function updateAliado(id, data) {
       UPDATE ALIADOS_COMERCIALES SET
         razon_social = $1, nombre_emisora = $2, rif = $3, frecuencia = $4,
         categoria = $5, estado = $6, direccion = $7,
-        fk_lugar = $8, fk_region = $9, fk_cobertura = $10
-      WHERE id = $11
+        fk_lugar = $8, fk_region = $9, fk_ciudad = $10, fk_cobertura = $11
+      WHERE id = $12
       RETURNING *
     `;
     const valoresAliado = [
       data.razon_social, data.nombre_emisora, data.rif, data.frecuencia,
       data.categoria, data.estado || 'activo', data.direccion,
-      data.fk_lugar || null, data.fk_region || null, data.fk_cobertura || null,
+      data.fk_lugar || null, data.fk_region || null, data.fk_ciudad || null, data.fk_cobertura || null,
       id
     ];
     const resAliado = await client.query(queryAliado, valoresAliado);
@@ -318,4 +318,10 @@ export async function updateAliado(id, data) {
   } finally {
     client.release();
   }
+}
+
+export async function deleteAliado(id) {
+  const query = 'DELETE FROM ALIADOS_COMERCIALES WHERE id = $1 RETURNING id';
+  const result = await pool.query(query, [id]);
+  return result.rowCount > 0;
 }

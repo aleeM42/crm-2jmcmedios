@@ -3,8 +3,8 @@
 // Entidades: USUARIO + VENDEDOR + CLIENTE (CSV)
 // ==============================================
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { getVendedorById } from '../services/vendedor.service.js';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { getVendedorById, eliminarVendedor } from '../services/vendedor.service.js';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
 import EditarVendedorModal from '../components/EditarVendedorModal.jsx';
 
@@ -21,6 +21,24 @@ export default function DetalleVendedor() {
   const [successMsg, setSuccessMsg] = useState('');
   const [forbidden, setForbidden] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const navigate = useNavigate();
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await eliminarVendedor(id);
+      if (res.success) {
+        navigate('/equipo-ventas', { state: { successMsg: '¡Vendedor eliminado exitosamente!' } });
+      }
+    } catch (err) {
+      setError(resolveErrorMessage(err, 'vendedores'));
+    } finally {
+      setDeleting(false);
+      setDeleteConfirm(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,7 +109,7 @@ export default function DetalleVendedor() {
           <h2 className="text-3xl font-bold text-slate-800 font-display">Detalle de Vendedor</h2>
         </div>
         <div className="flex gap-3 w-full sm:w-auto mt-4 sm:mt-0">
-          <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
+          <button onClick={() => setDeleteConfirm(true)} className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
             <span className="material-symbols-outlined text-lg">delete</span> Eliminar
           </button>
           <button onClick={() => setShowEdit(true)} className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
@@ -246,6 +264,47 @@ export default function DetalleVendedor() {
           </div>
         </div>
       </div>
+
+      {/* MODAL DE CONFIRMACIÓN DE ELIMINAR */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setDeleteConfirm(false)}></div>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative z-10 animate-[scaleIn_0.2s_ease-out]">
+            <div className="p-6">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-500 mb-4">
+                <span className="material-symbols-outlined text-2xl">warning</span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 mb-2">Eliminar Vendedor</h3>
+              <p className="text-sm text-slate-500 mb-6">
+                ¿Estás seguro de que deseas eliminar este vendedor? Esta acción no se puede deshacer y borrará permanentemente sus datos y los registros contiguos asociados.
+              </p>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDeleteConfirm(false)}
+                  disabled={deleting}
+                  className="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="px-5 py-2.5 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {deleting ? (
+                    <><span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Eliminando...</>
+                  ) : (
+                    <><span className="material-symbols-outlined text-[18px]">delete</span> Sí, Eliminar</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showEdit && (
         <EditarVendedorModal

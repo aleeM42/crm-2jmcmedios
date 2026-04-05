@@ -126,3 +126,21 @@ export async function getMontoDisponible(req, res, next) {
     next(error);
   }
 }
+
+/**
+ * DELETE /api/pautas/:id
+ * Elimina una pauta. ON DELETE CASCADE se encarga de CUNAS y DETALLE_PAUTA.
+ */
+export async function remove(req, res, next) {
+  try {
+    const { id } = req.params;
+    const deleted = await PautaModel.deletePauta(id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, error: 'Pauta no encontrada.' });
+    }
+    res.json({ success: true, message: 'Pauta eliminada exitosamente.' });
+  } catch (error) {
+    console.error('\n[ERROR AL ELIMINAR PAUTA]:', error);
+    next(error);
+  }
+}

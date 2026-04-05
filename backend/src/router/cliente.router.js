@@ -61,4 +61,13 @@ router.post(
   ClienteCtrl.createMarca
 );
 
+// DELETE /api/clientes/:id — Eliminar cliente (solo roles con permiso)
+const ROLES_DELETE = ['Administrador', 'Director', 'Director General'];
+router.delete(
+  '/:id',
+  authenticate,
+  authorize(...ROLES_DELETE),
+  ClienteCtrl.remove
+);
+
 export default router;

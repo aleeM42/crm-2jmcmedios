@@ -56,4 +56,7 @@ router.put(
   VendedorCtrl.update
 );
 
+// DELETE /api/vendedores/:id       — Eliminar vendedor
+router.delete('/:id', authenticate, authorize('Administrador', 'Director', 'Vendedor'), VendedorCtrl.remove);
+
 export default router;

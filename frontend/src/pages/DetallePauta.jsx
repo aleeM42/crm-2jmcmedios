@@ -2,7 +2,7 @@
 // DetallePauta.jsx — Detalle de Pauta Publicitaria
 // ==============================================
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { getCurrentUser } from '../services/auth.service';
 import { calcularProgresoPauta } from '../utils/pautasUtils';
@@ -25,6 +25,10 @@ export default function DetallePauta() {
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const navigate = useNavigate();
 
   const user = getCurrentUser();
   const rol = user?.rol || '';
@@ -51,6 +55,25 @@ export default function DetallePauta() {
     setSuccessMsg('Pauta actualizada exitosamente');
     fetchPauta();
   }, [fetchPauta]);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await api.delete(`/pautas/${id}`);
+      if (res.success) {
+        setDeleteConfirm(false);
+        setSuccessMsg('Pauta eliminada exitosamente');
+        setTimeout(() => navigate('/pautas'), 800);
+      }
+    } catch (err) {
+      console.error('Error eliminando pauta:', err);
+      setDeleteConfirm(false);
+      setSuccessMsg('');
+      alert(err?.response?.data?.error || 'Error al eliminar la pauta.');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   if (loading) {
     return <div className="p-8 text-center text-slate-500">Cargando detalles de la pauta...</div>;
@@ -107,7 +130,7 @@ export default function DetallePauta() {
           {/* Solo Admin, Director General y Gestor de Pautas pueden editar/eliminar pautas */}
           {(rol === 'Administrador' || rol === 'Director General' || rol === 'Gestor de Pautas') && (
             <>
-              <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
+              <button onClick={() => setDeleteConfirm(true)} className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
                 <span className="material-symbols-outlined text-lg">delete</span> Eliminar
               </button>
               <button onClick={() => setShowEdit(true)} className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
@@ -358,6 +381,42 @@ export default function DetallePauta() {
           onClose={() => setShowEdit(false)}
           onSuccess={handleEditSuccess}
         />
+      )}
+
+      {/* Modal Confirmación Eliminar */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 animate-[fadeIn_0.2s_ease-out]">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-red-500 text-3xl">warning</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">¿Eliminar esta pauta?</h3>
+              <p className="text-sm text-slate-500 mb-6">Estás a punto de eliminar la pauta <strong className="text-slate-800">{pauta.numero_ot}</strong>. Esta acción no se puede deshacer.</p>
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setDeleteConfirm(false)}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  {deleting ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                      Eliminando…
+                    </>
+                  ) : 'Sí, Eliminar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

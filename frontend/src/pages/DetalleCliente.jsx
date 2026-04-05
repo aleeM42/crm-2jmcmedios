@@ -2,8 +2,8 @@
 // DetalleCliente.jsx — Vista Detalle de Cliente (conectada al backend)
 // ==============================================
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { getClienteById } from '../services/cliente.service.js';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { getClienteById, eliminarCliente } from '../services/cliente.service.js';
 import { getCurrentUser } from '../services/auth.service';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
 import EditarClienteModal from '../components/EditarClienteModal.jsx';
@@ -17,9 +17,26 @@ export default function DetalleCliente() {
   const [subEmpresaModal, setSubEmpresaModal] = useState(null);
   const [editModal, setEditModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const user = getCurrentUser();
   const rol = user?.rol || '';
+  const navigate = useNavigate();
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await eliminarCliente(id);
+      toast.success('Cliente eliminado exitosamente');
+      navigate('/clientes');
+    } catch (err) {
+      toast.error(err.message || 'Error al eliminar el cliente');
+      setDeleteConfirm(false);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const fetchCliente = async () => {
     setLoading(true);
@@ -89,7 +106,7 @@ export default function DetalleCliente() {
           <div className="flex gap-3 w-full sm:w-auto mt-4 sm:mt-0">
             {/* Solo Admin, Director General y Director pueden eliminar clientes */}
             {(rol === 'Administrador' || rol === 'Director General' || rol === 'Director') && (
-              <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
+              <button onClick={() => setDeleteConfirm(true)} className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
                 <span className="material-symbols-outlined text-lg">delete</span> Eliminar
               </button>
             )}
@@ -606,6 +623,55 @@ export default function DetalleCliente() {
             {/* Footer */}
             <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/30 flex justify-end">
               <button onClick={() => setSubEmpresaModal(null)} className="px-5 py-2 rounded-lg bg-primary text-white text-sm font-bold hover:opacity-90 transition-opacity shadow-sm shadow-primary/20">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ MODAL CONFIRMAR ELIMINACIÓN ═══ */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => !deleting && setDeleteConfirm(false)}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-[fadeIn_0.2s_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3 bg-red-50/50">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <span className="material-symbols-outlined text-red-500">warning</span>
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 font-display text-base">Eliminar Cliente</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Acción irreversible</p>
+              </div>
+            </div>
+            <div className="p-6">
+              <p className="text-sm text-slate-600 leading-relaxed">
+                ¿Estás seguro de que deseas eliminar a <span className="font-bold text-slate-800">{c.nombre}</span>? Esta acción no se puede deshacer y se eliminarán todos los datos asociados (contactos, marcas, sub-empresas, etc.).
+              </p>
+            </div>
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/30 flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirm(false)}
+                disabled={deleting}
+                className="px-5 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="px-5 py-2 rounded-lg bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors shadow-sm shadow-red-500/20 flex items-center gap-2 disabled:opacity-50"
+              >
+                {deleting ? (
+                  <>
+                    <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
+                    Eliminando...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-base">delete_forever</span>
+                    Sí, eliminar
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

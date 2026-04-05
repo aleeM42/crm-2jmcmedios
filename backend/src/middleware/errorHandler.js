@@ -72,12 +72,16 @@ export default function errorHandler(err, req, res, _next) {
         });
 
       // Foreign key violation
-      case '23503':
-        return res.status(400).json({
+      case '23503': {
+        const isDelete = req.method === 'DELETE';
+        return res.status(isDelete ? 409 : 400).json({
           success: false,
-          error: 'Referencia inválida: el registro relacionado no existe',
+          error: isDelete
+            ? 'No se puede eliminar: existen registros (pautas, cobros, etc.) que dependen de este dato.'
+            : 'Referencia inválida: el registro relacionado no existe',
           detalle: err.detail || '',
         });
+      }
 
       // Check constraint violation
       case '23514':

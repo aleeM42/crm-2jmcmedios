@@ -422,3 +422,23 @@ export const update = async (req, res, next) => {
     client.release();
   }
 };
+
+/**
+ * DELETE /api/clientes/:id
+ * Elimina un cliente. ON DELETE CASCADE se encarga de las tablas dependientes.
+ */
+export const remove = async (req, res, next) => {
+  try {
+    const clienteId = parseInt(req.params.id, 10);
+
+    const deleted = await ClienteModel.deleteById(clienteId);
+    if (!deleted) {
+      return res.status(404).json({ success: false, error: 'Cliente no encontrado.' });
+    }
+
+    return res.json({ success: true, data: { id: deleted.id } });
+  } catch (err) {
+    console.error('❌ [delete cliente] ERROR:', err.message, '| Code:', err.code, '| Detail:', err.detail);
+    next(err);
+  }
+};

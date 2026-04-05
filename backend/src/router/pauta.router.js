@@ -18,5 +18,6 @@ router.post('/', PautaController.create);
 router.get('/', PautaController.getAll);
 router.get('/:id', PautaController.getById);
 router.put('/:id', PautaController.update);
+router.delete('/:id', PautaController.remove);
 
 export default router;

@@ -214,8 +214,8 @@ CREATE TABLE A_CONTACT(
 
     ---Constraints 
     CONSTRAINT pk_a_contacto PRIMARY KEY(fk_a_c, fk_contacto),
-    CONSTRAINT fk_a_comercial FOREIGN KEY (fk_a_c) references ALIADOS_COMERCIALES(id),
-    CONSTRAINT fk_contact FOREIGN KEY (fk_contacto) references CONTACTOS(id)    
+    CONSTRAINT fk_a_comercial FOREIGN KEY (fk_a_c) references ALIADOS_COMERCIALES(id) ON DELETE CASCADE,
+    CONSTRAINT fk_contact FOREIGN KEY (fk_contacto) references CONTACTOS(id) ON DELETE CASCADE
 );
 
 CREATE TABLE MARCA_INTER (
@@ -298,8 +298,8 @@ create table GASTOS_MARKETING (
         (fk_cliente IS NOT NULL AND fk_aliado_c IS NULL) OR
         (fk_cliente IS NULL AND fk_aliado_c IS NOT NULL)
     ),
-	CONSTRAINT fk_gasto_cli FOREIGN KEY (fk_cliente) REFERENCES CLIENTE(id) ON DELETE RESTRICT,
-    CONSTRAINT fk_gasto_aliado FOREIGN KEY (fk_aliado_c) REFERENCES ALIADOS_COMERCIALES(id) ON DELETE RESTRICT
+	CONSTRAINT fk_gasto_cli FOREIGN KEY (fk_cliente) REFERENCES CLIENTE(id) ON DELETE CASCADE,
+    CONSTRAINT fk_gasto_aliado FOREIGN KEY (fk_aliado_c) REFERENCES ALIADOS_COMERCIALES(id) ON DELETE CASCADE
 );
 
 create table PAUTAS(
@@ -327,7 +327,7 @@ create table PAUTAS(
 	
     -- Constraints
     CONSTRAINT fk_vend FOREIGN KEY (fk_vendedor) references VENDEDORES(usuario_id),
-	CONSTRAINT fk_client FOREIGN KEY (fk_cliente) references CLIENTE(id), 
+	CONSTRAINT fk_client FOREIGN KEY (fk_cliente) references CLIENTE(id) ON DELETE CASCADE, 
 	CONSTRAINT check_tipo_compra CHECK (tipo_compra IN('en vivo', 'rotativa')),
     CONSTRAINT check_tipo_pauta 
       CHECK (
@@ -347,7 +347,7 @@ create table CUNAS (
 	fk_pauta INTEGER NOT NULL,
 
     -- Constraints
-	CONSTRAINT fk_pau FOREIGN KEY (fk_pauta) references PAUTAS(id)
+	CONSTRAINT fk_pau FOREIGN KEY (fk_pauta) references PAUTAS(id) ON DELETE CASCADE
 );
 
 CREATE TABLE HISTORICO_NEGOCIACIONES (
@@ -371,7 +371,7 @@ CREATE TABLE DETALLE_PAUTA (
 
     --Constraints
     CONSTRAINT fk_pauta_detalle FOREIGN KEY (fk_pauta) REFERENCES PAUTAS(id) ON DELETE CASCADE,
-    CONSTRAINT fk_aliado_detalle FOREIGN KEY (fk_aliado) REFERENCES ALIADOS_COMERCIALES(id),
+    CONSTRAINT fk_aliado_detalle FOREIGN KEY (fk_aliado) REFERENCES ALIADOS_COMERCIALES(id) ON DELETE CASCADE,
 	CONSTRAINT pauta_aliado_unique UNIQUE (fk_pauta, fk_aliado)
 );
 

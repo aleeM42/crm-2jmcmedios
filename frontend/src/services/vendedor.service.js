@@ -41,3 +41,10 @@ export const getDirectores = async () => {
 export const actualizarVendedor = async (id, data) => {
   return api.put(`/vendedores/${id}`, data);
 };
+
+/**
+ * Elimina un vendedor.
+ */
+export const eliminarVendedor = async (id) => {
+  return api.delete(`/vendedores/${id}`);
+};

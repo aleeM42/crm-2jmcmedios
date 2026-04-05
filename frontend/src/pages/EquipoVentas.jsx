@@ -2,7 +2,7 @@
 // EquipoVentas.jsx — Equipo de Ventas (conectado al backend)
 // ==============================================
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getVendedores } from '../services/vendedor.service.js';
 import { getCurrentUser } from '../services/auth.service.js';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
@@ -15,8 +15,21 @@ export default function EquipoVentas() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [successMsg, setSuccessMsg] = useState(location.state?.successMsg || '');
   const currentUser = getCurrentUser();
   const canManage = ['Administrador', 'Director General', 'Director'].includes(currentUser?.rol);
+
+  useEffect(() => {
+    if (location.state?.successMsg) {
+      const timer = setTimeout(() => {
+        setSuccessMsg('');
+        navigate(location.pathname, { replace: true });
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [location, navigate]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,9 +104,17 @@ export default function EquipoVentas() {
 
       {/* Error */}
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
+        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3 animate-[fadeIn_0.3s_ease-out]">
           <span className="material-symbols-outlined text-red-500">error</span>
           <p className="text-sm text-red-600 font-medium">{error}</p>
+        </div>
+      )}
+
+      {/* Success */}
+      {successMsg && (
+        <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 flex items-center gap-3 animate-[fadeIn_0.3s_ease-out]">
+          <span className="material-symbols-outlined text-green-600">check_circle</span>
+          <p className="text-sm text-green-700 font-medium">{successMsg}</p>
         </div>
       )}
 

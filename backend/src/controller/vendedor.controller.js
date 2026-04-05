@@ -259,3 +259,30 @@ export const update = async (req, res, next) => {
     client.release();
   }
 };
+
+/**
+ * DELETE /api/vendedores/:id
+ */
+export const remove = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { rol, id: userId } = req.user;
+
+    // RBAC: Solo administrador o el mismo vendedor pueden eliminar
+    if (rol !== 'Administrador' && id !== userId) {
+      return res.status(403).json({ success: false, error: 'No tiene permisos para eliminar este vendedor.' });
+    }
+
+    const deleted = await VendedorModel.remove(id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, error: 'Vendedor no encontrado' });
+    }
+    return res.status(200).json({ success: true, data: deleted });
+  } catch (err) {
+    // Manejo especial para errores de llave foránea (ej. eliminar un vendedor con clientes)
+    if (err.code === '23503') {
+      return res.status(400).json({ success: false, error: 'No se puede eliminar este vendedor porque tiene clientes asignados o vendedores a su cargo.' });
+    }
+    next(err);
+  }
+};

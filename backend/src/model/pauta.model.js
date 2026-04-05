@@ -308,3 +308,14 @@ export async function updatePauta(id, data) {
   }
 }
 
+/**
+ * Elimina una pauta por ID.
+ * CUNAS y DETALLE_PAUTA se eliminan en cascada (ON DELETE CASCADE).
+ * @param {number} id - ID de la pauta
+ */
+export async function deletePauta(id) {
+  const query = 'DELETE FROM PAUTAS WHERE id = $1 RETURNING id';
+  const result = await pool.query(query, [id]);
+  return result.rows[0] || null;
+}
+
