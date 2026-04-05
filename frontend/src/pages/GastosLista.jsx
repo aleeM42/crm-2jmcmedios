@@ -4,6 +4,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api.js';
+import { eliminarGastoMarketing } from '../services/gasto.service.js';
+import EditarGastoModal from '../components/EditarGastoModal.jsx';
+import { toast } from 'sonner';
 
 const TIPO_STYLE = {
   publicidad: 'bg-blue-100 text-blue-600',
@@ -23,16 +26,39 @@ export default function GastosLista() {
   const [search, setSearch] = useState('');
   const [filterTipo, setFilterTipo] = useState('');
 
+  // Modals state
+  const [editModalGasto, setEditModalGasto] = useState(null);
+  const [deleteConfirmGasto, setDeleteConfirmGasto] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const fetchGastos = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/gastos-marketing');
+      if (res.success) setGastos(Array.isArray(res.data) ? res.data : []);
+    } catch { /* silently handle */ }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await api.get('/gastos-marketing');
-        if (res.success) setGastos(Array.isArray(res.data) ? res.data : []);
-      } catch { /* silently handle */ }
-      setLoading(false);
-    };
-    load();
+    fetchGastos();
   }, []);
+
+  const handleDeleteGasto = async () => {
+    if (!deleteConfirmGasto) return;
+    setDeleting(true);
+    try {
+      await eliminarGastoMarketing(deleteConfirmGasto.id);
+      toast.success('Gasto eliminado exitosamente');
+      setDeleteConfirmGasto(null);
+      fetchGastos(); // reload
+    } catch (err) {
+      toast.error(err.message || 'Error al eliminar el gasto');
+      setDeleteConfirmGasto(null);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   // Filtered
   const filtered = useMemo(() => {
@@ -100,21 +126,23 @@ export default function GastosLista() {
         ))}
       </div>
 
+      {/* TABS NAVEGACIÓN */}
+      <div className="flex items-center border-b border-slate-200 gap-8 mb-6">
+        <Link to="/actividad-comercial" className="pb-4 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-colors">Visitas</Link>
+        <button className="pb-4 text-sm font-bold border-b-2 border-primary text-primary">Gastos</button>
+      </div>
+
       {/* FILTERS */}
       <div className="flex items-center gap-4 mb-6">
         <div className="relative flex-1 max-w-sm">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar gasto..." className="w-full h-10 pl-10 pr-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
         </div>
-        <select value={filterTipo} onChange={(e) => setFilterTipo(e.target.value)} className="h-10 pr-10 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-          <option value="">Todas las categorías</option>
-          <option value="publicidad">Publicidad</option>
-          <option value="evento">Evento</option>
-          <option value="material pop">Material POP</option>
-          <option value="patrocinio">Patrocinio</option>
+        <select value={filterTipo} onChange={(e) => setFilterTipo(e.target.value)} className="h-10 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+          <option value="">Todos los tipos</option>
+          <option value="campaña">Campaña</option>
+          <option value="remota">Remota</option>
           <option value="regalos corporativos">Regalos Corporativos</option>
-          <option value="digital">Digital</option>
-          <option value="otro">Otro</option>
         </select>
       </div>
 
@@ -128,7 +156,7 @@ export default function GastosLista() {
               <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Fecha</th>
               <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Monto</th>
               <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Tipo</th>
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6"></th>
+              <th className="text-center text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -157,10 +185,23 @@ export default function GastosLista() {
                     <td className="py-3 px-6">
                       <span className={`px-3 py-1 rounded-full text-[10px] font-bold capitalize ${TIPO_STYLE[g.tipo?.toLowerCase()] || TIPO_STYLE.otro}`}>{g.tipo}</span>
                     </td>
-                    <td className="py-3 px-6 text-right">
-                      <button className="text-slate-400 hover:text-primary transition-colors">
-                        <span className="material-symbols-outlined text-[18px]">more_vert</span>
-                      </button>
+                    <td className="py-3 px-6 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => setEditModalGasto(g)}
+                          className="w-8 h-8 rounded-full bg-slate-100 hover:bg-primary/10 text-slate-500 hover:text-primary flex items-center justify-center transition-colors"
+                          title="Editar"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmGasto(g)}
+                          className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-500 flex items-center justify-center transition-colors"
+                          title="Eliminar"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -169,6 +210,68 @@ export default function GastosLista() {
           </tbody>
         </table>
       </div>
+
+      {/* ═══ MODAL MODIFICAR GASTO ═══ */}
+      {editModalGasto && (
+        <EditarGastoModal
+          gasto={editModalGasto}
+          onClose={() => setEditModalGasto(null)}
+          onSuccess={() => {
+            setEditModalGasto(null);
+            toast.success('Gasto actualizado exitosamente');
+            fetchGastos();
+          }}
+        />
+      )}
+
+      {/* ═══ MODAL CONFIRMAR ELIMINACIÓN ═══ */}
+      {deleteConfirmGasto && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => !deleting && setDeleteConfirmGasto(null)}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-[fadeIn_0.2s_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3 bg-red-50/50">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <span className="material-symbols-outlined text-red-500">warning</span>
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 font-display text-base">Eliminar Gasto</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Acción irreversible</p>
+              </div>
+            </div>
+            <div className="p-6">
+              <p className="text-sm text-slate-600 leading-relaxed">
+                ¿Estás seguro de que deseas eliminar el gasto por concepto de: <span className="font-bold text-slate-800">"{deleteConfirmGasto.concepto}"</span> por un monto de <span className="font-bold text-slate-800">${parseFloat(deleteConfirmGasto.monto || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>?
+              </p>
+            </div>
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/30 flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirmGasto(null)}
+                disabled={deleting}
+                className="px-5 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteGasto}
+                disabled={deleting}
+                className="px-5 py-2 rounded-lg bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors shadow-sm shadow-red-500/20 flex items-center gap-2 disabled:opacity-50"
+              >
+                {deleting ? (
+                  <>
+                    <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
+                    Eliminando...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-base">delete_forever</span>
+                    Sí, eliminar
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

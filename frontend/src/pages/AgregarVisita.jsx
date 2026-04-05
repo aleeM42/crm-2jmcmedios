@@ -411,7 +411,7 @@ export default function AgregarVisita() {
               ))}
 
               {/* Formulario inline para agregar gasto */}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text" placeholder="Concepto" value={gastoTemp.concepto}
                   onChange={(e) => setGastoTemp((p) => ({ ...p, concepto: e.target.value }))}
@@ -420,7 +420,7 @@ export default function AgregarVisita() {
                 <input
                   type="number" placeholder="$0" step="0.01" min="0" value={gastoTemp.monto}
                   onChange={(e) => setGastoTemp((p) => ({ ...p, monto: e.target.value }))}
-                  className="w-24 h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-accent-green focus:border-accent-green outline-none"
+                  className="w-full sm:w-28 shrink-0 h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-accent-green focus:border-accent-green outline-none"
                 />
               </div>
               <select

@@ -53,3 +53,38 @@ export const create = async (data) => {
   const result = await pool.query(query, values);
   return result.rows[0];
 };
+
+/**
+ * Actualiza un gasto de marketing.
+ * Arco exclusivo: fk_cliente XOR fk_aliado_c.
+ */
+export const update = async (id, data) => {
+  const { fecha, concepto, monto, tipo, fk_cliente, fk_aliado_c } = data;
+  const query = `
+    UPDATE GASTOS_MARKETING 
+    SET fecha = COALESCE($1, fecha),
+        concepto = COALESCE($2, concepto),
+        monto = COALESCE($3, monto),
+        tipo = COALESCE($4, tipo),
+        fk_cliente = $5,
+        fk_aliado_c = $6
+    WHERE id = $7
+    RETURNING *
+  `;
+  const values = [fecha, concepto, monto, tipo, fk_cliente || null, fk_aliado_c || null, id];
+  const result = await pool.query(query, values);
+  return result.rows[0];
+};
+
+/**
+ * Elimina un gasto de marketing.
+ */
+export const remove = async (id) => {
+  const query = `
+    DELETE FROM GASTOS_MARKETING
+    WHERE id = $1
+    RETURNING *
+  `;
+  const result = await pool.query(query, [id]);
+  return result.rows[0];
+};

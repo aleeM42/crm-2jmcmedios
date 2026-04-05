@@ -25,3 +25,17 @@ export const getClientes = async () => {
 export const getAliados = async () => {
   return api.get('/aliados');
 };
+
+/**
+ * Modifica un gasto de marketing.
+ */
+export const modificarGastoMarketing = async (id, data) => {
+  return api.put(`/gastos-marketing/${id}`, data);
+};
+
+/**
+ * Elimina un gasto de marketing.
+ */
+export const eliminarGastoMarketing = async (id) => {
+  return api.delete(`/gastos-marketing/${id}`);
+};

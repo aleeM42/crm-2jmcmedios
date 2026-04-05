@@ -77,3 +77,54 @@ export const create = async (req, res, next) => {
     next(err);
   }
 };
+
+/**
+ * PUT /api/gastos-marketing/:id
+ */
+export const update = async (req, res, next) => {
+  try {
+    const { fecha, concepto, monto, tipo, fk_cliente, fk_aliado_c } = req.body;
+
+    const tieneCliente = fk_cliente != null && fk_cliente !== '';
+    const tieneAliado  = fk_aliado_c != null && fk_aliado_c !== '';
+
+    if (tieneCliente && tieneAliado) {
+      return res.status(400).json({
+        success: false,
+        error: 'El gasto solo puede asociarse a un Cliente O a un Aliado Comercial, no a ambos',
+      });
+    }
+
+    const gasto = await GastoMktModel.update(req.params.id, {
+      fecha,
+      concepto,
+      monto,
+      tipo,
+      fk_cliente: tieneCliente ? fk_cliente : null,
+      fk_aliado_c: tieneAliado ? fk_aliado_c : null,
+    });
+
+    if (!gasto) {
+      return res.status(404).json({ success: false, error: 'Gasto no encontrado' });
+    }
+    
+    res.json({ success: true, data: gasto });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * DELETE /api/gastos-marketing/:id
+ */
+export const remove = async (req, res, next) => {
+  try {
+    const gasto = await GastoMktModel.remove(req.params.id);
+    if (!gasto) {
+      return res.status(404).json({ success: false, error: 'Gasto no encontrado' });
+    }
+    res.json({ success: true, data: { message: 'Gasto de marketing eliminado correctamente' } });
+  } catch (err) {
+    next(err);
+  }
+};

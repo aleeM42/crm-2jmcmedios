@@ -22,11 +22,14 @@ export const findAll = async (vendedorId = null) => {
            ct.pri_nombre AS contacto_nombre,
            ct.pri_apellido AS contacto_apellido,
            c.nombre AS cliente_nombre,
+           ac.nombre_emisora AS aliado_nombre,
            u.primer_nombre AS vendedor_nombre,
            u.primer_apellido AS vendedor_apellido
     FROM VISITAS v
     LEFT JOIN CONTACTOS ct ON v.fk_contacto = ct.id
     LEFT JOIN CLIENTE c ON ct.fk_cliente = c.id
+    LEFT JOIN A_CONTACT ac_link ON ct.id = ac_link.fk_contacto
+    LEFT JOIN ALIADOS_COMERCIALES ac ON ac_link.fk_a_c = ac.id
     LEFT JOIN USUARIOS u ON v.fk_vendedor = u.id
     ${where}
     ORDER BY v.fecha DESC, v.hora DESC
@@ -54,11 +57,14 @@ export const findById = async (id, vendedorId = null) => {
            ct.pri_nombre AS contacto_nombre,
            ct.pri_apellido AS contacto_apellido,
            c.nombre AS cliente_nombre,
+           ac.nombre_emisora AS aliado_nombre,
            u.primer_nombre AS vendedor_nombre,
            u.primer_apellido AS vendedor_apellido
     FROM VISITAS v
     LEFT JOIN CONTACTOS ct ON v.fk_contacto = ct.id
     LEFT JOIN CLIENTE c ON ct.fk_cliente = c.id
+    LEFT JOIN A_CONTACT ac_link ON ct.id = ac_link.fk_contacto
+    LEFT JOIN ALIADOS_COMERCIALES ac ON ac_link.fk_a_c = ac.id
     LEFT JOIN USUARIOS u ON v.fk_vendedor = u.id
     ${where}
   `;
@@ -74,10 +80,13 @@ export const findByVendedorId = async (vendedorId) => {
     SELECT v.*,
            ct.pri_nombre AS contacto_nombre,
            ct.pri_apellido AS contacto_apellido,
-           c.nombre AS cliente_nombre
+           c.nombre AS cliente_nombre,
+           ac.nombre_emisora AS aliado_nombre
     FROM VISITAS v
     LEFT JOIN CONTACTOS ct ON v.fk_contacto = ct.id
     LEFT JOIN CLIENTE c ON ct.fk_cliente = c.id
+    LEFT JOIN A_CONTACT ac_link ON ct.id = ac_link.fk_contacto
+    LEFT JOIN ALIADOS_COMERCIALES ac ON ac_link.fk_a_c = ac.id
     WHERE v.fk_vendedor = $1
     ORDER BY v.fecha DESC, v.hora DESC
   `;

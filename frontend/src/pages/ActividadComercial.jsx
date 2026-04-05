@@ -4,6 +4,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api.js';
+import { eliminarVisita } from '../services/visita.service.js';
+import EditarVisitaModal from '../components/EditarVisitaModal.jsx';
+import { toast } from 'sonner';
 
 function ActividadComercial() {
   // --- Data ---
@@ -24,11 +27,15 @@ function ActividadComercial() {
   const [page, setPage] = useState(1);
   const perPage = 10;
 
-  // Fetch data on mount
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const [visRes, gasVisRes, gasMktRes, venRes, cliRes] = await Promise.all([
+  // --- Modals State ---
+  const [editModalVisita, setEditModalVisita] = useState(null);
+  const [deleteConfirmVisita, setDeleteConfirmVisita] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const fetchActividad = async () => {
+    setLoadingData(true);
+    try {
+      const [visRes, gasVisRes, gasMktRes, venRes, cliRes] = await Promise.all([
           api.get('/visitas').catch(() => ({ success: false })),
           api.get('/gastos').catch(() => ({ success: false })),
           api.get('/gastos-marketing').catch(() => ({ success: false })),
@@ -53,10 +60,28 @@ function ActividadComercial() {
           setClientes(Array.isArray(d) ? d : (d?.clientes || []));
         }
       } catch { /* silently handle */ }
-      setLoadingData(false);
-    };
-    load();
+    setLoadingData(false);
+  };
+
+  useEffect(() => {
+    fetchActividad();
   }, []);
+
+  const handleDeleteVisita = async () => {
+    if (!deleteConfirmVisita) return;
+    setDeleting(true);
+    try {
+      await eliminarVisita(deleteConfirmVisita.id);
+      toast.success('Visita eliminada exitosamente');
+      setDeleteConfirmVisita(null);
+      fetchActividad(); // reload
+    } catch (err) {
+      toast.error(err.message || 'Error al eliminar visita');
+      setDeleteConfirmVisita(null);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   // Filtered visitas
   const filtered = useMemo(() => {
@@ -192,11 +217,12 @@ function ActividadComercial() {
                   <th className="px-6 py-4">Fecha</th>
                   <th className="px-6 py-4">Hora</th>
                   <th className="px-6 py-4">Vendedor</th>
-                  <th className="px-6 py-4">Cliente</th>
+                  <th className="px-6 py-4">Visitado</th>
                   <th className="px-6 py-4">Tipo</th>
                   <th className="px-6 py-4">Objetivo Visita</th>
                   <th className="px-6 py-4 text-center">Efectiva</th>
                   <th className="px-6 py-4">Detalle</th>
+                  <th className="px-6 py-4 text-center">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -215,7 +241,14 @@ function ActividadComercial() {
                         <td className="px-6 py-4 text-sm text-slate-700 whitespace-nowrap">{v.fecha?.slice(0, 10)}</td>
                         <td className="px-6 py-4 text-sm text-slate-500 whitespace-nowrap">{v.hora?.slice(0, 5)}</td>
                         <td className="px-6 py-4 text-sm font-medium text-slate-900 whitespace-nowrap">{v.vendedor_nombre} {v.vendedor_apellido}</td>
-                        <td className="px-6 py-4 text-sm text-slate-700">{v.cliente_nombre || '—'}</td>
+                        <td className="px-6 py-4 text-sm text-slate-700 whitespace-nowrap">
+                          {v.cliente_nombre || v.aliado_nombre || '—'}
+                          {v.aliado_nombre ? (
+                            <span className="ml-2 px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded text-[9px] uppercase tracking-wider font-bold">Aliado</span>
+                          ) : v.cliente_nombre ? (
+                            <span className="ml-2 px-2 py-0.5 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded text-[9px] uppercase tracking-wider font-bold">Cliente</span>
+                          ) : null}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`${tipoClass} px-3 py-1 rounded-full text-[11px] font-bold uppercase`}>{v.tipo}</span>
                         </td>
@@ -226,6 +259,24 @@ function ActividadComercial() {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-600 italic whitespace-nowrap">{v.detalle || '—'}</td>
+                        <td className="px-6 py-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => setEditModalVisita(v)}
+                              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-primary/10 text-slate-500 hover:text-primary flex items-center justify-center transition-colors"
+                              title="Editar"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">edit</span>
+                            </button>
+                            <button
+                              onClick={() => setDeleteConfirmVisita(v)}
+                              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-500 flex items-center justify-center transition-colors"
+                              title="Eliminar"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     );
                   })
@@ -254,6 +305,68 @@ function ActividadComercial() {
           </div>
         </div>
       </div>
+
+      {/* ═══ MODAL MODIFICAR VISITA ═══ */}
+      {editModalVisita && (
+        <EditarVisitaModal
+          visita={editModalVisita}
+          onClose={() => setEditModalVisita(null)}
+          onSuccess={() => {
+            setEditModalVisita(null);
+            toast.success('Visita actualizada exitosamente');
+            fetchActividad();
+          }}
+        />
+      )}
+
+      {/* ═══ MODAL CONFIRMAR ELIMINACIÓN ═══ */}
+      {deleteConfirmVisita && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => !deleting && setDeleteConfirmVisita(null)}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-[fadeIn_0.2s_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3 bg-red-50/50">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <span className="material-symbols-outlined text-red-500">warning</span>
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 font-display text-base">Eliminar Visita</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Acción irreversible</p>
+              </div>
+            </div>
+            <div className="p-6">
+              <p className="text-sm text-slate-600 leading-relaxed">
+                ¿Estás seguro de que deseas eliminar la visita con objetivo: <span className="font-bold text-slate-800">"{deleteConfirmVisita.objetivo_visita}"</span> del <span className="font-bold text-slate-800">{deleteConfirmVisita.fecha?.slice(0, 10)}</span>?
+              </p>
+            </div>
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/30 flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirmVisita(null)}
+                disabled={deleting}
+                className="px-5 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteVisita}
+                disabled={deleting}
+                className="px-5 py-2 rounded-lg bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors shadow-sm shadow-red-500/20 flex items-center gap-2 disabled:opacity-50"
+              >
+                {deleting ? (
+                  <>
+                    <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
+                    Eliminando...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-base">delete_forever</span>
+                    Sí, eliminar
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

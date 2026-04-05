@@ -24,3 +24,9 @@ export const getContactosByCliente = async (clienteId) => api.get(`/contactos/cl
 
 /** Contactos de un aliado (vía A_CONTACT). */
 export const getContactosByAliado = async (aliadoId) => api.get(`/contactos/aliado/${aliadoId}`);
+
+/** Modifica una visita existente. */
+export const modificarVisita = async (id, data) => api.put(`/visitas/${id}`, data);
+
+/** Elimina una visita existente. */
+export const eliminarVisita = async (id) => api.delete(`/visitas/${id}`);

@@ -14,5 +14,7 @@ const ROLES = ['Administrador', 'Director', 'Vendedor'];
 router.get('/',    authenticate, authorize(...ROLES), GastoMktCtrl.getAll);
 router.get('/:id', authenticate, authorize(...ROLES), GastoMktCtrl.getById);
 router.post('/',   authenticate, authorize(...ROLES), GastoMktCtrl.create);
+router.put('/:id', authenticate, authorize(...ROLES), GastoMktCtrl.update);
+router.delete('/:id', authenticate, authorize(...ROLES), GastoMktCtrl.remove);
 
 export default router;
