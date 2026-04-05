@@ -166,17 +166,17 @@ export default function PautasLista() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-100 bg-primary">
-                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Nro OC</th>
-                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Nro OT</th>
-                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Cliente</th>
-                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Emisora</th>
-                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Marca</th>
-                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Tipo</th>
-                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Vigencia</th>
-                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Estado</th>
-                <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-5">Progreso</th>
-                <th className="text-right text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Monto OC</th>
+              <tr className="border-b border-slate-100 bg-slate-100">
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Nro OT</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Nro OC</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Cliente</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Emisora</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Marca</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Tipo</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Vigencia</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Estado</th>
+                <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-5">Progreso</th>
+                <th className="text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Monto OC</th>
               </tr>
             </thead>
             <tbody>
@@ -191,10 +191,10 @@ export default function PautasLista() {
 
                   return (
                     <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                      <td className="py-3 px-6 text-xs font-medium text-slate-500">{p.numero_oc}</td>
                       <td className="py-3 px-5">
                         <Link to={`/pautas/${p.id}`} className="font-bold text-primary hover:underline">{p.numero_ot}</Link>
                       </td>
+                      <td className="py-3 px-6 text-xs font-medium text-slate-500">{p.numero_oc}</td>
                       <td className="py-3 px-5 font-medium text-slate-700">{p.cliente_nombre || 'Sin cliente'}</td>
                       <td className="py-3 px-5 text-slate-600 text-xs">{p.emisora_nombre || '—'}</td>
                       <td className="py-3 px-5 text-slate-600">{p.marca}</td>

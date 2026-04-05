@@ -176,15 +176,15 @@ export default function Clientes() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-primary border-b border-slate-100 ">
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Nombre</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Razón Social</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">RIF Fiscal</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Sector</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Clasificación</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Estado</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Tipo</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-100 uppercase tracking-widest">Acciones</th>
+              <tr className="bg-slate-100 border-b border-slate-100 ">
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Nombre</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Razón Social</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">RIF Fiscal</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Sector</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Clasificación</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Estado</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Tipo</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">

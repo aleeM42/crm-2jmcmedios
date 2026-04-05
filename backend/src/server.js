@@ -49,7 +49,7 @@ app.use(express.json({ limit: '1mb' }));
 // ---- Rate Limiting Global ----
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 200,                  // 200 requests por ventana
+  max: 3000,                 // Aumentado a 3000 rq/15m para tolerar comportamiento de SPA y NAT
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, error: 'Demasiadas solicitudes. Intente más tarde.' },

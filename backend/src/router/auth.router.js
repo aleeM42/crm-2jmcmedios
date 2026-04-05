@@ -11,7 +11,7 @@ const router = Router();
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 10,                   // 10 intentos de login por ventana
+  max: 100,                  // 100 intentos de login por ventana (para prevenir bloqueos por NAT/desarrollo)
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, error: 'Demasiados intentos de login. Espere 15 minutos.' },
