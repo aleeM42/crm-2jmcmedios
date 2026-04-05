@@ -393,11 +393,11 @@ export default function AgregarCliente() {
               <select name="sector" value={cliente.sector} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" required>
                 <option value="">Seleccione sector</option>
                 <option value="Salud">Salud</option>
-                <option value="Alimentacion">Alimentación</option>
-                <option value="Telematica">Telemática</option>
-                <option value="Fabricacion">Fabricación</option>
+                <option value="Alimentación">Alimentación</option>
+                <option value="Telemática">Telemática</option>
+                <option value="Ferretería">Ferretería</option>
                 <option value="Bancario">Bancario</option>
-                <option value="Aerolinea">Aerolínea</option>
+                <option value="Aerolínea">Aerolínea</option>
                 <option value="Moda">Moda</option>
                 <option value="Automotriz">Automotriz</option>
                 <option value="Envíos">Envíos</option>

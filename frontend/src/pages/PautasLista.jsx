@@ -86,7 +86,7 @@ export default function PautasLista() {
         </div>
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           <div className="flex items-center gap-1 bg-[#F4FAFB] rounded-lg border border-slate-200 p-1 shadow-sm">
-            <button className="px-3 py-1.5 rounded-md bg-primary text-white text-xs font-bold">Lista</button>
+            <button className="px-3 py-1.5 rounded-md bg-accent-green text-white text-xs font-bold">Lista</button>
             <Link to="/pautas/kanban" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Kanban</Link>
             <Link to="/pautas/calendario" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Calendario</Link>
           </div>
@@ -102,7 +102,7 @@ export default function PautasLista() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Total Pautas', value: totalPautas.toString(), sub: 'registradas' },
-          { label: 'En Transmisión', value: enTransmision.toString(), dot: 'bg-primary' },
+          { label: 'En Transmisión', value: enTransmision.toString(), dot: 'bg-accent-green' },
           { label: 'Monto OC Total', value: `$${montoOC.toLocaleString()}`, sub: 'facturado' },
           { label: 'Monto OT Total', value: `$${montoOT.toLocaleString()}`, sub: 'comprometido' },
         ].map((kpi) => (

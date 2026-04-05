@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getClientes } from '../services/cliente.service.js';
+import { getCurrentUser } from '../services/auth.service.js';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 function getInitials(nombre) {
@@ -18,6 +19,9 @@ export default function Clientes() {
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20, totalPages: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const user = getCurrentUser();
+  const rol = user?.rol || '';
 
   // Filtros
   const [filters, setFilters] = useState({
@@ -64,9 +68,12 @@ export default function Clientes() {
             <span className="material-symbols-outlined text-lg">file_download</span>
             <span className="text-xs font-bold uppercase tracking-wider">Exportar</span>
           </button>*/}
-          <Link to="/clientes/agregar" className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-2 flex-1 sm:flex-initial justify-center">
-            <span className="material-symbols-outlined">add</span>Agregar Cliente
-          </Link>
+          {/* Solo Admin, Director General, Director y Vendedores pueden agregar clientes */}
+          {(rol === 'Administrador' || rol === 'Director General' || rol === 'Director' || rol === 'Vendedor') && (
+            <Link to="/clientes/agregar" className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-2 flex-1 sm:flex-initial justify-center">
+              <span className="material-symbols-outlined">add</span>Agregar Cliente
+            </Link>
+          )}
         </div>
       </header>
 
@@ -127,11 +134,11 @@ export default function Clientes() {
         >
           <option value="">Sector: Todos</option>
           <option value="Salud">Salud</option>
-          <option value="Alimentacion">Alimentación</option>
-          <option value="Telematica">Telemática</option>
-          <option value="Fabricacion">Fabricación</option>
+          <option value="Alimentación">Alimentación</option>
+          <option value="Telemática">Telemática</option>
+          <option value="Ferretería">Ferretería</option>
           <option value="Bancario">Bancario</option>
-          <option value="Aerolinea">Aerolínea</option>
+          <option value="Aerolínea">Aerolínea</option>
           <option value="Otro">Otro</option>
         </select>
         <select
@@ -208,7 +215,7 @@ export default function Clientes() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className={`w-8 h-8 rounded-full bg-${color}/10 flex items-center justify-center text-${color} font-bold text-xs`}>{initials}</div>
-                          <span className="text-sm font-semibold text-slate-900">{c.nombre}</span>
+                          <Link to={`/clientes/${c.id}`} className="text-sm font-semibold text-slate-900 hover:text-primary transition-colors">{c.nombre}</Link>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600">{c.razon_social}</td>

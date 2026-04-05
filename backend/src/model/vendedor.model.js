@@ -160,3 +160,58 @@ export const findDirectores = async () => {
   const result = await pool.query(query);
   return result.rows;
 };
+
+/**
+ * Actualiza un vendedor: UPDATE USUARIOS + UPDATE VENDEDORES (transacción).
+ * @param {string} id - UUID del usuario_id
+ * @param {object} userData - Datos de usuario a actualizar
+ * @param {object} vendedorData - Datos de vendedor a actualizar
+ * @param {object} client - pg client de transacción
+ */
+export const update = async (id, userData, vendedorData, client) => {
+  // 1. Actualizar en USUARIOS
+  let userQuery = `
+    UPDATE USUARIOS
+    SET primer_nombre = $1, primer_apellido = $2, correo = $3, 
+        nombre_usuario = $4, rol = $5, estado = $6
+  `;
+  const userValues = [
+    userData.primer_nombre,
+    userData.primer_apellido,
+    userData.correo,
+    userData.nombre_usuario,
+    userData.rol,
+    userData.estado
+  ];
+
+  if (userData.password_hash) {
+    userQuery += `, password_hash = $7 WHERE id = $8 RETURNING *`;
+    userValues.push(userData.password_hash, id);
+  } else {
+    userQuery += ` WHERE id = $7 RETURNING *`;
+    userValues.push(id);
+  }
+
+  const userResult = await client.query(userQuery, userValues);
+  const updatedUser = userResult.rows[0];
+
+  // 2. Actualizar en VENDEDORES
+  const vendedorQuery = `
+    UPDATE VENDEDORES
+    SET meta = $1, tipo = $2, fk_vendedor_jefe = $3
+    WHERE usuario_id = $4
+    RETURNING *
+  `;
+  const vendedorValues = [
+    vendedorData.meta,
+    vendedorData.tipo,
+    vendedorData.fk_vendedor_jefe || null,
+    id
+  ];
+  const vendedorResult = await client.query(vendedorQuery, vendedorValues);
+
+  return {
+    ...updatedUser,
+    ...vendedorResult.rows[0],
+  };
+};

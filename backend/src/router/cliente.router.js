@@ -45,6 +45,14 @@ router.post(
   ClienteCtrl.create
 );
 
+// PUT  /api/clientes/:id       — Actualizar cliente (transacción atómica)
+router.put(
+  '/:id',
+  authenticate,
+  authorize(...ROLES_CLIENTES),
+  ClienteCtrl.update
+);
+
 // POST /api/clientes/:id/marcas — Crear una marca para un cliente
 router.post(
   '/:id/marcas',

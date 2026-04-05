@@ -265,3 +265,160 @@ export const createMarca = async (req, res, next) => {
     next(err);
   }
 };
+
+/**
+ * PUT /api/clientes/:id
+ * Transacción atómica: CLIENTE → CONTACTOS (update/create/delete) → TELEFONOS
+ */
+export const update = async (req, res, next) => {
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const clienteId = parseInt(req.params.id, 10);
+    const { cliente, contactos, telefonos } = req.body;
+
+    // ── Verificar que el cliente existe ──────────────────
+    const existente = await ClienteModel.findById(clienteId);
+    if (!existente) {
+      await client.query('ROLLBACK');
+      client.release();
+      return res.status(404).json({ success: false, error: 'Cliente no encontrado.' });
+    }
+
+    // ── Validaciones de negocio ──────────────────────────
+    const errCliente = validarCliente(cliente || {});
+    if (errCliente.length > 0) {
+      await client.query('ROLLBACK');
+      client.release();
+      return res.status(400).json({ success: false, error: errCliente[0] });
+    }
+
+    // Normalizar RIF a mayúsculas
+    if (cliente.rif_fiscal) cliente.rif_fiscal = cliente.rif_fiscal.toUpperCase();
+
+    // ── 1. Actualizar cliente ────────────────────────────
+    const updatedCliente = await ClienteModel.update(clienteId, cliente, client);
+    if (!updatedCliente) {
+      await client.query('ROLLBACK');
+      client.release();
+      return res.status(404).json({ success: false, error: 'No se pudo actualizar el cliente.' });
+    }
+
+    // ── 2. Sincronizar contactos ─────────────────────────
+    let updatedContactos = [];
+
+    if (contactos && Array.isArray(contactos)) {
+      const contactosActivos = contactos.filter(c => c.pri_nombre);
+
+      // Validar contactos
+      for (let i = 0; i < contactosActivos.length; i++) {
+        const errC = validarContacto(contactosActivos[i], i);
+        if (errC.length > 0) {
+          await client.query('ROLLBACK');
+          client.release();
+          return res.status(400).json({ success: false, error: errC[0] });
+        }
+      }
+
+      // Validar teléfonos
+      const errTel = validarTelefonos(telefonos);
+      if (errTel.length > 0) {
+        await client.query('ROLLBACK');
+        client.release();
+        return res.status(400).json({ success: false, error: errTel[0] });
+      }
+
+      // IDs de contactos enviados que ya existen (para actualizar)
+      const contactosConId = contactosActivos.filter(c => c.id);
+      const contactosSinId = contactosActivos.filter(c => !c.id);
+      const idsEnviados = contactosConId.map(c => c.id);
+
+      // IDs actuales en la BD para este cliente
+      const contactosActuales = existente.contactos || [];
+      const idsActuales = contactosActuales.map(c => c.id);
+
+      // Contactos eliminados (estaban en BD pero no vinieron en el request)
+      const idsAEliminar = idsActuales.filter(id => !idsEnviados.includes(id));
+      if (idsAEliminar.length > 0) {
+        await ContactoModel.deleteByIds(idsAEliminar, client);
+      }
+
+      // Actualizar contactos existentes
+      for (const cData of contactosConId) {
+        const updated = await ContactoModel.update(cData.id, cData, client);
+
+        // Sincronizar teléfonos del contacto: delete + re-insert
+        await TelefonoModel.deleteByContactoId(cData.id, client);
+        const telDeContacto = (cData.telefonos || []).filter(t => t.codigo_area && t.numero);
+        let newTels = [];
+        if (telDeContacto.length > 0) {
+          newTels = await TelefonoModel.createBatch(cData.id, req.user.id, telDeContacto, client);
+        }
+
+        updatedContactos.push({ ...updated, telefonos: newTels });
+      }
+
+      // Crear contactos nuevos
+      for (let i = 0; i < contactosSinId.length; i++) {
+        const cData = { ...contactosSinId[i], fk_cliente: clienteId };
+        const inserted = await ContactoModel.create(cData, client);
+
+        // Teléfonos para contactos nuevos: usar el array global solo para el primer contacto nuevo si no tiene telefonos propios
+        const telDeContacto = (cData.telefonos || []).filter(t => t.codigo_area && t.numero);
+        let newTels = [];
+        if (telDeContacto.length > 0) {
+          newTels = await TelefonoModel.createBatch(inserted.id, req.user.id, telDeContacto, client);
+        } else if (i === 0 && contactosConId.length === 0 && telefonos && telefonos.length > 0) {
+          // Si no hay contactos existentes, asignar teléfonos globales al primer contacto nuevo
+          const validTels = telefonos.filter(t => t.codigo_area && t.numero);
+          if (validTels.length > 0) {
+            newTels = await TelefonoModel.createBatch(inserted.id, req.user.id, validTels, client);
+          }
+        }
+
+        updatedContactos.push({ ...inserted, telefonos: newTels });
+      }
+    }
+
+    // ── 3. Negociación (Histórico) ───────────────────────
+    const { negociacion } = req.body;
+    let finalNegociacion = null;
+    if (negociacion && negociacion.monto_negociacion && negociacion.fecha_inicio) {
+      if (negociacion.id) {
+        // Actualizar existente
+        const upNeg = await client.query(
+          `UPDATE HISTORICO_NEGOCIACIONES
+           SET fecha_inicio = $1, fecha_fin = $2, monto_negociacion = $3, total_cunas = $4
+           WHERE id = $5 AND fk_cliente = $6
+           RETURNING *`,
+          [negociacion.fecha_inicio, negociacion.fecha_fin || null, negociacion.monto_negociacion, parseInt(negociacion.total_cunas, 10) || null, negociacion.id, clienteId]
+        );
+        finalNegociacion = upNeg.rows[0];
+      } else {
+        // Crear nuevo
+        const inNeg = await client.query(
+          `INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, total_cunas, fk_cliente)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING *`,
+          [negociacion.fecha_inicio, negociacion.fecha_fin || null, negociacion.monto_negociacion, parseInt(negociacion.total_cunas, 10) || null, clienteId]
+        );
+        finalNegociacion = inNeg.rows[0];
+      }
+    }
+
+    await client.query('COMMIT');
+
+    return res.json({
+      success: true,
+      data: { ...updatedCliente, contactos: updatedContactos },
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('❌ [update cliente] ERROR:', err.message, '| Code:', err.code, '| Detail:', err.detail);
+    next(err);
+  } finally {
+    client.release();
+  }
+};

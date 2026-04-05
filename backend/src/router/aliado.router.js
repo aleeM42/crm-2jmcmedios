@@ -13,5 +13,6 @@ router.use(authenticate);
 router.get('/', AliadoController.getAll);
 router.get('/:id', AliadoController.getById);
 router.post('/', AliadoController.create);
+router.put('/:id', AliadoController.update);
 
 export default router;

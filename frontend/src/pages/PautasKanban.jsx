@@ -46,7 +46,7 @@ export default function PautasKanban() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
           <div className="flex items-center gap-1 bg-[#F4FAFB] rounded-lg border border-slate-200 p-1 shadow-sm">
             <Link to="/pautas" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Lista</Link>
-            <button className="px-3 py-1.5 rounded-md bg-primary text-white text-xs font-bold">Kanban</button>
+            <button className="px-3 py-1.5 rounded-md bg-accent-green text-white text-xs font-bold">Kanban</button>
             <Link to="/pautas/calendario" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Calendario</Link>
           </div>
           {canCreatePauta && (
@@ -68,8 +68,8 @@ export default function PautasKanban() {
               <div className="flex items-center gap-3 mb-4">
                 <div className={`w-3 h-3 rounded-full ${col.color}`}></div>
                 <h3 className="text-sm font-bold text-slate-700">{col.label}</h3>
-              <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-bold">{col.items.length}</span>
-            </div>
+                <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-bold">{col.items.length}</span>
+              </div>
 
               {/* Cards */}
               <div className="space-y-3">

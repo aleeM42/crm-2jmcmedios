@@ -82,3 +82,53 @@ export const create = async (data, client) => {
   const result = await dbClient.query(query, values);
   return result.rows[0];
 };
+
+/**
+ * Actualiza un contacto existente.
+ * @param {number} id - ID del contacto
+ * @param {object} data - campos a actualizar
+ * @param {object} client - pg client de transacción
+ */
+export const update = async (id, data, client) => {
+  const dbClient = client || pool;
+  const query = `
+    UPDATE CONTACTOS SET
+      pri_nombre = $1,
+      seg_nombre = $2,
+      pri_apellido = $3,
+      departamento = $4,
+      correo = $5,
+      rol = $6,
+      anotac_especiales = $7,
+      fecha_nac = $8
+    WHERE id = $9
+    RETURNING *
+  `;
+  const values = [
+    data.pri_nombre,
+    data.seg_nombre || null,
+    data.pri_apellido,
+    data.departamento,
+    data.correo,
+    data.rol,
+    data.anotac_especiales || null,
+    data.fecha_nac || null,
+    id,
+  ];
+  const result = await dbClient.query(query, values);
+  return result.rows[0];
+};
+
+/**
+ * Elimina contactos por sus IDs (para borrar los removidos en la edición).
+ * @param {number[]} ids - IDs de contactos a eliminar
+ * @param {object} client - pg client de transacción
+ */
+export const deleteByIds = async (ids, client) => {
+  if (!ids || ids.length === 0) return;
+  const dbClient = client || pool;
+  await dbClient.query(
+    `DELETE FROM CONTACTOS WHERE id = ANY($1)`,
+    [ids]
+  );
+};

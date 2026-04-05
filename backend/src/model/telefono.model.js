@@ -40,3 +40,29 @@ export const findByContactoId = async (contactoId) => {
   const result = await pool.query(query, [contactoId]);
   return result.rows;
 };
+
+/**
+ * Elimina todos los teléfonos de un contacto (para re-insertar en edición).
+ * @param {number} contactoId
+ * @param {object} client - pg client de transacción
+ */
+export const deleteByContactoId = async (contactoId, client) => {
+  const dbClient = client || pool;
+  await dbClient.query(
+    `DELETE FROM TELEFONOS WHERE fk_contacto = $1`,
+    [contactoId]
+  );
+};
+
+/**
+ * Elimina todos los teléfonos de un usuario (para re-insertar en edición de vendedor/usuario).
+ * @param {string} usuarioId - UUID del usuario
+ * @param {object} client - pg client de transacción
+ */
+export const deleteByUsuarioId = async (usuarioId, client) => {
+  const dbClient = client || pool;
+  await dbClient.query(
+    `DELETE FROM TELEFONOS WHERE fk_usuario = $1`,
+    [usuarioId]
+  );
+};

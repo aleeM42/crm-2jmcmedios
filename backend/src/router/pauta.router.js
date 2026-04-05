@@ -17,5 +17,6 @@ router.get('/oc/:numeroOC/monto', PautaController.getMontoDisponible);
 router.post('/', PautaController.create);
 router.get('/', PautaController.getAll);
 router.get('/:id', PautaController.getById);
+router.put('/:id', PautaController.update);
 
 export default router;

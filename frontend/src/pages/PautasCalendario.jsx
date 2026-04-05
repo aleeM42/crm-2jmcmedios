@@ -42,7 +42,7 @@ export default function PautasCalendario() {
 
   const handlePrevMonth = () => setViewDate(new Date(currentYear, currentMonth - 1, 1));
   const handleNextMonth = () => setViewDate(new Date(currentYear, currentMonth + 1, 1));
-  
+
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0(Sun) - 6(Sat)
   const startDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1; // 0(Mon) - 6(Sun)
@@ -58,28 +58,44 @@ export default function PautasCalendario() {
       // Ajustar la fecha asegurando que usamos la fecha local para no desfasarnos por timezone
       const [sYear, sMonth, sDay] = pauta.fecha_inicio.split('T')[0].split('-');
       const startDate = new Date(sYear, sMonth - 1, sDay);
-      
+
       let endDate = startDate;
       if (pauta.fecha_fin) {
         const [eYear, eMonth, eDay] = pauta.fecha_fin.split('T')[0].split('-');
         endDate = new Date(eYear, eMonth - 1, eDay);
       }
-      
+
       let color = 'bg-slate-400';
       if (pauta.tipo_compra === 'rotativa') color = 'bg-[#55CCD3]';
       if (pauta.tipo_compra === 'en vivo') color = 'bg-[#8DC63F]';
 
       const label = pauta.cliente_nombre ? `OT-${pauta.numero_ot} - ${pauta.cliente_nombre.substring(0, 10)}${pauta.cliente_nombre.length > 10 ? '...' : ''}` : `OT-${pauta.numero_ot}`;
 
+      // Obtener los días de semana configurados
+      let configDias = [];
+      if (pauta.dias_semana) {
+        configDias = pauta.dias_semana.split(',').map(d => d.trim().toUpperCase());
+      }
+
+      // Mapeo local de JS getDay() al formato de dias_semana (ej: "L", "M", "X", "J", "V", "S", "D")
+      // getDay: 0 = Domingo, 1 = Lunes, ... 6 = Sabado
+      const weekDaysMap = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+
       // Recorrer los días desde inicio hasta fin
       let currentDate = new Date(startDate);
       // Solo iterar si las fechas son coherentes
       if (startDate <= endDate) {
         while (currentDate <= endDate) {
-          if (currentDate.getMonth() === currentMonth && currentDate.getFullYear() === currentYear) {
+          const currentDayName = weekDaysMap[currentDate.getDay()];
+
+          // Verificar si la pauta debe sonar este día de la semana
+          // Si no tiene días configurados (comportamiento legacy), o si coincide con la letra.
+          const shouldShowEvent = configDias.length === 0 || configDias.includes(currentDayName);
+
+          if (shouldShowEvent && currentDate.getMonth() === currentMonth && currentDate.getFullYear() === currentYear) {
             const pDay = currentDate.getDate();
             if (!EVENTS[pDay]) EVENTS[pDay] = [];
-            
+
             let displayLabel = label;
             if (startDate.getTime() !== endDate.getTime()) {
               if (currentDate.getTime() === startDate.getTime()) {
@@ -99,7 +115,7 @@ export default function PautasCalendario() {
   const pautasActivas = pautas.filter(p => !['finalizada', 'suspendida'].includes(p.estado)).length;
   const enTransmision = pautas.filter(p => p.estado === 'en transmision').length;
   const montoTotal = pautas.reduce((acc, curr) => acc + Number(curr.monto_ot), 0);
-  
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
   };
@@ -113,16 +129,16 @@ export default function PautasCalendario() {
   return (
     <>
       {/* HEADER */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 ">
         <div>
           <h2 className="text-3xl font-black text-slate-900 font-display">Pautas</h2>
           <p className="text-sm text-slate-400 mt-1">Vista Calendario</p>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center gap-1 bg-[#F4FAFB] rounded-lg border border-slate-200 p-1 shadow-sm">
+        <div className="flex flex-col margin-right-100 sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-1 bg-[#F4FAFB] rounded-lg border border-slate-200 p-1 shadow-sm ">
             <Link to="/pautas" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Lista</Link>
             <Link to="/pautas/kanban" className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors">Kanban</Link>
-            <button className="px-3 py-1.5 rounded-md bg-primary text-white text-xs font-bold">Calendario</button>
+            <button className="px-3 py-1.5 rounded-md bg-accent-green text-white text-xs font-bold">Calendario</button>
           </div>
           {canCreatePauta && (
             <Link to="/pautas/agregar" className="flex items-center justify-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
@@ -144,7 +160,7 @@ export default function PautasCalendario() {
               { label: 'Pautas Activas', value: pautasActivas.toString(), icon: 'campaign', color: 'text-primary' },
               { label: 'En Transmisión', value: enTransmision.toString(), icon: 'podcasts', color: 'text-accent-green' },
               { label: 'Pautas Totales', value: pautas.length.toString(), icon: 'graphic_eq', color: 'text-secondary' },
-              { label: 'Monto Total OC', value: formatCurrency(montoTotal), icon: 'payments', color: 'text-primary' },
+              { label: 'Monto Total OT', value: formatCurrency(montoTotal), icon: 'payments', color: 'text-accent-green' },
             ].map((kpi) => (
               <div key={kpi.label} className="bg-[#F4FAFB] p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
                 <span className={`material-symbols-outlined text-3xl ${kpi.color}`}>{kpi.icon}</span>
@@ -215,7 +231,7 @@ export default function PautasCalendario() {
               <span className="material-symbols-outlined text-primary text-lg">upcoming</span>
               Próximas Pautas
             </h3>
-            
+
             {proximasPautas.length > 0 ? (
               <div className="space-y-3">
                 {proximasPautas.map((pauta) => (

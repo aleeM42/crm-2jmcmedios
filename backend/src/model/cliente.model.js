@@ -178,6 +178,14 @@ export const findById = async (id) => {
     ORDER BY v.fecha DESC, v.hora DESC
   `;
   const visitasResult = await pool.query(visitasQuery, [id]);
+  // Historial de Negociaciones
+  const negociacionesQuery = `
+    SELECT id, fecha_inicio, fecha_fin, monto_negociacion, total_cunas, fk_cliente
+    FROM HISTORICO_NEGOCIACIONES
+    WHERE fk_cliente = $1
+    ORDER BY fecha_inicio DESC
+  `;
+  const negociacionesResult = await pool.query(negociacionesQuery, [id]);
 
   // Ensamblar respuesta
   const marcasByCliente = {};
@@ -207,6 +215,7 @@ export const findById = async (id) => {
     kpis: kpisResult.rows[0],
     pautas: pautasResult.rows,
     visitas: visitasResult.rows,
+    negociaciones: negociacionesResult.rows,
     marcas: marcasByCliente[id] || [],
     sub_empresas: subEmpresasResult.rows.map(se => ({
       ...se,
@@ -228,8 +237,8 @@ export const create = async (data, client) => {
     INSERT INTO CLIENTE (
       nombre, razon_social, tipo, direccion, rif_fiscal,
       clasificacion, sector, estado, nombre_agencia, observacion,
-      fk_lugar, fk_cliente_padre, fk_vendedor
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+      fk_lugar, fk_cliente_padre, fk_vendedor, archivo_adjunto
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
     RETURNING *
   `;
   const values = [
@@ -246,6 +255,7 @@ export const create = async (data, client) => {
     data.fk_lugar,
     data.fk_cliente_padre || null,
     data.fk_vendedor,
+    data.archivo_adjunto || null,
   ];
   const result = await dbClient.query(query, values);
   return result.rows[0];
@@ -285,4 +295,49 @@ export const findEmpresas = async () => {
   `;
   const result = await pool.query(query);
   return result.rows;
+};
+
+/**
+ * Actualiza los campos mutables de un cliente.
+ * No toca: tipo, fk_cliente_padre (inmutables post-creación).
+ * @param {number} id - ID del cliente
+ * @param {object} data - campos a actualizar
+ * @param {object} client - pg client de transacción (opcional)
+ */
+export const update = async (id, data, client) => {
+  const dbClient = client || pool;
+  const query = `
+    UPDATE CLIENTE SET
+      nombre = $1,
+      razon_social = $2,
+      direccion = $3,
+      rif_fiscal = $4,
+      clasificacion = $5,
+      sector = $6,
+      estado = $7,
+      nombre_agencia = $8,
+      observacion = $9,
+      fk_lugar = $10,
+      fk_vendedor = $11,
+      archivo_adjunto = $12
+    WHERE id = $13
+    RETURNING *
+  `;
+  const values = [
+    data.nombre,
+    data.razon_social,
+    data.direccion,
+    data.rif_fiscal,
+    data.clasificacion,
+    data.sector,
+    data.estado,
+    data.nombre_agencia || null,
+    data.observacion || null,
+    data.fk_lugar,
+    data.fk_vendedor,
+    data.archivo_adjunto || null,
+    id,
+  ];
+  const result = await dbClient.query(query, values);
+  return result.rows[0];
 };

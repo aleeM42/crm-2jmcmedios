@@ -171,3 +171,91 @@ export const create = async (req, res, next) => {
     client.release();
   }
 };
+
+/**
+ * PUT /api/vendedores/:id
+ * Transacción atómica: UPDATE USUARIO → UPDATE VENDEDOR → RE-CREATE TELEFONOS
+ * RBAC: Admin, Director, o el mismo vendedor
+ */
+export const update = async (req, res, next) => {
+  const { id } = req.params;
+  const { rol, id: userId } = req.user;
+
+  // RBAC checks for updating
+  if (rol === 'Vendedor' && id !== userId) {
+    return res.status(403).json({
+      success: false,
+      error: 'Solo puede editar su propio perfil',
+    });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const { usuario, vendedor, telefonos } = req.body;
+
+    // ── Validaciones de negocio ──────────────────────────
+    // Note: The password validation applies only if creating. For updates, password might be empty if unchanged.
+    // So we remove the password check if password is empty.
+    const usuarioAValidar = { ...usuario };
+    if (!usuarioAValidar.password) {
+      usuarioAValidar.password = 'placeholder'; // skip validacion
+    }
+
+    const errores = [
+      ...validarVendedor(usuarioAValidar || {}, vendedor || {}),
+      ...validarTelefonos(telefonos || []),
+    ];
+    if (errores.length > 0) {
+      await client.query('ROLLBACK');
+      client.release();
+      return res.status(400).json({ success: false, error: errores[0] });
+    }
+
+    // ── Hash de contraseña (opcional en update) ────────
+    let userDataToUpdate = { ...usuario };
+    if (usuario.password && usuario.password.trim() !== '') {
+      userDataToUpdate.password_hash = await bcrypt.hash(usuario.password, SALT_ROUNDS);
+    }
+
+    // ── 1. Update USUARIO + VENDEDOR ──────────────────────
+    const updatedVendedor = await VendedorModel.update(
+      id,
+      userDataToUpdate,
+      vendedor,
+      client
+    );
+
+    // ── 2. Update teléfonos ───────────────────────────────
+    // Delete existing phones for the user
+    await TelefonoModel.deleteByUsuarioId(id, client);
+
+    // Re-insert phones
+    let newTelefonos = [];
+    if (telefonos && telefonos.length > 0) {
+      const validTels = telefonos.filter(t => t.codigo_area && t.numero);
+      if (validTels.length > 0) {
+        newTelefonos = await TelefonoModel.createBatch(
+          null,
+          updatedVendedor.id,
+          validTels,
+          client
+        );
+      }
+    }
+
+    await client.query('COMMIT');
+
+    return res.status(200).json({
+      success: true,
+      data: { ...updatedVendedor, telefonos: newTelefonos },
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    next(err);
+  } finally {
+    client.release();
+  }
+};

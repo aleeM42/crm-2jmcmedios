@@ -1,9 +1,11 @@
 // ==============================================
 // DetalleEmisora.jsx — Detalle de Aliado Comercial
 // ==============================================
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../services/api';
+import { getCurrentUser } from '../services/auth.service';
+import EditarAliadoModal from '../components/EditarAliadoModal';
 
 const STATUS_DOT = {
   Activo: 'bg-accent-green',
@@ -15,6 +17,22 @@ export default function DetalleEmisora() {
   const { id } = useParams();
   const [emisora, setEmisora] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showEdit, setShowEdit] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+
+  const user = getCurrentUser();
+  const rol = user?.rol || '';
+
+  const handleEditSuccess = useCallback(async () => {
+    try {
+      const response = await api.get(`/aliados/${id}`);
+      if (response.success) {
+        setEmisora(response.data);
+        setSuccessMsg('Aliado actualizado exitosamente');
+      }
+    } catch { /* keep current state on error */ }
+    setShowEdit(false);
+  }, [id]);
 
   useEffect(() => {
     async function fetchEmisora() {
@@ -62,7 +80,7 @@ export default function DetalleEmisora() {
           <div className="flex items-center gap-4">
             <h2 className="text-3xl font-black text-slate-900 font-display">{emisora.nombre_emisora || emisora.razon_social || 'Detalle de Aliado'}</h2>
             {estadoMostrar === 'Activo' ? (
-              <span className="bg-secondary/10 text-slate-900 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border border-secondary/20">
+              <span className="bg-accent-green/10 text-slate-900 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border border-secondary/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span> Activa
               </span>
             ) : (
@@ -73,14 +91,33 @@ export default function DetalleEmisora() {
           </div>
         </div>
         <div className="flex gap-3 w-full sm:w-auto mt-4 sm:mt-0">
-          <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
-            <span className="material-symbols-outlined text-lg">delete</span> Eliminar
-          </button>
-          <button className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
-            <span className="material-symbols-outlined text-lg">edit</span> Editar
-          </button>
+          {/* Solo Admin, Director General y Director pueden eliminar aliados */}
+          {(rol === 'Administrador' || rol === 'Director General' || rol === 'Director') && (
+            <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
+              <span className="material-symbols-outlined text-lg">delete</span> Eliminar
+            </button>
+          )}
+
+          {/* Invitado y Gestor de Pautas no pueden editar aliados. Vendedor sí puede (según feedback). */}
+          {(rol !== 'Invitado' && rol !== 'Gestor de Pautas') && (
+            <button onClick={() => setShowEdit(true)} className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+              <span className="material-symbols-outlined text-lg">edit</span> Editar
+            </button>
+          )}
         </div>
       </header>
+
+      {successMsg && (
+        <div className="mb-6 animate-[fadeIn_0.3s_ease-out] p-4 rounded-xl bg-green-50 border border-green-200 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+            <p className="text-sm text-green-700 font-semibold">{successMsg}</p>
+          </div>
+          <button onClick={() => setSuccessMsg('')} className="text-green-500 hover:text-green-700 flex items-center justify-center p-1 rounded-full hover:bg-green-100 transition-colors">
+            <span className="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* LEFT COLUMN */}
@@ -164,7 +201,7 @@ export default function DetalleEmisora() {
                 <span className="material-symbols-outlined text-primary">list_alt</span>
                 <h3 className="text-lg font-bold text-slate-800 font-display">Pautas Asociadas</h3>
               </div>
-              <button className="text-primary text-xs font-bold hover:underline">Ver todas</button>
+              <Link to="/pautas" className="text-primary text-xs font-bold hover:underline">Ver todas</Link>
             </div>
             {emisora.pautas && emisora.pautas.length > 0 ? (
               <div className="overflow-x-auto">
@@ -285,6 +322,15 @@ export default function DetalleEmisora() {
           </section>
         </div>
       </div>
+
+      {/* Modal de edición */}
+      {showEdit && (
+        <EditarAliadoModal
+          emisora={emisora}
+          onClose={() => setShowEdit(false)}
+          onSuccess={handleEditSuccess}
+        />
+      )}
     </>
   );
 }

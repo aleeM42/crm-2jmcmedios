@@ -1,10 +1,12 @@
 // ==============================================
 // DetallePauta.jsx — Detalle de Pauta Publicitaria
 // ==============================================
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../services/api';
+import { getCurrentUser } from '../services/auth.service';
 import { calcularProgresoPauta } from '../utils/pautasUtils';
+import EditarPautaModal from '../components/EditarPautaModal';
 
 const STATUS_STYLE = {
   'en transmision': 'bg-primary/10 text-primary',
@@ -21,22 +23,34 @@ export default function DetallePauta() {
   const { id } = useParams();
   const [pauta, setPauta] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showEdit, setShowEdit] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+
+  const user = getCurrentUser();
+  const rol = user?.rol || '';
+
+  const fetchPauta = useCallback(async () => {
+    try {
+      const response = await api.get(`/pautas/${id}`);
+      if (response.success) {
+        setPauta(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching pauta details:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
 
   useEffect(() => {
-    const fetchPauta = async () => {
-      try {
-        const response = await api.get(`/pautas/${id}`);
-        if (response.success) {
-          setPauta(response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching pauta details:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchPauta();
-  }, [id]);
+  }, [fetchPauta]);
+
+  const handleEditSuccess = useCallback(() => {
+    setShowEdit(false);
+    setSuccessMsg('Pauta actualizada exitosamente');
+    fetchPauta();
+  }, [fetchPauta]);
 
   if (loading) {
     return <div className="p-8 text-center text-slate-500">Cargando detalles de la pauta...</div>;
@@ -57,11 +71,11 @@ export default function DetallePauta() {
   };
 
   const { cuñasEmitidas, progresoPorcentaje: progresoCunas } = calcularProgresoPauta(pauta);
-  
+
   const montoOC = Number(pauta.monto_oc) || 0;
   const montoOT = Number(pauta.monto_ot) || 0;
   const totalNegociacion = Number(pauta.monto_total_negociacion) || 0;
-  
+
   const progresoOC = totalNegociacion > 0 ? Math.min(Math.round((montoOC / totalNegociacion) * 100), 100) : 0;
 
   // Días de semana
@@ -89,15 +103,36 @@ export default function DetallePauta() {
             </span>
           </div>
         </div>
-        <div className="flex gap-3 w-full sm:w-auto">
-          <button className="px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm">edit</span> Editar
-          </button>
+        <div className="flex gap-3 w-full sm:w-auto mt-4 sm:mt-0">
+          {/* Solo Admin, Director General y Gestor de Pautas pueden editar/eliminar pautas */}
+          {(rol === 'Administrador' || rol === 'Director General' || rol === 'Gestor de Pautas') && (
+            <>
+              <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors">
+                <span className="material-symbols-outlined text-lg">delete</span> Eliminar
+              </button>
+              <button onClick={() => setShowEdit(true)} className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+                <span className="material-symbols-outlined text-lg">edit</span> Editar
+              </button>
+            </>
+          )}
+
           <button className="px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">picture_as_pdf</span> PDF
           </button>
         </div>
       </div>
+
+      {successMsg && (
+        <div className="mb-6 animate-[fadeIn_0.3s_ease-out] p-4 rounded-xl bg-green-50 border border-green-200 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+            <p className="text-sm text-green-700 font-semibold">{successMsg}</p>
+          </div>
+          <button onClick={() => setSuccessMsg('')} className="text-green-500 hover:text-green-700 flex items-center justify-center p-1 rounded-full hover:bg-green-100 transition-colors">
+            <span className="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* LEFT COLUMN */}
@@ -155,7 +190,7 @@ export default function DetallePauta() {
               <span className="material-symbols-outlined text-primary">donut_large</span>
               Progreso de Consumo
             </h3>
-            
+
             {/* CUÑAS */}
             <div className="flex items-center gap-8 mb-6">
               <div className="flex-1">
@@ -276,7 +311,7 @@ export default function DetallePauta() {
           {/* VIGENCIA */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary">date_range</span>
+              <span className="material-symbols-outlined text-accent-green">date_range</span>
               Vigencia
             </h3>
             <div className="space-y-4">
@@ -294,7 +329,7 @@ export default function DetallePauta() {
           {/* MONTOS */}
           <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-800 font-display flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary">payments</span>
+              <span className="material-symbols-outlined text-accent-green">payments</span>
               Montos
             </h3>
             <div className="space-y-4">
@@ -306,10 +341,7 @@ export default function DetallePauta() {
                 <span className="text-xs text-slate-500">Monto OT</span>
                 <span className="text-sm font-black text-[#A1DEE5]">${formatCurrency(montoOT)}</span>
               </div>
-              <div className="flex justify-between py-2">
-                <span className="text-xs text-slate-500">Diferencia OC-OT</span>
-                <span className="text-sm font-bold text-slate-700">${formatCurrency(montoOC - montoOT)}</span>
-              </div>
+
               <div className="flex justify-between py-2 pt-4 border-t border-slate-200">
                 <span className="text-xs font-bold text-slate-800">Total Negociación</span>
                 <span className="text-sm font-black text-primary">${formatCurrency(totalNegociacion)}</span>
@@ -318,6 +350,15 @@ export default function DetallePauta() {
           </section>
         </div>
       </div>
+
+      {/* Modal Editar Pauta */}
+      {showEdit && (
+        <EditarPautaModal
+          pauta={pauta}
+          onClose={() => setShowEdit(false)}
+          onSuccess={handleEditSuccess}
+        />
+      )}
     </>
   );
 }

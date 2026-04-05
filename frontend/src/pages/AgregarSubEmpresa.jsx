@@ -316,11 +316,11 @@ export default function AgregarSubEmpresa() {
               <select name="sector" value={subEmpresa.sector} onChange={handleSubEmpresa} className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" required>
                 <option value="">Seleccionar sector...</option>
                 <option value="Salud">Salud</option>
-                <option value="Alimentacion">Alimentación</option>
-                <option value="Telematica">Telemática</option>
-                <option value="Fabricacion">Fabricación</option>
+                <option value="Alimentación">Alimentación</option>
+                <option value="Telemática">Telemática</option>
+                <option value="Ferretería">Ferretería</option>
                 <option value="Bancario">Bancario</option>
-                <option value="Aerolinea">Aerolínea</option>
+                <option value="Aerolínea">Aerolínea</option>
                 <option value="Otro">Otro</option>
               </select>
             </div>

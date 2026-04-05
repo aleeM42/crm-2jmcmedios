@@ -32,3 +32,12 @@ export const crearVendedor = async (data) => {
 export const getDirectores = async () => {
   return api.get('/vendedores/directores');
 };
+
+/**
+ * Actualiza un vendedor (usuario, vendedor, telefonos).
+ * @param {string} id - UUID del usuario_id
+ * @param {object} data - { usuario, vendedor, telefonos }
+ */
+export const actualizarVendedor = async (id, data) => {
+  return api.put(`/vendedores/${id}`, data);
+};

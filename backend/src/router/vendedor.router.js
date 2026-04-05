@@ -39,4 +39,21 @@ router.post(
   VendedorCtrl.create
 );
 
+// PUT  /api/vendedores/:id         — Editar vendedor
+router.put(
+  '/:id',
+  authenticate,
+  authorize('Administrador', 'Director', 'Vendedor'),
+  validateBody([
+    'usuario.primer_nombre',
+    'usuario.primer_apellido',
+    'usuario.correo',
+    'usuario.nombre_usuario',
+    'usuario.rol',
+    'vendedor.meta',
+    'vendedor.tipo',
+  ]),
+  VendedorCtrl.update
+);
+
 export default router;

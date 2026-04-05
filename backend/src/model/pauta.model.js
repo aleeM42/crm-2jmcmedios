@@ -247,3 +247,64 @@ export async function getMontoDisponibleOC(numeroOC) {
     }))
   };
 }
+
+/**
+ * Actualiza una pauta existente y sincroniza DETALLE_PAUTA si cambia la emisora.
+ */
+export async function updatePauta(id, data) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const tipoCompraBD = data.tipoCompra === 'en_vivo' ? 'en vivo' : data.tipoCompra;
+
+    const query = `
+      UPDATE PAUTAS SET
+        numero_ot = $1, numero_oc = $2, fecha_emision = $3, marca = $4,
+        coordinadora = $5, fecha_inicio = $6, fecha_fin = $7,
+        cantidad_cunas = $8, costo_cunas = $9, monto_oc = $10, monto_ot = $11,
+        tipo_compra = $12, estado = $13, observaciones = $14,
+        programa = $15, presentadora = $16, horario = $17, dias_semana = $18,
+        fk_vendedor = $19, fk_cliente = $20
+      WHERE id = $21
+      RETURNING *
+    `;
+    const values = [
+      data.numeroOt, data.numeroOc, data.fechaEmision, data.marca,
+      data.coordinadora || null, data.fechaInicio, data.fechaFin,
+      data.cantidadCunas, data.costoCuna, data.montoOC, data.montoOT,
+      tipoCompraBD, data.estado, data.observaciones || null,
+      tipoCompraBD === 'en vivo' ? (data.programa || null) : null,
+      tipoCompraBD === 'en vivo' ? (data.presentadora || null) : null,
+      tipoCompraBD === 'en vivo' ? (data.horario || null) : null,
+      data.diasSemana || null,
+      data.vendedorId, data.clienteId,
+      id
+    ];
+
+    const result = await client.query(query, values);
+    if (result.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return null;
+    }
+
+    // Sincronizar emisora en DETALLE_PAUTA si se envía aliadoId
+    if (data.aliadoId) {
+      // Eliminar registro previo y re-insertar
+      await client.query('DELETE FROM DETALLE_PAUTA WHERE fk_pauta = $1', [id]);
+      await client.query(
+        'INSERT INTO DETALLE_PAUTA (fk_pauta, fk_aliado, cantidad_emisoras) VALUES ($1, $2, 1)',
+        [id, data.aliadoId]
+      );
+    }
+
+    await client.query('COMMIT');
+    return result.rows[0];
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+

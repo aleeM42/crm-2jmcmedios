@@ -69,3 +69,12 @@ export const getVendedores = async () => {
 export const crearMarca = async (clienteId, data) => {
   return api.post(`/clientes/${clienteId}/marcas`, data);
 };
+
+/**
+ * Actualiza un cliente (transacción: cliente + contactos + teléfonos).
+ * @param {number} id - ID del cliente
+ * @param {object} data - { cliente, contactos, telefonos }
+ */
+export const actualizarCliente = async (id, data) => {
+  return api.put(`/clientes/${id}`, data);
+};

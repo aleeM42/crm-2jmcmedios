@@ -180,3 +180,142 @@ export async function createAliado(data) {
     client.release();
   }
 }
+
+export async function updateAliado(id, data) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // ── 1. Actualizar datos del aliado ────────────────────
+    const queryAliado = `
+      UPDATE ALIADOS_COMERCIALES SET
+        razon_social = $1, nombre_emisora = $2, rif = $3, frecuencia = $4,
+        categoria = $5, estado = $6, direccion = $7,
+        fk_lugar = $8, fk_region = $9, fk_cobertura = $10
+      WHERE id = $11
+      RETURNING *
+    `;
+    const valoresAliado = [
+      data.razon_social, data.nombre_emisora, data.rif, data.frecuencia,
+      data.categoria, data.estado || 'activo', data.direccion,
+      data.fk_lugar || null, data.fk_region || null, data.fk_cobertura || null,
+      id
+    ];
+    const resAliado = await client.query(queryAliado, valoresAliado);
+    if (resAliado.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return null;
+    }
+    const aliadoActualizado = resAliado.rows[0];
+
+    // ── 2. Sincronizar contactos ─────────────────────────
+    const contactosEnviados = Array.isArray(data.contactos) ? data.contactos : [];
+    const contactosActivos = contactosEnviados.filter(c => c.primer_nombre || c.pri_nombre);
+
+    // IDs actuales en BD (via A_CONTACT)
+    const resActuales = await client.query(
+      'SELECT fk_contacto FROM A_CONTACT WHERE fk_a_c = $1', [id]
+    );
+    const idsActuales = resActuales.rows.map(r => r.fk_contacto);
+
+    // Separar contactos con ID (actualizar) y sin ID (crear)
+    const contactosConId = contactosActivos.filter(c => c.id);
+    const contactosSinId = contactosActivos.filter(c => !c.id);
+    const idsEnviados = contactosConId.map(c => c.id);
+
+    // Eliminar contactos que ya no vienen (y sus teléfonos por CASCADE o manual)
+    const idsAEliminar = idsActuales.filter(cid => !idsEnviados.includes(cid));
+    for (const cid of idsAEliminar) {
+      await client.query('DELETE FROM TELEFONOS WHERE fk_contacto = $1', [cid]);
+      await client.query('DELETE FROM A_CONTACT WHERE fk_a_c = $1 AND fk_contacto = $2', [id, cid]);
+      await client.query('DELETE FROM CONTACTOS WHERE id = $1', [cid]);
+    }
+
+    // Obtener usuario para FK de teléfonos
+    const userRes = await client.query('SELECT id FROM USUARIOS LIMIT 1');
+    const usuarioId = userRes.rows.length > 0 ? userRes.rows[0].id : null;
+
+    let contactosResultado = [];
+
+    // Actualizar contactos existentes
+    for (const c of contactosConId) {
+      const priNombre = c.primer_nombre || c.pri_nombre;
+      const segNombre = c.segundo_nombre || c.seg_nombre || null;
+      const priApellido = c.primer_apellido || c.pri_apellido;
+      const fechaNac = c.fecha_nacimiento || c.fecha_nac || null;
+      const anotaciones = c.anotaciones_especiales || c.anotac_especiales || null;
+
+      await client.query(
+        `UPDATE CONTACTOS SET
+          pri_nombre = $1, seg_nombre = $2, pri_apellido = $3,
+          departamento = $4, correo = $5, rol = $6,
+          anotac_especiales = $7, fecha_nac = $8
+        WHERE id = $9`,
+        [priNombre, segNombre, priApellido,
+         c.departamento || null, c.correo || null, c.rol || null,
+         anotaciones, fechaNac, c.id]
+      );
+
+      // Sincronizar teléfonos: delete + re-insert
+      await client.query('DELETE FROM TELEFONOS WHERE fk_contacto = $1', [c.id]);
+      const tels = (c.telefonos || []).filter(t => t.codigo_area && t.numero);
+      for (const t of tels) {
+        if (usuarioId) {
+          await client.query(
+            'INSERT INTO TELEFONOS (codigo_area, numero, fk_usuario, fk_contacto) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+            [t.codigo_area, t.numero, usuarioId, c.id]
+          );
+        }
+      }
+
+      contactosResultado.push({ id: c.id, pri_nombre: priNombre, pri_apellido: priApellido, telefonos: tels });
+    }
+
+    // Crear contactos nuevos
+    for (const c of contactosSinId) {
+      const priNombre = c.primer_nombre || c.pri_nombre;
+      const segNombre = c.segundo_nombre || c.seg_nombre || null;
+      const priApellido = c.primer_apellido || c.pri_apellido;
+      const fechaNac = c.fecha_nacimiento || c.fecha_nac || null;
+      const anotaciones = c.anotaciones_especiales || c.anotac_especiales || null;
+
+      if (!priNombre || !priApellido) continue;
+
+      const resC = await client.query(
+        `INSERT INTO CONTACTOS (pri_nombre, seg_nombre, pri_apellido, departamento, correo, rol, tipo, anotac_especiales, fecha_nac)
+         VALUES ($1, $2, $3, $4, $5, $6, 'emisora', $7, $8) RETURNING id`,
+        [priNombre, segNombre, priApellido,
+         c.departamento || null, c.correo || null, c.rol || null,
+         anotaciones, fechaNac]
+      );
+      const nuevoContactoId = resC.rows[0].id;
+
+      // Vincular al aliado
+      await client.query(
+        'INSERT INTO A_CONTACT (fk_a_c, fk_contacto) VALUES ($1, $2)',
+        [id, nuevoContactoId]
+      );
+
+      // Insertar teléfonos
+      const tels = (c.telefonos || []).filter(t => t.codigo_area && t.numero);
+      for (const t of tels) {
+        if (usuarioId) {
+          await client.query(
+            'INSERT INTO TELEFONOS (codigo_area, numero, fk_usuario, fk_contacto) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+            [t.codigo_area, t.numero, usuarioId, nuevoContactoId]
+          );
+        }
+      }
+
+      contactosResultado.push({ id: nuevoContactoId, pri_nombre: priNombre, pri_apellido: priApellido, telefonos: tels });
+    }
+
+    await client.query('COMMIT');
+    return { ...aliadoActualizado, contactos: contactosResultado };
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}

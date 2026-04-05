@@ -31,3 +31,17 @@ export async function create(req, res, next) {
     next(error);
   }
 }
+
+export async function update(req, res, next) {
+  try {
+    const { id } = req.params;
+    const aliadoActualizado = await AliadoModel.updateAliado(id, req.body);
+    if (!aliadoActualizado) {
+      return res.status(404).json({ success: false, error: 'Aliado no encontrado.' });
+    }
+    res.json({ success: true, data: aliadoActualizado });
+  } catch (error) {
+    console.error('❌ [update aliado] ERROR:', error.message, '| Code:', error.code, '| Detail:', error.detail);
+    next(error);
+  }
+}

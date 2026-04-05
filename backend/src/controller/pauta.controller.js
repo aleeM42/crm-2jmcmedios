@@ -71,6 +71,42 @@ export async function create(req, res, next) {
   }
 }
 
+export async function update(req, res, next) {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+
+    if (!data.aliadoId) {
+      return res.status(400).json({ success: false, error: 'Debe seleccionar una emisora (aliado comercial).' });
+    }
+
+    if (Number(data.montoOC) <= Number(data.montoOT)) {
+      return res.status(400).json({ success: false, error: 'El monto OC debe ser mayor al monto OT.' });
+    }
+
+    const updated = await PautaModel.updatePauta(id, data);
+    if (!updated) {
+      return res.status(404).json({ success: false, error: 'Pauta no encontrada.' });
+    }
+
+    res.json({ success: true, message: 'Pauta actualizada exitosamente', data: updated });
+  } catch (error) {
+    console.error('\n[ERROR AL ACTUALIZAR PAUTA]:', error);
+
+    if (error.code && ['23505', '23503', '23502', '23514'].includes(error.code)) {
+      return res.status(400).json({
+        success: false,
+        error: `Error de BD: Violación de constraint. Constraint: ${error.constraint || 'N/A'}. Detalle: ${error.detail || error.message}`
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor al actualizar Pauta',
+    });
+  }
+}
+
 export async function getByOC(req, res, next) {
   try {
     const { numeroOC } = req.params;
