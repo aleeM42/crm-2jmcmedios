@@ -122,13 +122,13 @@ export default function GastosLista() {
       <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-100 bg-primary">
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Asociado a</th>
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Concepto</th>
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Fecha</th>
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Monto</th>
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Tipo</th>
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6"></th>
+            <tr className="border-b border-slate-100 bg-slate-100">
+              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Asociado a</th>
+              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Concepto</th>
+              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Fecha</th>
+              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Monto</th>
+              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Tipo</th>
+              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6"></th>
             </tr>
           </thead>
           <tbody>
@@ -158,9 +158,14 @@ export default function GastosLista() {
                       <span className={`px-3 py-1 rounded-full text-[10px] font-bold capitalize ${TIPO_STYLE[g.tipo?.toLowerCase()] || TIPO_STYLE.otro}`}>{g.tipo}</span>
                     </td>
                     <td className="py-3 px-6 text-right">
-                      <button className="text-slate-400 hover:text-primary transition-colors">
-                        <span className="material-symbols-outlined text-[18px]">more_vert</span>
-                      </button>
+                      <div className="flex justify-end gap-2">
+                        <Link to={`/actividad-comercial/gastos/${g.id}/editar`} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors" title="Editar">
+                          <span className="material-symbols-outlined text-[18px]">edit</span>
+                        </Link>
+                        <button className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Eliminar">
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

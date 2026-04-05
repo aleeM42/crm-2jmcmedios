@@ -178,7 +178,6 @@ function ActividadComercial() {
           <div className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100">
             <h3 className="text-lg font-bold text-slate-800 font-display">Registro de Visitas</h3>
             <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-              <Link to="/actividad-comercial/gastos/agregar" className="px-4 py-2 bg-accent-green text-slate-50 rounded-lg text-sm font-bold shadow-lg shadow-accent-green/20 hover:bg-accent-green/70 transition-all border border-slate-200  text-center  flex items-center justify-center gap-2 flex-1 sm:flex-initial"><span className="material-symbols-outlined text-base">add</span>Agregar Gasto</Link>
               <Link to="/actividad-comercial/visita" className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg text-sm font-bold hover:opacity-90 shadow-md transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial">
                 <span className="material-symbols-outlined text-base">add</span>Agregar Visita
               </Link>
@@ -197,13 +196,14 @@ function ActividadComercial() {
                   <th className="px-6 py-4">Objetivo Visita</th>
                   <th className="px-6 py-4 text-center">Efectiva</th>
                   <th className="px-6 py-4">Detalle</th>
+                  <th className="px-6 py-4"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loadingData ? (
-                  <tr><td colSpan={8} className="px-6 py-12 text-center text-sm text-slate-400">Cargando visitas...</td></tr>
+                  <tr><td colSpan={9} className="px-6 py-12 text-center text-sm text-slate-400">Cargando visitas...</td></tr>
                 ) : paginated.length === 0 ? (
-                  <tr><td colSpan={8} className="px-6 py-12 text-center text-sm text-slate-400">No se encontraron visitas</td></tr>
+                  <tr><td colSpan={9} className="px-6 py-12 text-center text-sm text-slate-400">No se encontraron visitas</td></tr>
                 ) : (
                   paginated.map((v) => {
                     const tipoClass = v.tipo?.toLowerCase() === 'presencial'
@@ -226,6 +226,16 @@ function ActividadComercial() {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-600 italic whitespace-nowrap">{v.detalle || '—'}</td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex justify-end gap-2">
+                            <Link to={`/actividad-comercial/visitas/${v.id}/editar`} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors" title="Editar">
+                              <span className="material-symbols-outlined text-[18px]">edit</span>
+                            </Link>
+                            <button className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Eliminar">
+                              <span className="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     );
                   })
