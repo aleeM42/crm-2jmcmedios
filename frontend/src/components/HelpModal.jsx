@@ -2,6 +2,7 @@
 // HelpModal.jsx — Modal fullscreen del Manual de Usuario
 // ==============================================
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import ManualContenido from './ManualContenido';
 
 // ── Abre una ventana nueva con el contenido del manual y lanza la impresión ──
@@ -84,7 +85,7 @@ export default function HelpModal({ onClose }) {
     printManual(contentRef.current);
   };
 
-  return (
+  return createPortal(
     <>
       {/* ── Overlay ── */}
       <div
@@ -248,6 +249,7 @@ export default function HelpModal({ onClose }) {
           to   { transform: translateX(-50%) translateY(0);    opacity: 1 }
         }
       `}</style>
-    </>
+    </>,
+    document.body
   );
 }
