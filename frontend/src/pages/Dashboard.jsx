@@ -52,7 +52,7 @@ function Dashboard() {
   const usuarioLocal = {
     nombre: user ? (`${user.primer_nombre || ''} ${user.primer_apellido || ''}`.trim() || user.nombre_usuario || 'Usuario') : '',
     rol: user?.rol || 'Rol no definido',
-    inicial: user?.primer_nombre ? user.primer_nombre.charAt(0).toUpperCase() : (user?.nombre_usuario ? user.nombre_usuario.charAt(0).toUpperCase() : 'U')
+    iniciales: user?.primer_nombre ? user.primer_nombre.charAt(0).toUpperCase() + user.primer_apellido.charAt(0).toUpperCase() : (user?.nombre_usuario ? user.nombre_usuario.charAt(0).toUpperCase() : 'U')
   };
 
   useEffect(() => {
@@ -73,7 +73,7 @@ function Dashboard() {
           if (res.data.length > 0) setHasUnread(true);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
   }, [navigate]);
 
@@ -93,7 +93,7 @@ function Dashboard() {
             >
               <span className="material-symbols-outlined text-[28px]">notifications</span>
               {hasUnread && (
-                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse" />
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full  animate-pulse" />
               )}
             </button>
 
@@ -156,7 +156,7 @@ function Dashboard() {
               <p className="text-xs text-slate-500">{usuarioLocal.rol}</p>
             </div>
             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center border-2 border-primary/20 flex-shrink-0">
-              <span className="text-white font-bold text-sm">{usuarioLocal.inicial}</span>
+              <span className="text-white font-bold text-sm">{usuarioLocal.iniciales}</span>
             </div>
           </div>
         </div>

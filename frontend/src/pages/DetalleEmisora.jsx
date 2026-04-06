@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { toast } from 'sonner';
 import { getCurrentUser } from '../services/auth.service';
 import EditarAliadoModal from '../components/EditarAliadoModal';
 
@@ -20,7 +21,6 @@ export default function DetalleEmisora() {
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
   const navigate = useNavigate();
 
   const user = getCurrentUser();
@@ -31,7 +31,7 @@ export default function DetalleEmisora() {
       const response = await api.get(`/aliados/${id}`);
       if (response.success) {
         setEmisora(response.data);
-        setSuccessMsg('Aliado actualizado exitosamente');
+        toast.success('Aliado actualizado exitosamente');
       }
     } catch { /* keep current state on error */ }
     setShowEdit(false);
@@ -58,11 +58,11 @@ export default function DetalleEmisora() {
     try {
       const response = await api.delete(`/aliados/${id}`);
       if (response.success) {
-        setSuccessMsg('Aliado eliminado exitosamente. Redirigiendo...');
+        toast.success('Aliado eliminado exitosamente');
         setShowDelete(false);
         setTimeout(() => {
           navigate('/aliados-comerciales');
-        }, 1500);
+        }, 800);
       } else {
         alert(response.error || 'Error al eliminar el aliado');
       }
@@ -134,17 +134,7 @@ export default function DetalleEmisora() {
         </div>
       </header>
 
-      {successMsg && (
-        <div className="mb-6 animate-[fadeIn_0.3s_ease-out] p-4 rounded-xl bg-green-50 border border-green-200 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-green-500 text-xl">check_circle</span>
-            <p className="text-sm text-green-700 font-semibold">{successMsg}</p>
-          </div>
-          <button onClick={() => setSuccessMsg('')} className="text-green-500 hover:text-green-700 flex items-center justify-center p-1 rounded-full hover:bg-green-100 transition-colors">
-            <span className="material-symbols-outlined text-[18px]">close</span>
-          </button>
-        </div>
-      )}
+
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* LEFT COLUMN */}

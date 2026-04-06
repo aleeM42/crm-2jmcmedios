@@ -100,9 +100,27 @@ WITH nuevo_vendedor AS (
   ) ON CONFLICT (correo) DO NOTHING
   RETURNING id
 )
+
 INSERT INTO VENDEDORES (usuario_id, meta, tipo)
 SELECT id, 0, 'Vendedor' FROM nuevo_vendedor;
 
+INSERT INTO USUARIOS (
+  primer_nombre,
+  primer_apellido,
+  correo,
+  nombre_usuario,
+  password_hash,
+  rol,
+  estado
+) VALUES (
+  'Invitado',
+  'CRM',
+  'invitado@gmail.com',
+  'invitado',
+  '$2b$10$lwOP.v.FNh4SCUJdMIMegeQsdfdPfOUapvFerpiTXGMtuO158eHhq',
+  'Invitado',
+  'Activo'
+) ON CONFLICT (correo) DO NOTHING;
 
 --Telefonos de los usuarios
 

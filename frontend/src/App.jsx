@@ -63,9 +63,9 @@ export default function App() {
           <Route path="/mi-perfil" element={<ProtectedRoute allowedRoles={['Director General', 'Director', 'Vendedor', 'Gestor de Pautas', 'Invitado']}><MiPerfil /></ProtectedRoute>} />
 
           {/* Equipo de Ventas */}
-          <Route path="/equipo-ventas" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor']}><EquipoVentas /></ProtectedRoute>} />
+          <Route path="/equipo-ventas" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor', 'Invitado']}><EquipoVentas /></ProtectedRoute>} />
           <Route path="/equipo-ventas/agregar" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director']}><AgregarVendedor /></ProtectedRoute>} />
-          <Route path="/equipo-ventas/:id" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director']}><DetalleVendedor /></ProtectedRoute>} />
+          <Route path="/equipo-ventas/:id" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Invitado']}><DetalleVendedor /></ProtectedRoute>} />
 
           {/* Pautas */}
           <Route path="/pautas" element={<PautasLista />} />

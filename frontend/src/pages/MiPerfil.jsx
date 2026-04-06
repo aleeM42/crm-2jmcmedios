@@ -3,7 +3,8 @@
 // ==============================================
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import api from '../services/api';
 import EditarMiPerfilModal from '../components/EditarMiPerfilModal.jsx';
 import { eliminarVendedor } from '../services/vendedor.service.js';
@@ -12,7 +13,6 @@ export default function MiPerfil() {
   const [perfil, setPerfil] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -78,12 +78,12 @@ export default function MiPerfil() {
       {/* HEADER */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800 font-display">Mi Perfil</h2>
-          <nav className="flex text-xs text-slate-400 mt-1">
-            <span className="hover:text-primary cursor-pointer transition-colors">CRM 2JMC</span>
-            <span className="mx-2">/</span>
-            <span className="text-slate-600">Perfil de {rolLabel}</span>
+          <nav className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">
+            <Link className="hover:text-primary transition-colors" to="/dashboard">CRM 2JMC</Link>
+            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+            <span className="text-slate-600">Mi Perfil</span>
           </nav>
+          <h2 className="text-3xl font-black text-slate-900 font-display">Mi Perfil</h2>
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right hidden sm:block">
@@ -91,23 +91,13 @@ export default function MiPerfil() {
             <p className="text-xs text-slate-500">{rolLabel}</p>
           </div>
           <div className="relative">
-            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold border-2 border-white shadow-sm">{initials}</div>
-            <div className="absolute bottom-0 right-0 w-3 h-3 bg-accent-green rounded-full border-2 border-white"></div>
+            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold border-2 border-primary shadow-sm">{initials}</div>
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-accent-green rounded-full "></div>
           </div>
         </div>
       </header>
 
-      {successMsg && (
-        <div className="mb-6 animate-[fadeIn_0.3s_ease-out] p-4 rounded-xl bg-green-50 border border-green-200 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-green-500 text-xl">check_circle</span>
-            <p className="text-sm text-green-700 font-semibold">{successMsg}</p>
-          </div>
-          <button onClick={() => setSuccessMsg('')} className="text-green-500 hover:text-green-700 flex items-center justify-center p-1 rounded-full hover:bg-green-100 transition-colors">
-            <span className="material-symbols-outlined text-[18px]">close</span>
-          </button>
-        </div>
-      )}
+
 
       {/* INFO CARD */}
       <section className="bg-[#F4FAFB] rounded-xl p-6 shadow-sm border border-slate-100 mb-8">
@@ -127,11 +117,8 @@ export default function MiPerfil() {
               {perfil.estado}
             </span>
           </div>
-          <div className="flex gap-3 w-full sm:w-auto mt-4 sm:mt-0">
-            <button onClick={() => setDeleteConfirm(true)} className="flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/20 text-red-500 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors shadow-sm">
-              <span className="material-symbols-outlined text-lg">delete</span> Eliminar Perfil
-            </button>
-            <button onClick={() => setShowEdit(true)} className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+          <div className="flex gap-3 w-full sm:w-auto mt-4 sm:mt-0 sm:justify-self-end">
+            <button onClick={() => setShowEdit(true)} className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/30">
               <span className="material-symbols-outlined text-lg">edit</span> Editar Perfil
             </button>
           </div>
@@ -249,13 +236,13 @@ export default function MiPerfil() {
               <p className="text-sm text-slate-500 mb-6">
                 ¿Estás seguro de que deseas eliminar tu perfil de vendedor? Esta acción no se puede deshacer y borrará permanentemente todos tus datos y tu acceso al CRM.
               </p>
-              
+
               {errorMsg && (
                 <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
                   {errorMsg}
                 </div>
               )}
-              
+
               <div className="flex justify-end gap-3">
                 <button
                   type="button"
@@ -289,11 +276,8 @@ export default function MiPerfil() {
           onClose={() => setShowEdit(false)}
           onSuccess={() => {
             setShowEdit(false);
-            setSuccessMsg('Tu perfil ha sido actualizado correctamente.');
+            toast.success('Tu perfil ha sido actualizado correctamente.');
             fetchPerfil();
-            
-            // Ocultar mensaje después de unos segundos
-            setTimeout(() => setSuccessMsg(''), 4000);
           }}
         />
       )}

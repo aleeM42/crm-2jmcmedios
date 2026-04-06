@@ -16,7 +16,6 @@ export default function DetalleCliente() {
   const [error, setError] = useState('');
   const [subEmpresaModal, setSubEmpresaModal] = useState(null);
   const [editModal, setEditModal] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -121,17 +120,7 @@ export default function DetalleCliente() {
         </div>
       </header>
 
-      {successMsg && (
-        <div className="mb-6 animate-[fadeIn_0.3s_ease-out] p-4 rounded-xl bg-green-50 border border-green-200 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-green-500 text-xl">check_circle</span>
-            <p className="text-sm text-green-700 font-semibold">{successMsg}</p>
-          </div>
-          <button onClick={() => setSuccessMsg('')} className="text-green-500 hover:text-green-700 flex items-center justify-center p-1 rounded-full hover:bg-green-100 transition-colors">
-            <span className="material-symbols-outlined text-[18px]">close</span>
-          </button>
-        </div>
-      )}
+
 
       {/* ═══ KPI CARDS ═══ */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -684,7 +673,7 @@ export default function DetalleCliente() {
           onClose={() => setEditModal(false)}
           onSuccess={() => {
             setEditModal(false);
-            setSuccessMsg('Cliente actualizado exitosamente');
+            toast.success('Cliente actualizado exitosamente');
             fetchCliente();
           }}
         />

@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import api from '../services/api.js';
 import { eliminarGastoMarketing } from '../services/gasto.service.js';
 import EditarGastoModal from '../components/EditarGastoModal.jsx';
+import { getCurrentUser } from '../services/auth.service.js';
 import { toast } from 'sonner';
 
 const TIPO_STYLE = {
@@ -19,6 +20,10 @@ const TIPO_STYLE = {
 };
 
 export default function GastosLista() {
+  const user = getCurrentUser();
+  const userRole = user?.rol;
+  const isInvitado = userRole === 'Invitado';
+
   const [gastos, setGastos] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -108,9 +113,11 @@ export default function GastosLista() {
           <h2 className="text-3xl font-black text-slate-900 font-display">Gastos de Marketing</h2>
           <p className="text-sm text-slate-400 mt-1">Control de gastos de marketing del departamento de ventas</p>
         </div>
-        <Link to="/actividad-comercial/gastos/agregar" className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
-          <span className="material-symbols-outlined text-[18px]">add</span> Nuevo Gasto
-        </Link>
+        {!isInvitado && (
+          <Link to="/actividad-comercial/gastos/agregar" className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+            <span className="material-symbols-outlined text-[18px]">add</span> Nuevo Gasto
+          </Link>
+        )}
       </div>
 
       {/* KPI ROW */}
@@ -150,13 +157,13 @@ export default function GastosLista() {
       <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-100 bg-primary">
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Asociado a</th>
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Concepto</th>
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Fecha</th>
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Monto</th>
-              <th className="text-left text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Tipo</th>
-              <th className="text-center text-[10px] font-bold text-slate-100 uppercase tracking-widest py-3 px-6">Acciones</th>
+            <tr className="border-b border-slate-100 bg-slate-100">
+              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Asociado a</th>
+              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Concepto</th>
+              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Fecha</th>
+              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Monto</th>
+              <th className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Tipo</th>
+              {!isInvitado && <th className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 px-6">Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -185,24 +192,26 @@ export default function GastosLista() {
                     <td className="py-3 px-6">
                       <span className={`px-3 py-1 rounded-full text-[10px] font-bold capitalize ${TIPO_STYLE[g.tipo?.toLowerCase()] || TIPO_STYLE.otro}`}>{g.tipo}</span>
                     </td>
-                    <td className="py-3 px-6 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => setEditModalGasto(g)}
-                          className="w-8 h-8 rounded-full bg-slate-100 hover:bg-primary/10 text-slate-500 hover:text-primary flex items-center justify-center transition-colors"
-                          title="Editar"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">edit</span>
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirmGasto(g)}
-                          className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-500 flex items-center justify-center transition-colors"
-                          title="Eliminar"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">delete</span>
-                        </button>
-                      </div>
-                    </td>
+                    {!isInvitado && (
+                      <td className="py-3 px-6 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => setEditModalGasto(g)}
+                            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-primary/10 text-slate-500 hover:text-primary flex items-center justify-center transition-colors"
+                            title="Editar"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">edit</span>
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirmGasto(g)}
+                            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-500 flex items-center justify-center transition-colors"
+                            title="Eliminar"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 );
               })

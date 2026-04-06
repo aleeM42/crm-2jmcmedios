@@ -6,9 +6,13 @@ import { Link } from 'react-router-dom';
 import api from '../services/api.js';
 import { eliminarVisita } from '../services/visita.service.js';
 import EditarVisitaModal from '../components/EditarVisitaModal.jsx';
+import { getCurrentUser } from '../services/auth.service.js';
 import { toast } from 'sonner';
 
 function ActividadComercial() {
+  const user = getCurrentUser();
+  const userRole = user?.rol;
+  const isInvitado = userRole === 'Invitado';
   // --- Data ---
   const [visitas, setVisitas] = useState([]);
   const [gastosTotales, setGastosTotales] = useState(0);
@@ -203,9 +207,11 @@ function ActividadComercial() {
           <div className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100">
             <h3 className="text-lg font-bold text-slate-800 font-display">Registro de Visitas</h3>
             <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-              <Link to="/actividad-comercial/visita" className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg text-sm font-bold hover:opacity-90 shadow-md transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial">
-                <span className="material-symbols-outlined text-base">add</span>Agregar Visita
-              </Link>
+              {!isInvitado && (
+                <Link to="/actividad-comercial/visita" className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg text-sm font-bold hover:opacity-90 shadow-md transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial">
+                  <span className="material-symbols-outlined text-base">add</span>Agregar Visita
+                </Link>
+              )}
             </div>
           </div>
 
@@ -259,22 +265,24 @@ function ActividadComercial() {
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-600 italic whitespace-nowrap">{v.detalle || '—'}</td>
                         <td className="px-6 py-4 text-center">
-                          <div className="flex items-center justify-center gap-2">
-                            <button
-                              onClick={() => setEditModalVisita(v)}
-                              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-primary/10 text-slate-500 hover:text-primary flex items-center justify-center transition-colors"
-                              title="Editar"
-                            >
-                              <span className="material-symbols-outlined text-[18px]">edit</span>
-                            </button>
-                            <button
-                              onClick={() => setDeleteConfirmVisita(v)}
-                              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-500 flex items-center justify-center transition-colors"
-                              title="Eliminar"
-                            >
-                              <span className="material-symbols-outlined text-[18px]">delete</span>
-                            </button>
-                          </div>
+                          {!isInvitado && (
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => setEditModalVisita(v)}
+                                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-primary/10 text-slate-500 hover:text-primary flex items-center justify-center transition-colors"
+                                title="Editar"
+                              >
+                                <span className="material-symbols-outlined text-[18px]">edit</span>
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirmVisita(v)}
+                                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-500 flex items-center justify-center transition-colors"
+                                title="Eliminar"
+                              >
+                                <span className="material-symbols-outlined text-[18px]">delete</span>
+                              </button>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     );

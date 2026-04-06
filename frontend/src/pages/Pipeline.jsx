@@ -17,6 +17,7 @@ export default function Pipeline() {
   const [kpis, setKpis] = useState({ total_leads: 0, valor_total: 0, negociados: 0, activos: 0 });
   const user = JSON.parse(localStorage.getItem('crm_user') || '{}');
   const isAdmin = user.rol === 'Administrador';
+  const isInvitado = user.rol === 'Invitado';
   const [loading, setLoading] = useState(true);
   const [vendedores, setVendedores] = useState([]);
   const [filtroVendedor, setFiltroVendedor] = useState('');
@@ -151,12 +152,14 @@ export default function Pipeline() {
               ))}
             </select>
           )}
-          <button
-            onClick={() => openCreateModal()}
-            className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-sm flex-1 sm:flex-initial"
-          >
-            <span className="material-symbols-outlined text-lg">add</span>Nuevo Lead
-          </button>
+          {!isInvitado && (
+            <button
+              onClick={() => openCreateModal()}
+              className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-sm flex-1 sm:flex-initial"
+            >
+              <span className="material-symbols-outlined text-lg">add</span>Nuevo Lead
+            </button>
+          )}
         </div>
       </header>
 
@@ -194,8 +197,12 @@ export default function Pipeline() {
                   <div key={card.id} className="bg-[#F4FAFB] p-4 rounded-xl shadow-sm border-l-4 hover:shadow-md transition-shadow group relative" style={{ borderColor: col.color }}>
                     <div className="absolute right-3 top-3 flex items-center gap-1">
                       {card.estado === 'Negociado' && <span className="material-symbols-outlined text-[#8DC63F] text-lg">check_circle</span>}
-                      <button onClick={() => openEditModal(card)} className="material-symbols-outlined text-slate-300 text-[16px] group-hover:text-primary cursor-pointer" title="Editar">edit</button>
-                      <button onClick={() => handleDelete(card.id)} className="material-symbols-outlined text-slate-300 text-[16px] group-hover:text-red-400 cursor-pointer" title="Eliminar">delete</button>
+                      {!isInvitado && (
+                        <>
+                          <button onClick={() => openEditModal(card)} className="material-symbols-outlined text-slate-300 text-[16px] group-hover:text-primary cursor-pointer" title="Editar">edit</button>
+                          <button onClick={() => handleDelete(card.id)} className="material-symbols-outlined text-slate-300 text-[16px] group-hover:text-red-400 cursor-pointer" title="Eliminar">delete</button>
+                        </>
+                      )}
                     </div>
                     <h4 className="font-bold text-slate-800 pr-16">{card.nombre_cliente}</h4>
                     <p className="text-xs text-slate-500 mt-1">{card.nombre_contacto}</p>
@@ -207,7 +214,7 @@ export default function Pipeline() {
                         {new Date(card.fecha_creacion).toLocaleDateString('es-VE', { day: '2-digit', month: 'short' })}
                       </span>
                     </div>
-                    {card.estado === 'Negociado' && (
+                    {card.estado === 'Negociado' && !isInvitado && (
                       <Link
                         to={`/clientes/agregar?nombre=${encodeURIComponent(card.nombre_cliente)}`}
                         className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-accent-green hover:text-secondary transition-colors"
@@ -223,22 +230,26 @@ export default function Pipeline() {
                         <span className="text-[11px] text-slate-400">{card.vendedor_nombre} {card.vendedor_apellido}</span>
                       </div>
                       {/* Move buttons */}
-                      <div className="flex gap-1">
-                        {col.key !== 'Contacto inicial' && (
-                          <button onClick={() => handleChangeEstado(card, ESTADOS[ESTADOS.findIndex(e => e.key === col.key) - 1].key)}
-                            className="text-[10px] px-1.5 py-0.5 bg-slate-200 rounded text-slate-500 hover:bg-slate-300 transition-colors" title="Mover atrás">←</button>
-                        )}
-                        {col.key !== 'Negociado' && (
-                          <button onClick={() => handleChangeEstado(card, ESTADOS[ESTADOS.findIndex(e => e.key === col.key) + 1].key)}
-                            className="text-[10px] px-1.5 py-0.5 bg-primary/20 rounded text-primary hover:bg-primary/30 transition-colors" title="Mover adelante">→</button>
-                        )}
-                      </div>
+                      {!isInvitado && (
+                        <div className="flex gap-1">
+                          {col.key !== 'Contacto inicial' && (
+                            <button onClick={() => handleChangeEstado(card, ESTADOS[ESTADOS.findIndex(e => e.key === col.key) - 1].key)}
+                              className="text-[10px] px-1.5 py-0.5 bg-slate-200 rounded text-slate-500 hover:bg-slate-300 transition-colors" title="Mover atrás">←</button>
+                          )}
+                          {col.key !== 'Negociado' && (
+                            <button onClick={() => handleChangeEstado(card, ESTADOS[ESTADOS.findIndex(e => e.key === col.key) + 1].key)}
+                              className="text-[10px] px-1.5 py-0.5 bg-primary/20 rounded text-primary hover:bg-primary/30 transition-colors" title="Mover adelante">→</button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
-                <button onClick={() => openCreateModal(col.key)} className="mt-2 w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 hover:text-primary hover:border-primary transition-all flex items-center justify-center gap-2 text-sm font-medium">
-                  <span className="material-symbols-outlined text-lg">add_circle</span>Agregar Lead
-                </button>
+                {!isInvitado && (
+                  <button onClick={() => openCreateModal(col.key)} className="mt-2 w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 hover:text-primary hover:border-primary transition-all flex items-center justify-center gap-2 text-sm font-medium">
+                    <span className="material-symbols-outlined text-lg">add_circle</span>Agregar Lead
+                  </button>
+                )}
               </div>
             </div>
           );

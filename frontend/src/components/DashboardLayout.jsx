@@ -37,10 +37,8 @@ function DashboardLayout() {
       return item.to === '/pautas';
     }
 
-    // Invitado: Solo ve Dashboard y lectura general si se le habilita
-    if (rolAuth === 'invitado') {
-      return item.to === '/dashboard' || item.to === '/reportes';
-    }
+    // Invitado: Ve todo en modo consulta
+    if (rolAuth === 'invitado') return true;
 
     // Administrador: Todo excepto mi-perfil
     if (rolAuth === 'administrador') {
