@@ -20,6 +20,20 @@
     ((SELECT id FROM CLIENTE WHERE rif_fiscal = 'J000413126'), 'cliente', 'Nahir', 'Cacique', 'nahir.cacique@empresaspolar.com', 'orden de compras', 'compras'),
     ((SELECT id FROM CLIENTE WHERE rif_fiscal = 'J000413126'), 'cliente', 'Administrador', 'Polar', 'proveedores.0700.AlimentosPolarComercial@empresas-polar.com', 'administrativo', 'administración');
 
+    -- Cervecería Polar 
+    INSERT INTO CONTACTOS (fk_cliente, tipo, pri_nombre, pri_apellido, correo, rol, departamento)
+    VALUES 
+    ((SELECT id FROM CLIENTE WHERE rif_fiscal = 'J301370139'), 'cliente', 'Natasha', 'Moreno', 'natasha.moreno@empresaspolar.com', 'marketing', 'marketing'),
+    ((SELECT id FROM CLIENTE WHERE rif_fiscal = 'J301370139'), 'cliente', 'Carolina', 'Teixeira', 'carolina.teixeira@empresaspolar.com', 'orden de compras', 'compras'),
+    ((SELECT id FROM CLIENTE WHERE rif_fiscal = 'J301370139'), 'cliente', 'Nahir', 'Cacique', 'nahir.cacique@empresaspolar.com', 'orden de compras', 'compras');
+
+    -- PepsiCola 
+    INSERT INTO CONTACTOS (fk_cliente, tipo, pri_nombre, pri_apellido, correo, rol, departamento)
+    VALUES 
+    ((SELECT id FROM CLIENTE WHERE rif_fiscal = 'J000063729'), 'cliente', 'Natasha', 'Moreno', 'natasha.moreno@empresaspolar.com', 'marketing', 'marketing'),
+    ((SELECT id FROM CLIENTE WHERE rif_fiscal = 'J000063729'), 'cliente', 'Carolina', 'Teixeira', 'carolina.teixeira@empresaspolar.com', 'orden de compras', 'compras'),
+    ((SELECT id FROM CLIENTE WHERE rif_fiscal = 'J000063729'), 'cliente', 'Nahir', 'Cacique', 'nahir.cacique@empresaspolar.com', 'orden de compras', 'compras');
+
     -- Arcos Dorados
     INSERT INTO CONTACTOS (fk_cliente, tipo, pri_nombre, pri_apellido, correo, rol, departamento)
     VALUES 

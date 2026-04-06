@@ -78,8 +78,34 @@ INSERT INTO USUARIOS (
   'Activo'
 ) ON CONFLICT (correo) DO NOTHING;
 
--- 6. Insertar usuaria Adriana Sabino (Vendedor)
--- Password: AdrianaS.crm26 (bcrypt hash)
+-- 6. Insertar Jackson Chacón como Director
+-- Password: Jackson.crm26 (bcrypt hash)
+WITH nuevo_director AS (
+  INSERT INTO USUARIOS (
+    primer_nombre,
+    primer_apellido,
+    correo,
+    nombre_usuario,
+    password_hash,
+    rol,
+    estado
+  ) VALUES (
+    'Jackson',
+    'Chacón',
+    'jacksonchaconfm@gmail.com',
+    'jacksonC2jmc',
+    '$2b$10$ikI3TnfG77qivRT83YSmH.l3JUbdFXOJFKogymcsfnAoBi6KUwymK',
+    'Director',
+    'Activo'
+  ) ON CONFLICT (correo) DO UPDATE SET rol = EXCLUDED.rol -- Usamos UPDATE para asegurar que RETURNING devuelva el ID incluso si ya existe
+  RETURNING id
+)
+INSERT INTO VENDEDORES (usuario_id, meta, tipo)
+SELECT id, 0, 'Director' FROM nuevo_director
+ON CONFLICT (usuario_id) DO NOTHING;
+
+
+-- 7. Insertar usuaria Adriana Sabino (Vendedor) asignada a Jackson
 WITH nuevo_vendedor AS (
   INSERT INTO USUARIOS (
     primer_nombre,
@@ -97,13 +123,16 @@ WITH nuevo_vendedor AS (
     '$2b$12$zDPzNMCj.uA8M4gqv2f40e18wBqWuNxacQAJYsniIexerHwgqkYxm',
     'Vendedor',
     'Activo'
-  ) ON CONFLICT (correo) DO NOTHING
+  ) ON CONFLICT (correo) DO UPDATE SET rol = EXCLUDED.rol
   RETURNING id
 )
+INSERT INTO VENDEDORES (usuario_id, meta, tipo, fk_vendedor_jefe)
+SELECT id, 0, 'Vendedor', (SELECT id FROM USUARIOS WHERE correo = 'jacksonchaconfm@gmail.com') FROM nuevo_vendedor
+ON CONFLICT (usuario_id) DO NOTHING;
 
-INSERT INTO VENDEDORES (usuario_id, meta, tipo)
-SELECT id, 0, 'Vendedor' FROM nuevo_vendedor;
 
+-- 8. Insertar usuario Invitado
+-- Password: invitado.crm26 (bcrypt hash)
 INSERT INTO USUARIOS (
   primer_nombre,
   primer_apellido,
@@ -127,4 +156,6 @@ INSERT INTO USUARIOS (
 INSERT INTO TELEFONOS (codigo_area, numero, fk_usuario)
 VALUES 
     (0424, 2926003, (SELECT id FROM USUARIOS WHERE primer_nombre = 'Adriana' AND primer_apellido = 'Sabino')),
-    (0412, 3888053, (SELECT id FROM USUARIOS WHERE primer_nombre = 'Yossuel' AND primer_apellido = 'Marcano'));
+    (0412, 3888053, (SELECT id FROM USUARIOS WHERE primer_nombre = 'Yossuel' AND primer_apellido = 'Marcano')),
+    (0414, 3315905, (SELECT id FROM USUARIOS WHERE primer_nombre = 'Jackson' AND primer_apellido = 'Chacón'));
+

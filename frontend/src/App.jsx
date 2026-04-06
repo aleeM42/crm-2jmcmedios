@@ -40,7 +40,6 @@ import ReporteIngresosMensuales from './pages/ReporteIngresosMensuales';
 import ReportePautasFiltro from './pages/ReportePautasFiltro';
 import ReporteGastosCliente from './pages/ReporteGastosCliente';
 import ReporteEfectividadVendedores from './pages/ReporteEfectividadVendedores';
-import ReporteGastosVendedores from './pages/ReporteGastosVendedores';
 import ReporteGastosDetalleVendedor from './pages/ReporteGastosDetalleVendedor';
 import ReporteTopEmisorasCunas from './pages/ReporteTopEmisorasCunas';
 import ReporteEmisorasRegion from './pages/ReporteEmisorasRegion';
@@ -105,7 +104,6 @@ export default function App() {
           <Route path="/reportes/pautas-filtro" element={<ReportePautasFiltro />} />
           <Route path="/reportes/gastos-cliente" element={<ReporteGastosCliente />} />
           <Route path="/reportes/efectividad-vendedores" element={<ReporteEfectividadVendedores />} />
-          <Route path="/reportes/gastos-vendedores" element={<ReporteGastosVendedores />} />
           <Route path="/reportes/gastos-detalle-vendedor" element={<ReporteGastosDetalleVendedor />} />
           <Route path="/reportes/top-emisoras-cunas" element={<ReporteTopEmisorasCunas />} />
           <Route path="/reportes/emisoras-region" element={<ReporteEmisorasRegion />} />

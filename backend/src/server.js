@@ -28,6 +28,7 @@ import coberturaRouter from './router/cobertura.router.js';
 import categoriaRouter from './router/categoria.router.js';
 import oportunidadRouter from './router/oportunidad.router.js';
 import gastoMarketingRouter from './router/gastoMarketing.router.js';
+import reporteRouter    from './router/reporte.router.js';
 
 const app = express();
 // Necesario para que express-rate-limit no falle detrás de Nginx en Docker
@@ -73,6 +74,7 @@ app.use('/api/coberturas', coberturaRouter);
 app.use('/api/categorias', categoriaRouter);
 app.use('/api/oportunidades', oportunidadRouter);
 app.use('/api/gastos-marketing', gastoMarketingRouter);
+app.use('/api/reportes',   reporteRouter);
 
 // ---- Health Check ----
 app.get('/api/health', (req, res) => {

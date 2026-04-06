@@ -23,7 +23,6 @@ const CATEGORIES = [
     color: 'accent-green',
     reports: [
       { name: 'Ranking por Efectividad', desc: 'Comparativa de cierre de ventas y cumplimiento de objetivos.', to: '/reportes/efectividad-vendedores', icon: 'trending_up' },
-      { name: 'Ranking por Gastos', desc: 'Control de gastos operativos asociados a la gestión comercial.', to: '/reportes/gastos-vendedores', icon: 'account_balance_wallet' },
       { name: 'Gastos por Vendedor', desc: 'Listado detallado de viáticos y recursos asignados por ejecutivo.', to: '/reportes/gastos-detalle-vendedor', icon: 'credit_card' },
     ],
   },

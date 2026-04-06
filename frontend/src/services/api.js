@@ -23,8 +23,8 @@ async function request(endpoint, options = {}) {
 
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
-  // Si el token expiró, limpiar y redirigir a login
-  if (response.status === 401) {
+  // Si el token expiró, limpiar y redirigir a login (excepto si estamos intentando hacer login)
+  if (response.status === 401 && !endpoint.includes('/auth/login')) {
     localStorage.removeItem('crm_token');
     localStorage.removeItem('crm_user');
     window.location.href = '/login';
