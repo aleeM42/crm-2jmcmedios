@@ -5,7 +5,7 @@
 import ReporteModel from '../model/reporte.model.js';
 
 class ReporteController {
-  
+
   static async getReportData(req, res, next) {
     try {
       const { nombreReporte } = req.params;
@@ -21,6 +21,11 @@ class ReporteController {
         case 'regiones-cliente':
           data = await ReporteModel.getRegionesCliente();
           break;
+        case 'ingresos-mensuales': {
+          const anio = req.query.anio || new Date().getFullYear();
+          data = await ReporteModel.getIngresosMensuales(anio);
+          break;
+        }
         default:
           return res.status(404).json({
             success: false,
