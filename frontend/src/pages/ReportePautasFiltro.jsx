@@ -2,34 +2,99 @@
 // ReportePautasFiltro.jsx — Pautas por Región, Marca, Cliente
 // ==============================================
 import { Link } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import api from '../services/api';
 
-const DISTRIBUCIONES = [
-  { nombre: 'Capital', pautas: 35, color: '#16B1B8', offset: 0 },
-  { nombre: 'Central', pautas: 25, color: '#8DC63F', offset: 35 },
-  { nombre: 'Oriente', pautas: 18, color: '#55CCD3', offset: 60 },
-  { nombre: 'Occidente', pautas: 12, color: '#A1DEE5', offset: 78 },
-  { nombre: 'Los Andes', pautas: 10, color: '#d1d5db', offset: 90 },
-];
-
-const TABLE_DATA = [
-  { ot: '001-2026', cliente: 'Alimentos Polar', marca: 'Harina PAN', region: 'Capital', emisora: 'Éxitos FM', estado: 'En transmisión', monto: '$4,200' },
-  { ot: '002-2026', cliente: 'Farmatodo', marca: 'Farmatodo Express', region: 'Central', emisora: 'Unión Radio', estado: 'Programada', monto: '$3,800' },
-  { ot: '003-2026', cliente: 'Banco Mercantil', marca: 'Tarjeta Mercantil', region: 'Capital', emisora: 'Caracol Radio', estado: 'En transmisión', monto: '$5,100' },
-  { ot: '004-2026', cliente: 'Coca-Cola FEMSA', marca: 'Coca-Cola', region: 'Nacional', emisora: 'RCN Radio', estado: 'Finalizada', monto: '$6,500' },
-  { ot: '005-2026', cliente: 'Movistar', marca: 'Movistar Plus', region: 'Oriente', emisora: 'Radio Tiempo', estado: 'En transmisión', monto: '$3,200' },
-  { ot: '006-2026', cliente: 'Nestlé', marca: 'Nestlé Purina', region: 'Central', emisora: 'La Mega', estado: 'Programada', monto: '$2,900' },
-  { ot: '007-2026', cliente: 'Toyota', marca: 'Hilux', region: 'Occidente', emisora: 'Planeta FM', estado: 'Finalizada', monto: '$4,800' },
-  { ot: '008-2026', cliente: 'Digitel', marca: 'Digitel 4G', region: 'Los Andes', emisora: 'Éxitos FM', estado: 'En transmisión', monto: '$2,500' },
-];
+const CHART_COLORS = ['#16B1B8', '#8DC63F', '#55CCD3', '#A1DEE5', '#d1d5db', '#F59E0B', '#EF4444', '#8B5CF6'];
 
 const ESTADO_STYLE = {
-  'En transmisión': 'bg-accent-green/10 text-accent-green',
-  'Programada': 'bg-primary/10 text-primary',
-  'Finalizada': 'bg-slate-100 text-slate-500',
+  'en transmision': 'bg-accent-green/10 text-accent-green',
+  'programada': 'bg-primary/10 text-primary',
+  'finalizada': 'bg-slate-100 text-slate-500',
+  'suspendida': 'bg-red-50 text-red-500',
 };
 
+const ESTADO_LABEL = {
+  'en transmision': 'En transmisión',
+  'programada': 'Programada',
+  'finalizada': 'Finalizada',
+  'suspendida': 'Suspendida',
+};
+
+function fmt(num) {
+  if (!num && num !== 0) return '—';
+  return `$${Number(num).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 export default function ReportePautasFiltro() {
+  // ── Filter state ──
+  const [region, setRegion] = useState('');
+  const [marca, setMarca] = useState('');
+  const [cliente, setCliente] = useState('');
+  const [estado, setEstado] = useState('');
+  const [fechaDesde, setFechaDesde] = useState('');
+  const [fechaHasta, setFechaHasta] = useState('');
+
+  // ── Data state ──
+  const [listData, setListData] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [filterOptions, setFilterOptions] = useState({ regiones: [], marcas: [], clientes: [], estados: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // ── Fetch data ──
+  const fetchData = useCallback(() => {
+    setLoading(true);
+    setError(null);
+
+    const params = new URLSearchParams();
+    if (region) params.set('region', region);
+    if (marca) params.set('marca', marca);
+    if (cliente) params.set('cliente', cliente);
+    if (estado) params.set('estado', estado);
+    if (fechaDesde) params.set('fechaDesde', fechaDesde);
+    if (fechaHasta) params.set('fechaHasta', fechaHasta);
+
+    const qs = params.toString();
+    const endpoint = `/reportes/pautas-filtro${qs ? `?${qs}` : ''}`;
+
+    api.get(endpoint)
+      .then((res) => {
+        const d = res.data;
+        setListData(d.listData || []);
+        setChartData(d.chartData || []);
+        setTotalCount(d.totalCount || 0);
+        if (d.filterOptions) setFilterOptions(d.filterOptions);
+      })
+      .catch((err) => {
+        setError(err.message || 'Error al cargar el reporte');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [region, marca, cliente, estado, fechaDesde, fechaHasta]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // ── Derived: total pautas for donut center ──
+  const totalPautasChart = chartData.reduce((s, d) => s + d.pautas, 0);
+
+  // ── Clear all filters ──
+  const clearFilters = () => {
+    setRegion('');
+    setMarca('');
+    setCliente('');
+    setEstado('');
+    setFechaDesde('');
+    setFechaHasta('');
+  };
+
+  const hasFilters = region || marca || cliente || estado || fechaDesde || fechaHasta;
+
   return (
     <>
       <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
@@ -53,70 +118,155 @@ export default function ReportePautasFiltro() {
         </div>
       </header>
 
+      {/* Error state */}
+      {error && (
+        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
+          <span className="material-symbols-outlined align-middle text-base mr-1">error</span>
+          {error}
+        </div>
+      )}
+
       {/* FILTERS */}
       <div className="bg-[#F4FAFB] p-4 rounded-xl shadow-sm border border-slate-100 mb-8 flex flex-wrap items-center gap-4">
-        <select className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
-          <option>Región: Todas</option>
-          <option>Capital</option>
-          <option>Central</option>
-          <option>Oriente</option>
-          <option>Occidente</option>
-          <option>Los Andes</option>
+        <select
+          id="filtro-region"
+          value={region}
+          onChange={(e) => setRegion(e.target.value)}
+          className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+        >
+          <option value="">Región: Todas</option>
+          {filterOptions.regiones.map((r) => (
+            <option key={r} value={r}>{r}</option>
+          ))}
         </select>
-        <select className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
-          <option>Marca: Todas</option>
-          <option>Harina PAN</option>
-          <option>Coca-Cola</option>
-          <option>Movistar Plus</option>
+
+        <select
+          id="filtro-marca"
+          value={marca}
+          onChange={(e) => setMarca(e.target.value)}
+          className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+        >
+          <option value="">Marca: Todas</option>
+          {filterOptions.marcas.map((m) => (
+            <option key={m} value={m}>{m}</option>
+          ))}
         </select>
-        <select className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
-          <option>Cliente: Todos</option>
-          <option>Alimentos Polar</option>
-          <option>Farmatodo</option>
-          <option>Banco Mercantil</option>
+
+        <select
+          id="filtro-cliente"
+          value={cliente}
+          onChange={(e) => setCliente(e.target.value)}
+          className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+        >
+          <option value="">Cliente: Todos</option>
+          {filterOptions.clientes.map((c) => (
+            <option key={c.id} value={c.id}>{c.nombre}</option>
+          ))}
         </select>
-        <select className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary">
-          <option>Estado: Todos</option>
-          <option>En transmisión</option>
-          <option>Programada</option>
-          <option>Finalizada</option>
+
+        <select
+          id="filtro-estado"
+          value={estado}
+          onChange={(e) => setEstado(e.target.value)}
+          className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+        >
+          <option value="">Estado: Todos</option>
+          {filterOptions.estados.map((e) => (
+            <option key={e} value={e}>{ESTADO_LABEL[e] || e}</option>
+          ))}
         </select>
-        <input type="date" className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary" />
-        <input type="date" className="bg-slate-50 border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 focus:ring-primary" />
+
+        <div className="flex items-center gap-2">
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Desde</label>
+          <input
+            type="date"
+            id="filtro-fecha-desde"
+            value={fechaDesde}
+            onChange={(e) => setFechaDesde(e.target.value)}
+            className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hasta</label>
+          <input
+            type="date"
+            id="filtro-fecha-hasta"
+            value={fechaHasta}
+            onChange={(e) => setFechaHasta(e.target.value)}
+            className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+          />
+        </div>
+
+        {hasFilters && (
+          <button
+            onClick={clearFilters}
+            className="flex items-center gap-1 px-3 py-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-all text-xs font-bold"
+          >
+            <span className="material-symbols-outlined text-sm">close</span>
+            Limpiar
+          </button>
+        )}
       </div>
 
       {/* DONUT */}
       <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
-        <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Distribución de Pautas</h3>
-        <div className="flex flex-col lg:flex-row items-center justify-around gap-8">
-          <div className="relative w-48 h-48">
-            <ResponsiveContainer>
-              <PieChart>
-                <Pie data={DISTRIBUCIONES} dataKey="pautas" nameKey="nombre" cx="50%" cy="50%" innerRadius="60%" outerRadius="85%" paddingAngle={2} strokeWidth={0}>
-                  {DISTRIBUCIONES.map((d) => (
-                    <Cell key={d.nombre} fill={d.color} />
-                  ))}
-                </Pie>
-                <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }} formatter={(value, name) => [`${value}%`, name]} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-3xl font-bold text-slate-900">100%</span>
-              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Regiones</span>
+        <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Distribución de Pautas por Región</h3>
+        {loading ? (
+          <div className="h-48 flex items-center justify-center text-slate-400 text-sm font-medium">
+            <span className="animate-spin material-symbols-outlined mr-2">autorenew</span> Cargando datos…
+          </div>
+        ) : chartData.length === 0 ? (
+          <div className="h-48 flex items-center justify-center text-slate-400 text-sm font-medium">
+            No hay datos para mostrar
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row items-center justify-around gap-8">
+            <div className="relative w-48 h-48">
+              <ResponsiveContainer>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    dataKey="pautas"
+                    nameKey="nombre"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="60%"
+                    outerRadius="85%"
+                    paddingAngle={2}
+                    strokeWidth={0}
+                  >
+                    {chartData.map((d, i) => (
+                      <Cell key={d.nombre} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }}
+                    formatter={(value, name) => [`${value} pautas`, name]}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-3xl font-bold text-slate-900">{totalPautasChart}</span>
+                <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Pautas</span>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {chartData.map((d, i) => (
+                <div key={d.nombre} className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}></div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{d.nombre}</p>
+                    <p className="text-xs text-slate-500">
+                      {d.pautas} pauta{d.pautas !== 1 ? 's' : ''}
+                      {totalPautasChart > 0 ? ` (${((d.pautas / totalPautasChart) * 100).toFixed(1)}%)` : ''}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="space-y-3">
-            {DISTRIBUCIONES.map((d) => (
-              <div key={d.nombre} className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }}></div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">{d.nombre}</p>
-                  <p className="text-xs text-slate-500">{d.pautas}%</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        )}
       </section>
 
       {/* TABLE */}
@@ -138,28 +288,47 @@ export default function ReportePautasFiltro() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {TABLE_DATA.map((r) => (
-                <tr key={r.ot} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 text-sm font-bold text-primary">{r.ot}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-slate-900">{r.cliente}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{r.marca}</td>
-                  <td className="px-6 py-4"><span className="text-[10px] font-bold px-2 py-1 rounded-full bg-primary/10 text-primary uppercase">{r.region}</span></td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{r.emisora}</td>
-                  <td className="px-6 py-4"><span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase ${ESTADO_STYLE[r.estado]}`}>{r.estado}</span></td>
-                  <td className="px-6 py-4 text-sm font-medium text-slate-700">{r.monto}</td>
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center text-sm text-slate-400 font-medium">
+                    <span className="animate-spin material-symbols-outlined align-middle mr-2">autorenew</span>
+                    Cargando…
+                  </td>
                 </tr>
-              ))}
+              ) : listData.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center text-sm text-slate-400 font-medium">
+                    No se encontraron pautas con los filtros seleccionados
+                  </td>
+                </tr>
+              ) : (
+                listData.map((r) => (
+                  <tr key={r.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4 text-sm font-bold text-primary">{r.numero_ot}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-slate-900">{r.cliente_nombre || '—'}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{r.marca || '—'}</td>
+                    <td className="px-6 py-4">
+                      <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-primary/10 text-primary uppercase">
+                        {r.region || 'Sin región'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{r.emisora || '—'}</td>
+                    <td className="px-6 py-4">
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase ${ESTADO_STYLE[r.estado] || 'bg-slate-100 text-slate-500'}`}>
+                        {ESTADO_LABEL[r.estado] || r.estado}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-medium text-slate-700">{fmt(r.monto_ot)}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
         <div className="px-6 py-4 bg-slate-50/30 flex justify-between items-center border-t border-slate-100">
-          <p className="text-xs text-slate-500">Mostrando <span className="font-bold">1-8</span> de <span className="font-bold">156</span> pautas</p>
-          <div className="flex items-center gap-1">
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-100 transition-colors"><span className="material-symbols-outlined text-lg">chevron_left</span></button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-white font-bold text-xs">1</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-600 font-medium text-xs">2</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-100 transition-colors"><span className="material-symbols-outlined text-lg">chevron_right</span></button>
-          </div>
+          <p className="text-xs text-slate-500">
+            Mostrando <span className="font-bold">{listData.length}</span> de <span className="font-bold">{totalCount}</span> pautas
+          </p>
         </div>
       </section>
     </>

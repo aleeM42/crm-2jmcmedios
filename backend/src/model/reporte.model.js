@@ -195,6 +195,231 @@ class ReporteModel {
       aniosDisponibles: aniosRes.rows.map(r => r.anio),
     };
   }
+  // 5. Pautas por Filtro (Región, Marca, Cliente, Estado, Fechas)
+  static async getPautasFiltro(filters = {}) {
+    const { region, marca, cliente, estado, fechaDesde, fechaHasta } = filters;
+
+    // ── Build dynamic WHERE clauses ──
+    const conditions = [];
+    const params = [];
+    let paramIdx = 1;
+
+    if (region) {
+      conditions.push(`r.nombre = $${paramIdx++}`);
+      params.push(region);
+    }
+    if (marca) {
+      conditions.push(`p.marca = $${paramIdx++}`);
+      params.push(marca);
+    }
+    if (cliente) {
+      conditions.push(`c.id = $${paramIdx++}`);
+      params.push(parseInt(cliente, 10));
+    }
+    if (estado) {
+      conditions.push(`p.estado = $${paramIdx++}`);
+      params.push(estado.toLowerCase());
+    }
+    if (fechaDesde) {
+      conditions.push(`p.fecha_emision >= $${paramIdx++}`);
+      params.push(fechaDesde);
+    }
+    if (fechaHasta) {
+      conditions.push(`p.fecha_emision <= $${paramIdx++}`);
+      params.push(fechaHasta);
+    }
+
+    const whereClause = conditions.length > 0
+      ? 'WHERE ' + conditions.join(' AND ')
+      : '';
+
+    // ── Main list query ──
+    const listQuery = `
+      SELECT
+        p.id,
+        p.numero_ot,
+        p.numero_oc,
+        c.nombre   AS cliente_nombre,
+        p.marca,
+        r.nombre   AS region,
+        ac.nombre_emisora AS emisora,
+        p.estado,
+        p.monto_ot,
+        p.fecha_emision
+      FROM PAUTAS p
+      LEFT JOIN CLIENTE c ON p.fk_cliente = c.id
+      LEFT JOIN DETALLE_PAUTA dp ON dp.fk_pauta = p.id
+      LEFT JOIN ALIADOS_COMERCIALES ac ON dp.fk_aliado = ac.id
+      LEFT JOIN LUGAR r ON ac.fk_region = r.id
+      ${whereClause}
+      ORDER BY p.fecha_emision DESC, p.id DESC
+    `;
+
+    // ── Chart: distribution by region ──
+    const chartQuery = `
+      SELECT
+        COALESCE(r.nombre, 'Sin región') AS nombre,
+        COUNT(DISTINCT p.id)::INTEGER    AS pautas
+      FROM PAUTAS p
+      LEFT JOIN DETALLE_PAUTA dp ON dp.fk_pauta = p.id
+      LEFT JOIN ALIADOS_COMERCIALES ac ON dp.fk_aliado = ac.id
+      LEFT JOIN LUGAR r ON ac.fk_region = r.id
+      LEFT JOIN CLIENTE c ON p.fk_cliente = c.id
+      ${whereClause}
+      GROUP BY r.nombre
+      ORDER BY pautas DESC
+    `;
+
+    // ── Filter options (always unfiltered so the user can see all options) ──
+    const regionesQuery = `
+      SELECT DISTINCT r.nombre
+      FROM ALIADOS_COMERCIALES ac
+      JOIN LUGAR r ON ac.fk_region = r.id
+      ORDER BY r.nombre
+    `;
+    const marcasQuery = `
+      SELECT DISTINCT marca FROM PAUTAS ORDER BY marca
+    `;
+    const clientesQuery = `
+      SELECT DISTINCT c.id, c.nombre
+      FROM CLIENTE c
+      JOIN PAUTAS p ON p.fk_cliente = c.id
+      ORDER BY c.nombre
+    `;
+    const estadosQuery = `
+      SELECT DISTINCT estado FROM PAUTAS ORDER BY estado
+    `;
+
+    const [listRes, chartRes, regionesRes, marcasRes, clientesRes, estadosRes] = await Promise.all([
+      pool.query(listQuery, params),
+      pool.query(chartQuery, params),
+      pool.query(regionesQuery),
+      pool.query(marcasQuery),
+      pool.query(clientesQuery),
+      pool.query(estadosQuery),
+    ]);
+
+    return {
+      listData: listRes.rows,
+      chartData: chartRes.rows,
+      totalCount: listRes.rowCount,
+      filterOptions: {
+        regiones: regionesRes.rows.map(r => r.nombre),
+        marcas: marcasRes.rows.map(r => r.marca),
+        clientes: clientesRes.rows.map(r => ({ id: r.id, nombre: r.nombre })),
+        estados: estadosRes.rows.map(r => r.estado),
+      },
+    };
+  }
+  // 6. Gastos en inversión de atención comercial (por Cliente)
+  static async getGastosCliente() {
+    // ── Unify both GASTOS_VISITAS and GASTOS_MARKETING into one dataset ──
+    // GASTOS_VISITAS: gasto → visita → contacto → cliente
+    // GASTOS_MARKETING: gasto → cliente (direct FK)
+    const listQuery = `
+      (
+        SELECT
+          gv.id,
+          gv.fecha,
+          c.nombre   AS cliente_nombre,
+          gv.concepto,
+          gv.categoria,
+          gv.monto,
+          u.primer_nombre || ' ' || u.primer_apellido AS vendedor_nombre,
+          'visita' AS origen
+        FROM GASTOS_VISITAS gv
+        JOIN VISITAS vi ON gv.fk_visita = vi.id
+        LEFT JOIN USUARIOS u ON vi.fk_vendedor = u.id
+        LEFT JOIN CONTACTOS co ON vi.fk_contacto = co.id
+        LEFT JOIN CLIENTE c ON co.fk_cliente = c.id
+      )
+      UNION ALL
+      (
+        SELECT
+          gm.id,
+          gm.fecha,
+          c.nombre   AS cliente_nombre,
+          gm.concepto,
+          gm.tipo    AS categoria,
+          gm.monto,
+          NULL       AS vendedor_nombre,
+          'marketing' AS origen
+        FROM GASTOS_MARKETING gm
+        LEFT JOIN CLIENTE c ON gm.fk_cliente = c.id
+        WHERE gm.fk_cliente IS NOT NULL
+      )
+      ORDER BY fecha DESC
+    `;
+
+    // ── Chart: Top 10 clients by total spend ──
+    const chartQuery = `
+      SELECT nombre, SUM(total)::NUMERIC AS gasto_total
+      FROM (
+        (
+          SELECT c.nombre, SUM(gv.monto) AS total
+          FROM GASTOS_VISITAS gv
+          JOIN VISITAS vi ON gv.fk_visita = vi.id
+          LEFT JOIN CONTACTOS co ON vi.fk_contacto = co.id
+          LEFT JOIN CLIENTE c ON co.fk_cliente = c.id
+          WHERE c.nombre IS NOT NULL
+          GROUP BY c.nombre
+        )
+        UNION ALL
+        (
+          SELECT c.nombre, SUM(gm.monto) AS total
+          FROM GASTOS_MARKETING gm
+          LEFT JOIN CLIENTE c ON gm.fk_cliente = c.id
+          WHERE c.nombre IS NOT NULL
+          GROUP BY c.nombre
+        )
+      ) combined
+      GROUP BY nombre
+      ORDER BY gasto_total DESC
+      LIMIT 10
+    `;
+
+    // ── KPI: totals by category ──
+    const kpiQuery = `
+      SELECT categoria, SUM(monto)::NUMERIC AS total
+      FROM (
+        (SELECT categoria, monto FROM GASTOS_VISITAS)
+        UNION ALL
+        (SELECT tipo AS categoria, monto FROM GASTOS_MARKETING WHERE fk_cliente IS NOT NULL)
+      ) all_gastos
+      GROUP BY categoria
+      ORDER BY total DESC
+    `;
+
+    const [listRes, chartRes, kpiRes] = await Promise.all([
+      pool.query(listQuery),
+      pool.query(chartQuery),
+      pool.query(kpiQuery),
+    ]);
+
+    // Compute grand total
+    const grandTotal = listRes.rows.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
+
+    // Normalize chart data: add percentage field for bar chart
+    const maxGasto = chartRes.rows.length > 0 ? parseFloat(chartRes.rows[0].gasto_total) : 1;
+    const chartData = chartRes.rows.map(r => ({
+      nombre: r.nombre,
+      gasto_total: parseFloat(r.gasto_total),
+      pct: Math.round((parseFloat(r.gasto_total) / maxGasto) * 100),
+    }));
+
+    return {
+      listData: listRes.rows,
+      chartData,
+      totalCount: listRes.rowCount,
+      kpi: {
+        grandTotal,
+        byCategoria: kpiRes.rows.map(r => ({
+          categoria: r.categoria,
+          total: parseFloat(r.total),
+        })),
+      },
+    };
+  }
 }
 
 export default ReporteModel;

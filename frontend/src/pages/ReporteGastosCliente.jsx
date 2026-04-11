@@ -2,31 +2,61 @@
 // ReporteGastosCliente.jsx — Lista de Gastos por Cliente
 // ==============================================
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import api from '../services/api';
 
-const TOP_CLIENTES = [
-  { nombre: 'Alimentos Polar', gasto: '$12,500', pct: 100 },
-  { nombre: 'Farmatodo', gasto: '$9,800', pct: 78 },
-  { nombre: 'Procter & Gamble', gasto: '$8,400', pct: 67 },
-  { nombre: 'Coca-Cola FEMSA', gasto: '$7,200', pct: 58 },
-  { nombre: 'Nestlé', gasto: '$6,500', pct: 52 },
-  { nombre: 'Banco Mercantil', gasto: '$5,800', pct: 46 },
-  { nombre: 'Banesco', gasto: '$5,200', pct: 42 },
-  { nombre: 'Movistar', gasto: '$4,600', pct: 37 },
-  { nombre: 'Digitel', gasto: '$3,900', pct: 31 },
-  { nombre: 'Toyota', gasto: '$3,100', pct: 25 },
-];
+const CATEGORIA_STYLE = {
+  transporte: 'bg-blue-100 text-blue-600',
+  alimentacion: 'bg-amber-100 text-amber-600',
+  peaje: 'bg-purple-100 text-purple-600',
+  estacionamiento: 'bg-pink-100 text-pink-600',
+  regalos: 'bg-rose-100 text-rose-600',
+  atencion: 'bg-cyan-100 text-cyan-600',
+  otros: 'bg-slate-100 text-slate-500',
+  'campaña': 'bg-green-100 text-green-600',
+  remota: 'bg-indigo-100 text-indigo-600',
+  'regalos corporativos': 'bg-rose-100 text-rose-600',
+};
 
-const TABLE_DATA = [
-  { fecha: '2026-03-01', cliente: 'Alimentos Polar', concepto: 'Reunión cliente', categoria: 'Viáticos', monto: '$450', vendedor: 'Carlos Jaramillo' },
-  { fecha: '2026-03-03', cliente: 'Farmatodo', concepto: 'Presentación propuesta', categoria: 'Transporte', monto: '$180', vendedor: 'Marta Lucía R.' },
-  { fecha: '2026-03-05', cliente: 'Banco Mercantil', concepto: 'Almuerzo de negocios', categoria: 'Alimentación', monto: '$320', vendedor: 'Andrés F. Rojas' },
-  { fecha: '2026-03-07', cliente: 'Coca-Cola FEMSA', concepto: 'Visita planta', categoria: 'Transporte', monto: '$250', vendedor: 'Sandra Gómez' },
-  { fecha: '2026-03-10', cliente: 'Nestlé', concepto: 'Material POP', categoria: 'Marketing', monto: '$890', vendedor: 'Carlos Jaramillo' },
-  { fecha: '2026-03-12', cliente: 'Procter & Gamble', concepto: 'Evento lanzamiento', categoria: 'Marketing', monto: '$1,200', vendedor: 'Marta Lucía R.' },
-];
+function fmt(num) {
+  if (!num && num !== 0) return '—';
+  return `$${Number(num).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
 
 export default function ReporteGastosCliente() {
+  const [listData, setListData] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [kpi, setKpi] = useState(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    api.get('/reportes/gastos-cliente')
+      .then((res) => {
+        if (cancelled) return;
+        const d = res.data;
+        setListData(d.listData || []);
+        setChartData(d.chartData || []);
+        setKpi(d.kpi || null);
+        setTotalCount(d.totalCount || 0);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err.message || 'Error al cargar el reporte');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, []);
+
   return (
     <>
       <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
@@ -50,26 +80,96 @@ export default function ReporteGastosCliente() {
         </div>
       </header>
 
+      {/* Error state */}
+      {error && (
+        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
+          <span className="material-symbols-outlined align-middle text-base mr-1">error</span>
+          {error}
+        </div>
+      )}
+
+      {/* KPI CARDS */}
+      {kpi && !loading && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
+            <div>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Total Inversión</p>
+              <h3 className="text-3xl font-bold text-slate-900">{fmt(kpi.grandTotal)}</h3>
+            </div>
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <span className="material-symbols-outlined text-primary">payments</span>
+            </div>
+          </div>
+          <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
+            <div>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Total Registros</p>
+              <h3 className="text-3xl font-bold text-slate-900">{totalCount}</h3>
+            </div>
+            <div className="p-2 bg-accent-green/10 rounded-lg">
+              <span className="material-symbols-outlined text-accent-green">receipt_long</span>
+            </div>
+          </div>
+          <div className="bg-[#F4FAFB] p-6 rounded-xl shadow-sm border border-slate-100">
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Desglose por Categoría</p>
+            <div className="space-y-2">
+              {kpi.byCategoria.map((c) => (
+                <div key={c.categoria} className="flex items-center justify-between">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${CATEGORIA_STYLE[c.categoria?.toLowerCase()] || CATEGORIA_STYLE.otros}`}>
+                    {c.categoria}
+                  </span>
+                  <span className="text-sm font-bold text-slate-700">{fmt(c.total)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* TOP CLIENTES CHART */}
       <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Top Clientes por Gasto Total</h3>
-        <div style={{ width: '100%', height: 420 }}>
-          <ResponsiveContainer>
-            <BarChart data={TOP_CLIENTES} margin={{ top: 5, right: 20, left: 0, bottom: 60 }}>
-              <defs>
-                <linearGradient id="gastoGradient" x1="0" y1="1" x2="0" y2="0">
-                  <stop offset="0%" stopColor="#16B1B8" />
-                  <stop offset="100%" stopColor="#8DC63F" />
-                </linearGradient>
-              </defs>
-              <CartesianGrid vertical={false} stroke="#f1f5f9" />
-              <XAxis dataKey="nombre" tick={{ fontSize: 11, fill: '#1F2937', fontWeight: 600, angle: -35, textAnchor: 'end' }} axisLine={false} tickLine={false} interval={0} />
-              <YAxis tick={{ fontSize: 11, fill: '#6B7280', fontWeight: 600 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }} formatter={(value, name, props) => [props.payload.gasto, 'Gasto']} cursor={{ fill: '#f1f5f9' }} />
-              <Bar dataKey="pct" fill="url(#gastoGradient)" radius={[6, 6, 0, 0]} barSize={28} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        {loading ? (
+          <div className="h-[420px] flex items-center justify-center text-slate-400 text-sm font-medium">
+            <span className="animate-spin material-symbols-outlined mr-2">autorenew</span> Cargando datos…
+          </div>
+        ) : chartData.length === 0 ? (
+          <div className="h-[420px] flex items-center justify-center text-slate-400 text-sm font-medium">
+            No hay datos de gastos registrados
+          </div>
+        ) : (
+          <div style={{ width: '100%', height: 420 }}>
+            <ResponsiveContainer>
+              <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 60 }}>
+                <defs>
+                  <linearGradient id="gastoGradient" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0%" stopColor="#16B1B8" />
+                    <stop offset="100%" stopColor="#8DC63F" />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} stroke="#f1f5f9" />
+                <XAxis
+                  dataKey="nombre"
+                  tick={{ fontSize: 11, fill: '#1F2937', fontWeight: 600, angle: -35, textAnchor: 'end' }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={0}
+                />
+                <YAxis
+                  tick={{ fontSize: 11, fill: '#6B7280', fontWeight: 600 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                />
+                <Tooltip
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', fontWeight: 600 }}
+                  formatter={(value, name, props) => [fmt(props.payload.gasto_total), 'Gasto Total']}
+                  cursor={{ fill: '#f1f5f9' }}
+                />
+                <Bar dataKey="gasto_total" fill="url(#gastoGradient)" radius={[6, 6, 0, 0]} barSize={28} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </section>
 
       {/* TABLE */}
@@ -90,27 +190,42 @@ export default function ReporteGastosCliente() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {TABLE_DATA.map((r, i) => (
-                <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 text-sm text-slate-600">{r.fecha}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-slate-900">{r.cliente}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{r.concepto}</td>
-                  <td className="px-6 py-4"><span className="text-[10px] font-bold px-2 py-1 rounded-full bg-primary/10 text-primary uppercase">{r.categoria}</span></td>
-                  <td className="px-6 py-4 text-sm font-bold text-slate-900">{r.monto}</td>
-                  <td className="px-6 py-4 text-sm text-slate-500">{r.vendedor}</td>
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-slate-400 font-medium">
+                    <span className="animate-spin material-symbols-outlined align-middle mr-2">autorenew</span>
+                    Cargando…
+                  </td>
                 </tr>
-              ))}
+              ) : listData.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-slate-400 font-medium">
+                    No se encontraron gastos registrados
+                  </td>
+                </tr>
+              ) : (
+                listData.map((r, i) => (
+                  <tr key={`${r.origen}-${r.id}-${i}`} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4 text-sm text-slate-600">{r.fecha?.slice(0, 10)}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-slate-900">{r.cliente_nombre || '—'}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{r.concepto}</td>
+                    <td className="px-6 py-4">
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase ${CATEGORIA_STYLE[r.categoria?.toLowerCase()] || CATEGORIA_STYLE.otros}`}>
+                        {r.categoria}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-bold text-slate-900">{fmt(r.monto)}</td>
+                    <td className="px-6 py-4 text-sm text-slate-500">{r.vendedor_nombre || '—'}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
         <div className="px-6 py-4 bg-slate-50/30 flex justify-between items-center border-t border-slate-100">
-          <p className="text-xs text-slate-500">Mostrando <span className="font-bold">1-6</span> de <span className="font-bold">245</span> gastos</p>
-          <div className="flex items-center gap-1">
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-100 transition-colors"><span className="material-symbols-outlined text-lg">chevron_left</span></button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-white font-bold text-xs">1</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-600 font-medium text-xs">2</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-100 transition-colors"><span className="material-symbols-outlined text-lg">chevron_right</span></button>
-          </div>
+          <p className="text-xs text-slate-500">
+            Mostrando <span className="font-bold">{listData.length}</span> de <span className="font-bold">{totalCount}</span> gastos
+          </p>
         </div>
       </section>
     </>

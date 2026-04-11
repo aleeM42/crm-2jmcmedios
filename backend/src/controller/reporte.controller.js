@@ -26,6 +26,14 @@ class ReporteController {
           data = await ReporteModel.getIngresosMensuales(anio);
           break;
         }
+        case 'pautas-filtro': {
+          const { region, marca, cliente, estado, fechaDesde, fechaHasta } = req.query;
+          data = await ReporteModel.getPautasFiltro({ region, marca, cliente, estado, fechaDesde, fechaHasta });
+          break;
+        }
+        case 'gastos-cliente':
+          data = await ReporteModel.getGastosCliente();
+          break;
         default:
           return res.status(404).json({
             success: false,
