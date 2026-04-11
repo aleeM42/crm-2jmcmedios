@@ -74,29 +74,29 @@ export default function App() {
           <Route path="/pautas/:id" element={<DetallePauta />} />
 
           {/* Aliados Comerciales */}
-          <Route path="/aliados-comerciales" element={<AliadosComerciales />} />
+          <Route path="/aliados-comerciales" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor', 'Invitado']}><AliadosComerciales /></ProtectedRoute>} />
           <Route path="/aliados-comerciales/agregar" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director']}><AgregarAliado /></ProtectedRoute>} />
-          <Route path="/aliados-comerciales/:id" element={<DetalleEmisora />} />
+          <Route path="/aliados-comerciales/:id" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor', 'Invitado', 'Gestor de Pautas']}><DetalleEmisora /></ProtectedRoute>} />
 
           {/* Actividad Comercial */}
-          <Route path="/actividad-comercial" element={<ActividadComercial />} />
-          <Route path="/actividad-comercial/visita" element={<AgregarVisita />} />
-          <Route path="/actividad-comercial/gastos" element={<GastosLista />} />
-          <Route path="/actividad-comercial/gastos/agregar" element={<AgregarGasto />} />
+          <Route path="/actividad-comercial" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor', 'Invitado']}><ActividadComercial /></ProtectedRoute>} />
+          <Route path="/actividad-comercial/visita" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor']}><AgregarVisita /></ProtectedRoute>} />
+          <Route path="/actividad-comercial/gastos" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor']}><GastosLista /></ProtectedRoute>} />
+          <Route path="/actividad-comercial/gastos/agregar" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor']}><AgregarGasto /></ProtectedRoute>} />
 
           {/* Pipeline */}
           <Route path="/pipeline" element={<Pipeline />} />
           <Route path="/pipeline/agregar" element={<AgregarLead />} />
 
           {/* Clientes */}
-          <Route path="/clientes" element={<Clientes />} />
-          <Route path="/clientes/agregar" element={<AgregarCliente />} />
-          <Route path="/clientes/:id" element={<DetalleCliente />} />
-          <Route path="/clientes/:clienteId/sub-empresa" element={<AgregarSubEmpresa />} />
-          <Route path="/clientes/:clienteId/marca" element={<AgregarMarca />} />
+          <Route path="/clientes" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor', 'Invitado']}><Clientes /></ProtectedRoute>} />
+          <Route path="/clientes/agregar" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor']}><AgregarCliente /></ProtectedRoute>} />
+          <Route path="/clientes/:id" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor', 'Invitado']}><DetalleCliente /></ProtectedRoute>} />
+          <Route path="/clientes/:clienteId/sub-empresa" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor']}><AgregarSubEmpresa /></ProtectedRoute>} />
+          <Route path="/clientes/:clienteId/marca" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor']}><AgregarMarca /></ProtectedRoute>} />
 
           {/* Reportes */}
-          <Route path="/reportes" element={<ReportesDirectorio />} />
+          <Route path="/reportes" element={<ProtectedRoute allowedRoles={['Administrador', 'Director General', 'Director', 'Vendedor', 'Invitado']}><ReportesDirectorio /></ProtectedRoute>} />
           <Route path="/reportes/ranking-clientes-pautas" element={<ReporteRankingClientesPautas />} />
           <Route path="/reportes/clientes-sector" element={<ReporteClientesSector />} />
           <Route path="/reportes/regiones-cliente" element={<ReporteRegionesCliente />} />

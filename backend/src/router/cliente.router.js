@@ -11,7 +11,7 @@ import validateBody from '../middleware/validateBody.js';
 const router = Router();
 
 // Todos los endpoints requieren autenticación + roles permitidos
-const ROLES_CLIENTES = ['Administrador', 'Director', 'Vendedor'];
+const ROLES_CLIENTES = ['Administrador', 'Director', 'Vendedor', 'Gestor de Pautas'];
 
 // GET  /api/clientes           — Lista paginada con filtros + KPIs
 router.get('/', authenticate, authorize(...ROLES_CLIENTES), ClienteCtrl.getAll);

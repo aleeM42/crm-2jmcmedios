@@ -10,7 +10,7 @@ import validateBody from '../middleware/validateBody.js';
 
 const router = Router();
 
-const ROLES_LECTURA = ['Administrador', 'Director', 'Vendedor'];
+const ROLES_LECTURA = ['Administrador', 'Director', 'Vendedor', 'Gestor de Pautas'];
 
 // GET  /api/vendedores             — Lista + KPIs (todos los roles)
 router.get('/', authenticate, authorize(...ROLES_LECTURA), VendedorCtrl.getAll);

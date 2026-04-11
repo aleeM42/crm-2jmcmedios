@@ -1537,19 +1537,6 @@ INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, 
   (SELECT id FROM COBERTURA WHERE descripcion ILIKE 'Maracaibo - San Francisco y costa Oriental del Lag%' LIMIT 1)
 );
 
-INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, categoria, direccion, estado, fk_lugar, fk_ciudad, fk_region, fk_cobertura) VALUES (
-  'PRODUCCIONES Z 103.5, C.A.',
-  'Radio Z',
-  'J294336884',
-  '103.5 FM',
-  'multitarget',
-  'Ocumare del Tuy',
-  'activo',
-  (SELECT id FROM LUGAR WHERE nombre = 'Miranda' AND tipo = 'Estado' LIMIT 1),
-  (SELECT id FROM LUGAR WHERE nombre = 'Caracas' AND tipo = 'Ciudad' LIMIT 1),
-  (SELECT id FROM LUGAR WHERE nombre = 'Capital' AND tipo = 'Region' LIMIT 1),
-  (SELECT id FROM COBERTURA WHERE descripcion ILIKE 'N/T%' LIMIT 1)
-);
 
 INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, categoria, direccion, estado, fk_lugar, fk_ciudad, fk_region, fk_cobertura) VALUES (
   'PRODUCTORA TOP C.A.',
@@ -2187,21 +2174,6 @@ INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, 
 );
 
 
--- 9. Power 95.3 FM → "POWER 93.5 FM" en regional CSV (Anzoátegui, Puerto La Cruz)
-INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, categoria, direccion, estado, fk_lugar, fk_ciudad, fk_region, fk_cobertura) VALUES (
-  'OSWALDO SIFONTES',
-  'Power',
-  'V83012345',
-  '95.3 FM',
-  'juvenil',
-  'Puerto La Cruz, Anzoategui',
-  'activo',
-  (SELECT id FROM LUGAR WHERE nombre = 'Anzoátegui' AND tipo = 'Estado' LIMIT 1),
-  (SELECT id FROM LUGAR WHERE nombre = 'Puerto La Cruz' AND tipo = 'Ciudad' LIMIT 1),
-  (SELECT id FROM LUGAR WHERE nombre = 'Oriental' AND tipo = 'Region' LIMIT 1),
-  (SELECT id FROM COBERTURA WHERE descripcion ILIKE 'Barcelona, Lechería, Puerto La Cruz y Guanta%' LIMIT 1)
-);
-
 -- 10. Solar 101.5 FM → "SOLAR 101.5 FM" en regional CSV (Sucre, Carúpano)
 INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, categoria, direccion, estado, fk_lugar, fk_ciudad, fk_region, fk_cobertura) VALUES (
   'OSWALDO SIFONTES',
@@ -2217,20 +2189,7 @@ INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, 
   (SELECT id FROM COBERTURA WHERE descripcion ILIKE 'N/T%' LIMIT 1)
 );
 
--- 12. Costera 102.7 FM → "costera 102.7 fm" en regional CSV (Carabobo, Puerto Cabello)
-INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, categoria, direccion, estado, fk_lugar, fk_ciudad, fk_region, fk_cobertura) VALUES (
-  'PRODUCCIONES LOS PORTEÑAZOS DE NELSON, C.A',
-  'Costera',
-  'J293963311',
-  '102.7 FM',
-  'multitarget',
-  'La Guaira, Estado La Guaira',
-  'activo',
-  (SELECT id FROM LUGAR WHERE nombre = 'Carabobo' AND tipo = 'Estado' LIMIT 1),
-  (SELECT id FROM LUGAR WHERE nombre = 'Puerto Cabello' AND tipo = 'Ciudad' LIMIT 1),
-  (SELECT id FROM LUGAR WHERE nombre = 'Central' AND tipo = 'Region' LIMIT 1),
-  (SELECT id FROM COBERTURA WHERE descripcion ILIKE 'Todo a nivel local, Nacional e Internacional%' LIMIT 1)
-);
+
 
 -- 13. Radio Zeta 103.5 FM → "radio zeta 103.5 fm" en regional CSV (Miranda, Charallave)
 INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, categoria, direccion, estado, fk_lugar, fk_ciudad, fk_region, fk_cobertura) VALUES (
@@ -2247,18 +2206,3 @@ INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, 
   (SELECT id FROM COBERTURA WHERE descripcion ILIKE 'Valles del Tuy, San Lucía, San José, Este de Cúa%' LIMIT 1)
 );
 
-
--- 17. Stéreo 100.3 FM → "STEREO CENTER 100.3 FM" en regional CSV (Guárico, Calabozo)
-INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, categoria, direccion, estado, fk_lugar, fk_ciudad, fk_region, fk_cobertura) VALUES (
-  'STEREO CENTER C.A',
-  'Stéreo',
-  'J402505060',
-  '100.3 FM',
-  'multitarget',
-  'Charallave, Miranda',
-  'activo',
-  (SELECT id FROM LUGAR WHERE nombre = 'Guárico' AND tipo = 'Estado' LIMIT 1),
-  (SELECT id FROM LUGAR WHERE nombre = 'Calabozo' AND tipo = 'Ciudad' LIMIT 1),
-  (SELECT id FROM LUGAR WHERE nombre = 'Los Llanos' AND tipo = 'Region' LIMIT 1),
-  (SELECT id FROM COBERTURA WHERE descripcion ILIKE 'N/T%' LIMIT 1)
-);

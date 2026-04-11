@@ -7,7 +7,12 @@ WORKDIR /app
 COPY package*.json ./
 
 # Obviar el package-lock estricto y usar npm install
-RUN npm install --omit=dev
+# Configurar reintentos para npm (ayuda con errores de red ECONNRESET)
+RUN npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm install --omit=dev && \
+    npm cache clean --force
 
 # Copiamos el resto del código
 COPY . .
