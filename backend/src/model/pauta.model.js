@@ -95,21 +95,33 @@ export async function getPautaById(id) {
   const resultOtras = await pool.query(queryOtrasEmisoras, [pauta.numero_oc, id]);
   pauta.otras_emisoras_oc = resultOtras.rows;
 
-  // Histórico de negociaciones total
+  // Historico de negociaciones - valor directo (NO SUM)
+  // Si el cliente tiene un historial, se usa el monto_negociacion y total_cunas tal cual.
+  // Si no tiene, se usa monto_ot de la pauta como fallback para el total negociado.
   const queryHistorico = `
-    SELECT COALESCE(SUM(monto_negociacion), 0) AS total_negociacion
+    SELECT monto_negociacion, total_cunas
     FROM HISTORICO_NEGOCIACIONES
     WHERE fk_cliente = (SELECT fk_cliente FROM PAUTAS WHERE id = $1)
+    ORDER BY id DESC
+    LIMIT 1
   `;
   const resultHistorico = await pool.query(queryHistorico, [id]);
-  pauta.monto_total_negociacion = parseFloat(resultHistorico.rows[0].total_negociacion);
+
+  if (resultHistorico.rows.length > 0) {
+    pauta.monto_total_negociacion = parseFloat(resultHistorico.rows[0].monto_negociacion);
+    pauta.total_cunas_cliente = parseInt(resultHistorico.rows[0].total_cunas, 10);
+  } else {
+    // Sin historico - fallback a monto_ot de la pauta
+    pauta.monto_total_negociacion = parseFloat(pauta.monto_ot);
+    pauta.total_cunas_cliente = 0;
+  }
 
   return pauta;
 }
 
 /**
  * Crea una pauta con 1 emisora asociada.
- * Inserta en PAUTAS, CUNAS, DETALLE_PAUTA e HISTORICO_NEGOCIACIONES.
+ * Inserta en PAUTAS, CUNAS, DETALLE_PAUTA.
  */
 export async function createPauta(data) {
   const client = await pool.connect();
@@ -169,19 +181,6 @@ export async function createPauta(data) {
       `;
       await client.query(queryDetalle, [pautaId, data.aliadoId]);
     }
-
-    // HISTORICO_NEGOCIACIONES
-    const queryHistorico = `
-      INSERT INTO HISTORICO_NEGOCIACIONES (fecha_inicio, fecha_fin, monto_negociacion, total_cunas, fk_cliente)
-      VALUES ($1, $2, $3, $4, $5)
-    `;
-    await client.query(queryHistorico, [
-      data.fechaInicio,
-      data.fechaFin,
-      data.montoOT || 0,
-      parseInt(data.cantidadCunas, 10) || 0,
-      data.clienteId
-    ]);
 
     await client.query('COMMIT');
     return pautaId;

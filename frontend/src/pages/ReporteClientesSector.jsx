@@ -1,10 +1,12 @@
 // ==============================================
 // ReporteClientesSector.jsx — Clientes por Sector
 // ==============================================
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { toast } from 'sonner';
 import api from '../services/api';
+import { exportToExcel, exportToPDF } from '../services/ExportService.js';
 
 const COLORS = ['#16B1B8', '#8DC63F', '#55CCD3', '#A1DEE5', '#d1d5db', '#8B5CF6', '#F59E0B', '#EF4444', '#10B981', '#3B82F6'];
 
@@ -13,6 +15,9 @@ export default function ReporteClientesSector() {
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [exporting, setExporting] = useState(null);
+
+  const chartRef = useRef(null);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -46,6 +51,59 @@ export default function ReporteClientesSector() {
     return { totalClientes: total, chartData: data };
   }, [chartDataRaw]);
 
+  // ── Export handlers ──────────────────────────────────────────────────────
+  const isEmpty = !loading && chartData.length === 0;
+
+  const buildChartRows = () => chartData.map(s => ({
+    'Sector':   s.nombre,
+    'Clientes': s.clientes,
+    '%':        s.pct,
+  }));
+  const buildListRows = () => listData.map(r => ({
+    'RIF Fiscal':      r.rif_fiscal,
+    'Razón Social':    r.razon_social,
+    'Nombre Comercial':r.nombre,
+    'Sector':          r.sector || 'N/A',
+    'Estado':          r.estado,
+  }));
+
+  const handleExportExcel = async () => {
+    if (exporting || loading || isEmpty) return;
+    setExporting('excel');
+    const toastId = toast.loading('Generando Excel…', { description: '0%' });
+    try {
+      await exportToExcel({
+        reportName:  'Clientes_por_Sector',
+        columns:     ['RIF Fiscal', 'Razón Social', 'Nombre Comercial', 'Sector', 'Estado'],
+        rows:        buildListRows(),
+        columnTypes: {},
+        sheetName:   'Clientes por Sector',
+        onProgress:  (p) => toast.loading('Generando Excel…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('Excel descargado', { id: toastId });
+    } catch (err) {
+      toast.error('Error al exportar Excel', { id: toastId, description: err.message });
+    } finally { setExporting(null); }
+  };
+
+  const handleExportPDF = async () => {
+    if (exporting || loading || isEmpty) return;
+    setExporting('pdf');
+    const toastId = toast.loading('Generando PDF…', { description: '0%' });
+    try {
+      await exportToPDF({
+        reportName:   'Clientes_por_Sector',
+        chartElement: chartRef.current,
+        columns:      ['RIF Fiscal', 'Razón Social', 'Nombre Comercial', 'Sector', 'Estado'],
+        rows:         buildListRows(),
+        onProgress:   (p) => toast.loading('Generando PDF…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('PDF descargado', { id: toastId });
+    } catch (err) {
+      toast.error('Error al exportar PDF', { id: toastId, description: err.message });
+    } finally { setExporting(null); }
+  };
+
   if (loading) {
     return <div className="p-10 text-center text-slate-500 font-medium">Cargando reporte...</div>;
   }
@@ -62,15 +120,33 @@ export default function ReporteClientesSector() {
         <span className="text-slate-900 font-semibold">Clientes por Sector</span>
       </nav>
 
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex flex-wrap justify-between items-center gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-display">Clientes por Sector</h2>
           <p className="text-slate-500 text-sm mt-1">Distribución de cartera de clientes según industria y sector comercial</p>
         </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportPDF}
+            disabled={!!exporting || loading || isEmpty}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-lg">{exporting === 'pdf' ? 'hourglass_top' : 'picture_as_pdf'}</span>
+            {exporting === 'pdf' ? 'Generando…' : 'PDF'}
+          </button>
+          <button
+            onClick={handleExportExcel}
+            disabled={!!exporting || loading || isEmpty}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-lg">{exporting === 'excel' ? 'hourglass_top' : 'table_view'}</span>
+            {exporting === 'excel' ? 'Generando…' : 'Excel'}
+          </button>
+        </div>
       </header>
 
       {/* DONUT + LEGEND */}
-      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section ref={chartRef} className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-2">Distribución de Mercado</h3>
         <p className="text-xs text-slate-400 mb-6">Representación visual por sectores comerciales (Estado: Activo)</p>
         <div className="flex flex-col lg:flex-row items-center justify-around gap-8">

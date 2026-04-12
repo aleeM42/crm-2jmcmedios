@@ -34,6 +34,26 @@ class ReporteController {
         case 'gastos-cliente':
           data = await ReporteModel.getGastosCliente();
           break;
+        case 'top-emisoras-cunas': {
+          const mes  = req.query.mes  || new Date().getMonth() + 1;
+          const anio = req.query.anio || new Date().getFullYear();
+          data = await ReporteModel.getTopEmisorasCunas(mes, anio);
+          break;
+        }
+        case 'emisoras-region':
+          data = await ReporteModel.getEmisorasRegion();
+          break;
+        case 'marcas-region': {
+          const mes  = req.query.mes  || new Date().getMonth() + 1;
+          const anio = req.query.anio || new Date().getFullYear();
+          data = await ReporteModel.getMarcasRegion(mes, anio);
+          break;
+        }
+        case 'clientes-emisora': {
+          const { emisoraId } = req.query;
+          data = await ReporteModel.getClientesEmisora(emisoraId || null);
+          break;
+        }
         default:
           return res.status(404).json({
             success: false,

@@ -2,11 +2,13 @@
 // ReporteIngresosMensuales.jsx — Total Ingresos por Pautas Mensual
 // ==============================================
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
+import { toast } from 'sonner';
 import api from '../services/api';
+import { exportToExcel, exportToPDF } from '../services/ExportService.js';
 
 const MESES_NOMBRES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -28,6 +30,9 @@ export default function ReporteIngresosMensuales() {
   const [kpi, setKpi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [exporting, setExporting] = useState(null);
+
+  const chartRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -63,6 +68,55 @@ export default function ReporteIngresosMensuales() {
     return { ...m, variacion, positivo };
   });
 
+  // ── Export handlers ──────────────────────────────────────────────────────
+  const isEmpty = !loading && tableData.length === 0;
+  const EXCEL_COLS  = ['Mes', 'Monto', 'Variación'];
+  const EXCEL_TYPES = { 'Monto': 'currency' };
+
+  const buildRows = () => tableData.map(r => ({
+    'Mes':      r.label,
+    'Monto':    parseFloat(r.monto) || 0,
+    'Variación': r.variacion,
+  }));
+
+  const handleExportExcel = async () => {
+    if (exporting || loading || isEmpty) return;
+    setExporting('excel');
+    const toastId = toast.loading('Generando Excel…', { description: '0%' });
+    try {
+      await exportToExcel({
+        reportName:  `Ingresos_Mensuales_${anio}`,
+        columns:     EXCEL_COLS,
+        rows:        buildRows(),
+        columnTypes: EXCEL_TYPES,
+        sheetName:   `Ingresos ${anio}`,
+        onProgress:  (p) => toast.loading('Generando Excel…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('Excel descargado', { id: toastId });
+    } catch (err) {
+      toast.error('Error al exportar Excel', { id: toastId, description: err.message });
+    } finally { setExporting(null); }
+  };
+
+  const handleExportPDF = async () => {
+    if (exporting || loading || isEmpty) return;
+    setExporting('pdf');
+    const toastId = toast.loading('Generando PDF…', { description: '0%' });
+    try {
+      await exportToPDF({
+        reportName:   `Ingresos_Mensuales_${anio}`,
+        chartElement: chartRef.current,
+        columns:      EXCEL_COLS,
+        rows:         buildRows(),
+        columnTypes:  EXCEL_TYPES,
+        onProgress:   (p) => toast.loading('Generando PDF…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('PDF descargado', { id: toastId });
+    } catch (err) {
+      toast.error('Error al exportar PDF', { id: toastId, description: err.message });
+    } finally { setExporting(null); }
+  };
+
   return (
     <>
       <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
@@ -83,17 +137,27 @@ export default function ReporteIngresosMensuales() {
             id="filtro-anio"
             value={anio}
             onChange={(e) => setAnio(Number(e.target.value))}
-            className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+            className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 py-2.5 px-7 focus:ring-primary focus:outline-none"
           >
             {aniosDisponibles.map((a) => (
               <option key={a} value={a}>{a}</option>
             ))}
           </select>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
-            <span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF
+          <button
+            onClick={handleExportPDF}
+            disabled={!!exporting || loading || isEmpty}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-lg">{exporting === 'pdf' ? 'hourglass_top' : 'picture_as_pdf'}</span>
+            {exporting === 'pdf' ? 'Generando…' : 'PDF'}
           </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
-            <span className="material-symbols-outlined text-lg">table_view</span>Excel
+          <button
+            onClick={handleExportExcel}
+            disabled={!!exporting || loading || isEmpty}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-lg">{exporting === 'excel' ? 'hourglass_top' : 'table_view'}</span>
+            {exporting === 'excel' ? 'Generando…' : 'Excel'}
           </button>
         </div>
       </header>
@@ -152,7 +216,7 @@ export default function ReporteIngresosMensuales() {
       </div>
 
       {/* BAR CHART */}
-      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section ref={chartRef} className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-6">
           Evolución de Ingresos Mensuales — {anio}
         </h3>

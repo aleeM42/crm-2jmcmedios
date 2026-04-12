@@ -138,10 +138,6 @@ export default function DetallePauta() {
               </button>
             </>
           )}
-
-          <button className="px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm">picture_as_pdf</span> PDF
-          </button>
         </div>
       </div>
 
@@ -214,7 +210,7 @@ export default function DetallePauta() {
               Progreso de Consumo
             </h3>
 
-            {/* CUÑAS */}
+            {/* CUÑAS EMITIDAS */}
             <div className="flex items-center gap-8 mb-6">
               <div className="flex-1">
                 <div className="flex justify-between text-xs font-bold mb-2">
@@ -239,6 +235,43 @@ export default function DetallePauta() {
                 </div>
               </div>
             </div>
+
+            {/* CONSUMO DE CUÑAS DEL CLIENTE */}
+            {(() => {
+              const totalCunasCliente = Number(pauta.total_cunas_cliente) || 0;
+              const cunasPauta = Number(pauta.cantidad_cunas) || 0;
+              const cunasRestantes = Math.max(totalCunasCliente - cunasPauta, 0);
+              const porcentajeConsumo = totalCunasCliente > 0
+                ? Math.min(Math.round((cunasPauta / totalCunasCliente) * 100), 100)
+                : 0;
+
+              return totalCunasCliente > 0 ? (
+                <div className="flex items-center gap-8 mb-6">
+                  <div className="flex-1">
+                    <div className="flex justify-between text-xs font-bold mb-2">
+                      <span className="text-slate-600">
+                        Cuñas Pauta: {cunasPauta} / Total Cliente: {totalCunasCliente}
+                        <span className="ml-2 text-slate-400">
+                          (Restante: {cunasRestantes})
+                        </span>
+                      </span>
+                      <span className="text-[#E8A838]">{porcentajeConsumo}%</span>
+                    </div>
+                    <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${porcentajeConsumo}%`,
+                          background: porcentajeConsumo > 80
+                            ? 'linear-gradient(90deg, #E8A838, #E85D38)'
+                            : 'linear-gradient(90deg, #E8A838, #F0C056)',
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              ) : null;
+            })()}
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
               <div className="bg-slate-50 rounded-lg p-4 text-center border border-slate-100">
@@ -408,7 +441,7 @@ export default function DetallePauta() {
                 >
                   {deleting ? (
                     <>
-                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
                       Eliminando…
                     </>
                   ) : 'Sí, Eliminar'}

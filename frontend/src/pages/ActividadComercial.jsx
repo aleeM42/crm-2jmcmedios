@@ -8,6 +8,10 @@ import { eliminarVisita } from '../services/visita.service.js';
 import EditarVisitaModal from '../components/EditarVisitaModal.jsx';
 import { getCurrentUser } from '../services/auth.service.js';
 import { toast } from 'sonner';
+import { exportToExcel, exportToPDF } from '../services/ExportService.js';
+
+// ── Columnas del reporte de visitas ────────────────────────────────────────────
+const EXCEL_COLS = ['Fecha', 'Hora', 'Vendedor', 'Visitado', 'Tipo', 'Objetivo', 'Efectiva', 'Gasto ($)', 'Detalle'];
 
 function ActividadComercial() {
   const user = getCurrentUser();
@@ -15,6 +19,7 @@ function ActividadComercial() {
   const isInvitado = userRole === 'Invitado';
   // --- Data ---
   const [visitas, setVisitas] = useState([]);
+  const [gastosVisitas, setGastosVisitas] = useState([]); // lista de GASTOS_VISITAS
   const [gastosTotales, setGastosTotales] = useState(0);
   const [vendedores, setVendedores] = useState([]);
   const [clientes, setClientes] = useState([]);
@@ -35,6 +40,7 @@ function ActividadComercial() {
   const [editModalVisita, setEditModalVisita] = useState(null);
   const [deleteConfirmVisita, setDeleteConfirmVisita] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(null); // 'pdf' | 'excel' | null
 
   const fetchActividad = async () => {
     setLoadingData(true);
@@ -51,6 +57,8 @@ function ActividadComercial() {
         {
           const arrVis = gasVisRes.success ? (Array.isArray(gasVisRes.data) ? gasVisRes.data : []) : [];
           const arrMkt = gasMktRes.success ? (Array.isArray(gasMktRes.data) ? gasMktRes.data : []) : [];
+          // Guardar lista de gastos de visitas para cruzar con la tabla
+          setGastosVisitas(arrVis);
           const totalVis = arrVis.reduce((s, g) => s + parseFloat(g.monto || 0), 0);
           const totalMkt = arrMkt.reduce((s, g) => s + parseFloat(g.monto || 0), 0);
           setGastosTotales(totalVis + totalMkt);
@@ -113,16 +121,108 @@ function ActividadComercial() {
   // Reset page when filters change
   useEffect(() => { setPage(1); }, [filterFecha, filterVendedor, filterCliente, filterTipo, filterEfectiva]);
 
+  // ── Export helpers ────────────────────────────────────────────────────────
+  // Índice de gastos por visita para O(1) lookup
+  const gastosPorVisita = useMemo(() => {
+    const map = {};
+    gastosVisitas.forEach((g) => {
+      const vid = g.fk_visita;
+      if (!map[vid]) map[vid] = 0;
+      map[vid] += parseFloat(g.monto || 0);
+    });
+    return map;
+  }, [gastosVisitas]);
+
+  const buildRows = () =>
+    filtered.map((v) => ({
+      'Fecha':    v.fecha?.slice(0, 10) ?? '',
+      'Hora':     v.hora?.slice(0, 5)  ?? '',
+      'Vendedor': `${v.vendedor_nombre ?? ''} ${v.vendedor_apellido ?? ''}`.trim(),
+      'Visitado': v.cliente_nombre || v.aliado_nombre || '—',
+      'Tipo':     v.tipo ?? '',
+      'Objetivo': v.objetivo_visita ?? '',
+      'Efectiva': v.efectiva === 'si' ? 'Sí' : 'No',
+      'Gasto ($)': gastosPorVisita[v.id] ?? 0,
+      'Detalle':  v.detalle ?? '',
+    }));
+
+  const buildSubtitle = () => {
+    const parts = [];
+    if (filterFecha)    parts.push(`Fecha: ${filterFecha}`);
+    if (filterVendedor) parts.push(`Vendedor ID: ${filterVendedor}`);
+    if (filterCliente)  parts.push(`Cliente: ${filterCliente}`);
+    if (filterTipo)     parts.push(`Tipo: ${filterTipo}`);
+    if (filterEfectiva) parts.push(`Efectiva: ${filterEfectiva === 'si' ? 'Sí' : 'No'}`);
+    return parts.length ? parts.join('  •  ') : 'Todas las visitas';
+  };
+
+  const handleExportExcel = async () => {
+    if (exporting || loadingData || filtered.length === 0) return;
+    setExporting('excel');
+    const toastId = toast.loading('Generando Excel…', { description: '0%' });
+    try {
+      await exportToExcel({
+        reportName:  'Actividad_Comercial_Visitas',
+        columns:     EXCEL_COLS,
+        rows:        buildRows(),
+        columnTypes: { 'Gasto ($)': 'currency' },
+        sheetName:   'Visitas',
+        onProgress:  (p) => toast.loading('Generando Excel…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('Excel descargado', { id: toastId });
+    } catch (err) {
+      console.error('[Export Excel]', err);
+      toast.error('Error al exportar Excel', { id: toastId, description: err.message });
+    } finally {
+      setExporting(null);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    if (exporting || loadingData || filtered.length === 0) return;
+    setExporting('pdf');
+    const toastId = toast.loading('Generando PDF…', { description: '0%' });
+    try {
+      await exportToPDF({
+        reportName:   'Actividad_Comercial_Visitas',
+        chartElement: null,
+        columns:      EXCEL_COLS,
+        rows:         buildRows(),
+        columnTypes:  { 'Gasto ($)': 'currency' },
+        subtitle:     buildSubtitle(),
+        onProgress:   (p) => toast.loading('Generando PDF…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('PDF descargado', { id: toastId });
+    } catch (err) {
+      console.error('[Export PDF]', err);
+      toast.error('Error al exportar PDF', { id: toastId, description: err.message });
+    } finally {
+      setExporting(null);
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <h2 className="text-2xl font-bold text-slate-800 font-display">Actividad Comercial</h2>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all text-sm font-semibold text-slate-700">
-            <span className="material-symbols-outlined text-sm">picture_as_pdf</span>PDF
+          <button
+            onClick={handleExportPDF}
+            disabled={!!exporting || loadingData || filtered.length === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all text-sm font-semibold text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-sm">
+              {exporting === 'pdf' ? 'hourglass_top' : 'picture_as_pdf'}
+            </span>PDF
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all text-sm font-semibold text-slate-700">
-            <span className="material-symbols-outlined text-sm">table_view</span>Excel
+          <button
+            onClick={handleExportExcel}
+            disabled={!!exporting || loadingData || filtered.length === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-[#F4FAFB] border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-all text-sm font-semibold text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-sm">
+              {exporting === 'excel' ? 'hourglass_top' : 'table_view'}
+            </span>Excel
           </button>
         </div>
       </div>

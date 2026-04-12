@@ -85,37 +85,53 @@ function AgregarAliado() {
   const addTelefono = () => setTelefonos([...telefonos, { codigo_area: '', numero: '' }]);
   const removeTelefono = (idx) => setTelefonos(telefonos.filter((_, i) => i !== idx));
 
+  // ── Categorías canónicas (deben coincidir con CHECK constraint de la BD) ────
+  const CATEGORIAS_DEFAULT = [
+    { id: 'multitarget',  nombre: 'Multitarget'  },
+    { id: 'comunitaria',  nombre: 'Comunitaria'  },
+    { id: 'juvenil',      nombre: 'Juvenil'      },
+    { id: 'adulto joven', nombre: 'Adulto joven' },
+    { id: 'popular',      nombre: 'Popular'      },
+    { id: 'adulto',       nombre: 'Adulto'       },
+    { id: 'deportiva',    nombre: 'Deportiva'    },
+  ];
+
   // Estados para opciones dinámicas
   const [regiones, setRegiones] = useState([]);
   const [estados, setEstados] = useState([]);
   const [selectedEstado, setSelectedEstado] = useState('');
   const [ciudades, setCiudades] = useState([]);
   const [coberturas, setCoberturas] = useState([]);
-  const [categorias, setCategorias] = useState([
-    { id: 'multitarget', nombre: 'Multitarget' },
-    { id: 'comunitaria', nombre: 'Comunitaria' },
-    { id: 'juvenil', nombre: 'Juvenil' },
-    { id: 'adulto joven', nombre: 'Adulto joven' },
-    { id: 'popular', nombre: 'Popular' },
-    { id: 'adulto', nombre: 'Adulto' },
-    { id: 'deportiva', nombre: 'Deportiva' },
-  ]);
+  const [categorias, setCategorias] = useState(CATEGORIAS_DEFAULT);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [resRegiones, resEstados, resCoberturas, resCategorias] = await Promise.all([
-          api.get('/lugares?tipo=Region').catch(err => ({ success: false })),
-          api.get('/lugares?tipo=Estado').catch(err => ({ success: false })),
-          api.get('/coberturas').catch(err => ({ success: false })),
-          api.get('/categorias').catch(err => ({ success: false })),
+          api.get('/lugares?tipo=Region').catch(() => ({ success: false })),
+          api.get('/lugares?tipo=Estado').catch(() => ({ success: false })),
+          api.get('/coberturas').catch(() => ({ success: false })),
+          api.get('/categorias').catch(() => ({ success: false })),
         ]);
 
         if (resRegiones.success) setRegiones(resRegiones.data);
         if (resEstados.success) setEstados(resEstados.data);
         if (resCoberturas.success) setCoberturas(resCoberturas.data);
+
+        // Fusionar API con la lista canónica para garantizar que todas
+        // las categorías del CHECK constraint estén siempre presentes.
         if (resCategorias.success && resCategorias.data.length > 0) {
-          setCategorias(resCategorias.data);
+          const apiNames = new Set(
+            resCategorias.data.map((c) => (c.nombre || c).toLowerCase())
+          );
+          const merged = [...CATEGORIAS_DEFAULT];
+          resCategorias.data.forEach((c) => {
+            const nombre = c.nombre || c;
+            if (!merged.find((m) => m.id === nombre.toLowerCase())) {
+              merged.push({ id: nombre.toLowerCase(), nombre });
+            }
+          });
+          setCategorias(merged);
         }
       } catch (err) {
         console.error('Error fetching select options:', err);

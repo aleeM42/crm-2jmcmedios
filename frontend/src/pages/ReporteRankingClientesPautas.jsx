@@ -1,10 +1,12 @@
 // ==============================================
 // ReporteRankingClientesPautas.jsx — Ranking de Clientes por Pautas Contratadas
 // ==============================================
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { toast } from 'sonner';
 import api from '../services/api';
+import { exportToExcel, exportToPDF } from '../services/ExportService.js';
 
 const COLORS = ['#16B1B8', '#8DC63F', '#A1DEE5', '#1F2937', '#6B7280'];
 
@@ -13,6 +15,9 @@ export default function ReporteRankingClientesPautas() {
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [exporting, setExporting] = useState(null);
+
+  const chartRef = useRef(null);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -42,8 +47,59 @@ export default function ReporteRankingClientesPautas() {
     return <div className="p-10 text-center text-red-500 font-medium">{error}</div>;
   }
 
-  // Helper formatting if necessary (e.g., currency)
+  // Helper formatting
   const formatCurrency = (val) => val ? `$${Number(val).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00';
+
+  // ── Export handlers ──────────────────────────────────────────────────────
+  const isEmpty = listData.length === 0;
+  const EXCEL_COLS  = ['Pos.', 'Cliente', 'RIF', 'Tot. Pautas', 'Inversión Total'];
+  const EXCEL_TYPES = { 'Inversión Total': 'currency', 'Tot. Pautas': 'number', 'Pos.': 'number' };
+
+  const buildRows = () => listData.map((r, i) => ({
+    'Pos.':           i + 1,
+    'Cliente':        r.nombre,
+    'RIF':            r.rif_fiscal,
+    'Tot. Pautas':    Number(r.total_pautas) || 0,
+    'Inversión Total': parseFloat(r.monto_total) || 0,
+  }));
+
+  const handleExportExcel = async () => {
+    if (exporting || loading || isEmpty) return;
+    setExporting('excel');
+    const toastId = toast.loading('Generando Excel…', { description: '0%' });
+    try {
+      await exportToExcel({
+        reportName:  'Ranking_Clientes_Pautas',
+        columns:     EXCEL_COLS,
+        rows:        buildRows(),
+        columnTypes: EXCEL_TYPES,
+        sheetName:   'Ranking Clientes',
+        onProgress:  (p) => toast.loading('Generando Excel…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('Excel descargado', { id: toastId });
+    } catch (err) {
+      toast.error('Error al exportar Excel', { id: toastId, description: err.message });
+    } finally { setExporting(null); }
+  };
+
+  const handleExportPDF = async () => {
+    if (exporting || loading || isEmpty) return;
+    setExporting('pdf');
+    const toastId = toast.loading('Generando PDF…', { description: '0%' });
+    try {
+      await exportToPDF({
+        reportName:   'Ranking_Clientes_Pautas',
+        chartElement: chartRef.current,
+        columns:      EXCEL_COLS,
+        rows:         buildRows(),
+        columnTypes:  EXCEL_TYPES,
+        onProgress:   (p) => toast.loading('Generando PDF…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('PDF descargado', { id: toastId });
+    } catch (err) {
+      toast.error('Error al exportar PDF', { id: toastId, description: err.message });
+    } finally { setExporting(null); }
+  };
 
   return (
     <>
@@ -54,15 +110,33 @@ export default function ReporteRankingClientesPautas() {
         <span className="text-slate-900 font-semibold">Ranking Clientes por Pautas</span>
       </nav>
 
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex flex-wrap justify-between items-center gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-display">Ranking de Clientes por Pautas Contratadas</h2>
           <p className="text-slate-500 text-sm mt-1">Visualización de clientes con mayor volumen de pautas publicitarias</p>
         </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportPDF}
+            disabled={!!exporting || loading || isEmpty}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-lg">{exporting === 'pdf' ? 'hourglass_top' : 'picture_as_pdf'}</span>
+            {exporting === 'pdf' ? 'Generando…' : 'PDF'}
+          </button>
+          <button
+            onClick={handleExportExcel}
+            disabled={!!exporting || loading || isEmpty}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-lg">{exporting === 'excel' ? 'hourglass_top' : 'table_view'}</span>
+            {exporting === 'excel' ? 'Generando…' : 'Excel'}
+          </button>
+        </div>
       </header>
 
       {/* TOP CHART */}
-      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section ref={chartRef} className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Top 5 Clientes en Inversión</h3>
         <div style={{ width: '100%', height: 420 }}>
           <ResponsiveContainer>

@@ -2,9 +2,11 @@
 // ReporteGastosCliente.jsx — Lista de Gastos por Cliente
 // ==============================================
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { toast } from 'sonner';
 import api from '../services/api';
+import { exportToExcel, exportToPDF } from '../services/ExportService.js';
 
 const CATEGORIA_STYLE = {
   transporte: 'bg-blue-100 text-blue-600',
@@ -31,6 +33,9 @@ export default function ReporteGastosCliente() {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [exporting, setExporting] = useState(null);
+
+  const chartRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,6 +62,58 @@ export default function ReporteGastosCliente() {
     return () => { cancelled = true; };
   }, []);
 
+  // ── Export handlers ──────────────────────────────────────────────────────
+  const isEmpty = !loading && listData.length === 0;
+  const EXCEL_COLS  = ['Fecha', 'Cliente', 'Concepto', 'Categoría', 'Monto', 'Vendedor'];
+  const EXCEL_TYPES = { 'Monto': 'currency' };
+
+  const buildRows = () => listData.map(r => ({
+    'Fecha':    r.fecha?.slice(0, 10) || '—',
+    'Cliente':  r.cliente_nombre || '—',
+    'Concepto': r.concepto,
+    'Categoría':r.categoria,
+    'Monto':    parseFloat(r.monto) || 0,
+    'Vendedor': r.vendedor_nombre || '—',
+  }));
+
+  const handleExportExcel = async () => {
+    if (exporting || loading || isEmpty) return;
+    setExporting('excel');
+    const toastId = toast.loading('Generando Excel…', { description: '0%' });
+    try {
+      await exportToExcel({
+        reportName:  'Gastos_por_Cliente',
+        columns:     EXCEL_COLS,
+        rows:        buildRows(),
+        columnTypes: EXCEL_TYPES,
+        sheetName:   'Gastos',
+        onProgress:  (p) => toast.loading('Generando Excel…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('Excel descargado', { id: toastId });
+    } catch (err) {
+      toast.error('Error al exportar Excel', { id: toastId, description: err.message });
+    } finally { setExporting(null); }
+  };
+
+  const handleExportPDF = async () => {
+    if (exporting || loading || isEmpty) return;
+    setExporting('pdf');
+    const toastId = toast.loading('Generando PDF…', { description: '0%' });
+    try {
+      await exportToPDF({
+        reportName:   'Gastos_por_Cliente',
+        chartElement: chartRef.current,
+        columns:      EXCEL_COLS,
+        rows:         buildRows(),
+        columnTypes:  EXCEL_TYPES,
+        onProgress:   (p) => toast.loading('Generando PDF…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('PDF descargado', { id: toastId });
+    } catch (err) {
+      toast.error('Error al exportar PDF', { id: toastId, description: err.message });
+    } finally { setExporting(null); }
+  };
+
   return (
     <>
       <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
@@ -71,11 +128,21 @@ export default function ReporteGastosCliente() {
           <p className="text-slate-500 text-sm mt-1">Detalle de inversión publicitaria desglosado por cada cuenta</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
-            <span className="material-symbols-outlined text-lg">picture_as_pdf</span>PDF
+          <button
+            onClick={handleExportPDF}
+            disabled={!!exporting || loading || isEmpty}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-lg">{exporting === 'pdf' ? 'hourglass_top' : 'picture_as_pdf'}</span>
+            {exporting === 'pdf' ? 'Generando…' : 'PDF'}
           </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold">
-            <span className="material-symbols-outlined text-lg">table_view</span>Excel
+          <button
+            onClick={handleExportExcel}
+            disabled={!!exporting || loading || isEmpty}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-lg">{exporting === 'excel' ? 'hourglass_top' : 'table_view'}</span>
+            {exporting === 'excel' ? 'Generando…' : 'Excel'}
           </button>
         </div>
       </header>
@@ -126,7 +193,7 @@ export default function ReporteGastosCliente() {
       )}
 
       {/* TOP CLIENTES CHART */}
-      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section ref={chartRef} className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <h3 className="text-lg font-bold font-display text-slate-900 mb-6">Top Clientes por Gasto Total</h3>
         {loading ? (
           <div className="h-[420px] flex items-center justify-center text-slate-400 text-sm font-medium">

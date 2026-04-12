@@ -1,10 +1,12 @@
 // ==============================================
 // ReporteRegionesCliente.jsx — Clientes por Región
 // ==============================================
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts';
+import { toast } from 'sonner';
 import api from '../services/api';
+import { exportToExcel, exportToPDF } from '../services/ExportService.js';
 
 const COLORS = ['#16B1B8', '#8DC63F', '#55CCD3', '#A1DEE5', '#d1d5db'];
 
@@ -13,6 +15,9 @@ export default function ReporteRegionesCliente() {
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [exporting, setExporting] = useState(null);
+
+  const chartRef = useRef(null);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -45,6 +50,55 @@ export default function ReporteRegionesCliente() {
     }));
   }, [chartDataRaw]);
 
+  // ── Export handlers ──────────────────────────────────────────────────────
+  const isEmpty = !loading && listData.length === 0;
+  const EXCEL_COLS  = ['Región', 'Estado (Prov.)', 'Cliente', 'RIF Fiscal', 'Sector'];
+
+  const buildRows = () => listData.map(r => ({
+    'Región':         r.region || 'Sin asignar',
+    'Estado (Prov.)': r.estado_lugar || '—',
+    'Cliente':        r.nombre,
+    'RIF Fiscal':     r.rif_fiscal,
+    'Sector':         r.sector || 'N/A',
+  }));
+
+  const handleExportExcel = async () => {
+    if (exporting || loading || isEmpty) return;
+    setExporting('excel');
+    const toastId = toast.loading('Generando Excel…', { description: '0%' });
+    try {
+      await exportToExcel({
+        reportName:  'Clientes_por_Region',
+        columns:     EXCEL_COLS,
+        rows:        buildRows(),
+        columnTypes: {},
+        sheetName:   'Clientes por Región',
+        onProgress:  (p) => toast.loading('Generando Excel…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('Excel descargado', { id: toastId });
+    } catch (err) {
+      toast.error('Error al exportar Excel', { id: toastId, description: err.message });
+    } finally { setExporting(null); }
+  };
+
+  const handleExportPDF = async () => {
+    if (exporting || loading || isEmpty) return;
+    setExporting('pdf');
+    const toastId = toast.loading('Generando PDF…', { description: '0%' });
+    try {
+      await exportToPDF({
+        reportName:   'Clientes_por_Region',
+        chartElement: chartRef.current,
+        columns:      EXCEL_COLS,
+        rows:         buildRows(),
+        onProgress:   (p) => toast.loading('Generando PDF…', { id: toastId, description: `${p}%` }),
+      });
+      toast.success('PDF descargado', { id: toastId });
+    } catch (err) {
+      toast.error('Error al exportar PDF', { id: toastId, description: err.message });
+    } finally { setExporting(null); }
+  };
+
   if (loading) {
     return <div className="p-10 text-center text-slate-500 font-medium">Cargando reporte...</div>;
   }
@@ -61,15 +115,33 @@ export default function ReporteRegionesCliente() {
         <span className="text-slate-900 font-semibold">Clientes por Región</span>
       </nav>
 
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex flex-wrap justify-between items-center gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-display">Distribución Geográfica de Clientes</h2>
           <p className="text-slate-500 text-sm mt-1">Análisis de la presencia de clientes en el territorio nacional por región</p>
         </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportPDF}
+            disabled={!!exporting || loading || isEmpty}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-lg">{exporting === 'pdf' ? 'hourglass_top' : 'picture_as_pdf'}</span>
+            {exporting === 'pdf' ? 'Generando…' : 'PDF'}
+          </button>
+          <button
+            onClick={handleExportExcel}
+            disabled={!!exporting || loading || isEmpty}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-[#F4FAFB] text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-lg">{exporting === 'excel' ? 'hourglass_top' : 'table_view'}</span>
+            {exporting === 'excel' ? 'Generando…' : 'Excel'}
+          </button>
+        </div>
       </header>
 
       {/* CHART */}
-      <section className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+      <section ref={chartRef} className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
         <div className="flex items-center gap-2 mb-1">
           <span className="material-symbols-outlined text-primary">public</span>
           <h3 className="text-lg font-bold font-display text-slate-900">Concentración de Clientes</h3>

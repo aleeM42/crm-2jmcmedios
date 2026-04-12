@@ -50,7 +50,10 @@ export const login = async (req, res, next) => {
       );
       return res.status(423).json({
         success: false,
+        code: 'ACCOUNT_LOCKED',
         error: `Cuenta bloqueada temporalmente. Intente en ${minutosRestantes} minuto(s).`,
+        lockedUntil: user.bloqueado_hasta,
+        minutesRemaining: minutosRestantes,
       });
     }
 
@@ -59,14 +62,24 @@ export const login = async (req, res, next) => {
 
     if (!passwordMatch) {
       const failure = await AuthModel.updateLoginFailure(user.id);
-      const intentosRestantes = 5 - failure.intentos_fallidos;
+      const intentosRestantes = 3 - failure.intentos_fallidos;
+
+      // La cuenta acaba de bloquearse con este intento
+      if (failure.bloqueado_hasta && new Date(failure.bloqueado_hasta) > new Date()) {
+        return res.status(423).json({
+          success: false,
+          code: 'ACCOUNT_LOCKED',
+          error: 'Cuenta bloqueada por demasiados intentos fallidos. Intente en 15 minutos.',
+          lockedUntil: failure.bloqueado_hasta,
+          minutesRemaining: 15,
+        });
+      }
 
       return res.status(401).json({
         success: false,
-        error:
-          intentosRestantes > 0
-            ? `Credenciales inválidas. ${intentosRestantes} intento(s) restante(s).`
-            : 'Cuenta bloqueada por demasiados intentos fallidos.',
+        code: 'INVALID_CREDENTIALS',
+        error: `Credenciales inválidas. ${intentosRestantes} intento(s) restante(s).`,
+        attemptsRemaining: intentosRestantes,
       });
     }
 

@@ -42,7 +42,7 @@ export const updateLoginFailure = async (id) => {
     UPDATE USUARIOS
     SET intentos_fallidos = intentos_fallidos + 1,
         bloqueado_hasta = CASE 
-          WHEN intentos_fallidos + 1 >= 5 
+          WHEN intentos_fallidos + 1 >= 3 
           THEN CURRENT_TIMESTAMP + INTERVAL '15 minutes'
           ELSE bloqueado_hasta 
         END,

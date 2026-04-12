@@ -2158,20 +2158,7 @@ INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, 
 );
 
 
--- 6. Marawaka 103.1 FM → "marawaka 103.1 fm" en regional CSV (Amazonas, Puerto Ayacucho)
-INSERT INTO ALIADOS_COMERCIALES (razon_social, nombre_emisora, rif, frecuencia, categoria, direccion, estado, fk_lugar, fk_ciudad, fk_region, fk_cobertura) VALUES (
-  'MARAWAKA C.A',
-  'Marawaka',
-  'J304882165',
-  '103.1 FM',
-  'multitarget',
-  'Av Andrés Eloy Blanco entre Calle el Río y las Flores Edif. Resd Los Chaguaramos PB Local 1 y 2 Casco Central Higuerote',
-  'activo',
-  (SELECT id FROM LUGAR WHERE nombre = 'Amazonas' AND tipo = 'Estado' LIMIT 1),
-  (SELECT id FROM LUGAR WHERE nombre = 'Puerto Ayacucho' AND tipo = 'Ciudad' LIMIT 1),
-  (SELECT id FROM LUGAR WHERE nombre = 'Guayana' AND tipo = 'Region' LIMIT 1),
-  (SELECT id FROM COBERTURA WHERE descripcion ILIKE 'Puerto Ayacuchp, República de Colombia y Cazuarito%' LIMIT 1)
-);
+
 
 
 -- 10. Solar 101.5 FM → "SOLAR 101.5 FM" en regional CSV (Sucre, Carúpano)

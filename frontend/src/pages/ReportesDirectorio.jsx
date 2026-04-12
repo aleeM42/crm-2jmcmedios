@@ -31,7 +31,7 @@ const CATEGORIES = [
     icon: 'cell_tower',
     color: 'secondary',
     reports: [
-      { name: 'Top 5 Emisoras por Cuñas', desc: 'Las emisoras con mayor frecuencia de transmisión publicitaria.', to: '/reportes/top-emisoras-cunas', icon: 'radio' },
+      { name: 'Top 10 Emisoras por Cuñas', desc: 'Las emisoras con mayor frecuencia de transmisión publicitaria.', to: '/reportes/top-emisoras-cunas', icon: 'radio' },
       { name: 'Emisoras por Región', desc: 'Clasificación de medios radiales según cobertura geográfica.', to: '/reportes/emisoras-region', icon: 'location_on' },
       { name: 'Marcas por Región', desc: 'Impacto de marcas específicas en las diferentes regiones.', to: '/reportes/marcas-region', icon: 'branding_watermark' },
       { name: 'Clientes por Emisora', desc: 'Cartera de anunciantes activa por cada estación de radio.', to: '/reportes/clientes-emisora', icon: 'contacts' },

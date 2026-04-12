@@ -274,8 +274,8 @@ function Dashboard() {
           <div className="flex justify-between items-center mb-6">
             <h4 className="text-lg font-bold font-display text-slate-900">Ingresos Mensuales</h4>
             <select className="bg-slate-50 border-none rounded-lg text-xs font-bold text-slate-500 py-1 pl-2 pr-8 cursor-pointer focus:ring-1 focus:ring-primary">
-              <option>2024</option>
-              <option>2025</option>
+              <option>2026</option>
+              <option>2027</option>
             </select>
           </div>
           <div className="h-[200px] w-full">

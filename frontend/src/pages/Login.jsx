@@ -1,10 +1,9 @@
 // ==============================================
 // Login.jsx — Pantalla de Login CRM Vortice
 // ==============================================
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AlertError from '../components/AlertError.jsx';
-import { resolveErrorMessage } from '../utils/errorMessages.js';
 import { login } from '../services/auth.service.js';
 
 export default function Login() {
@@ -13,10 +12,53 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [errorVariant, setErrorVariant] = useState('error');
   const [loading, setLoading] = useState(false);
+
+  // ── Estado de bloqueo por fuerza bruta ────────────────────
+  const [locked, setLocked] = useState(false);
+  const [lockCountdown, setLockCountdown] = useState('');
+  const lockTimerRef = useRef(null);
+
+  /**
+   * Inicia un countdown visual hasta `lockedUntilISO`.
+   * Cuando expira, limpia el estado de bloqueo automáticamente.
+   */
+  const startLockCountdown = useCallback((lockedUntilISO) => {
+    // Limpiar timer previo
+    if (lockTimerRef.current) clearInterval(lockTimerRef.current);
+
+    const target = new Date(lockedUntilISO).getTime();
+
+    const tick = () => {
+      const diff = target - Date.now();
+      if (diff <= 0) {
+        clearInterval(lockTimerRef.current);
+        lockTimerRef.current = null;
+        setLocked(false);
+        setLockCountdown('');
+        setError('');
+        return;
+      }
+      const mins = Math.floor(diff / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+      setLockCountdown(`${mins}:${secs.toString().padStart(2, '0')}`);
+    };
+
+    tick(); // Ejecutar inmediatamente
+    lockTimerRef.current = setInterval(tick, 1000);
+  }, []);
+
+  // Cleanup del timer al desmontar
+  useEffect(() => {
+    return () => {
+      if (lockTimerRef.current) clearInterval(lockTimerRef.current);
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (locked) return;
     setError('');
     setLoading(true);
 
@@ -31,11 +73,43 @@ export default function Login() {
         }
       }
     } catch (err) {
-      setError(resolveErrorMessage(err, 'auth'));
+      const data = err.data || {};
+      const status = err.status;
+
+      // ── Cuenta bloqueada (423) ──────────────────────────
+      if (status === 423 || data.code === 'ACCOUNT_LOCKED') {
+        setLocked(true);
+        setErrorVariant('warning');
+        setError(data.error || 'Cuenta bloqueada temporalmente. Intente más tarde.');
+        if (data.lockedUntil) {
+          startLockCountdown(data.lockedUntil);
+        }
+        return;
+      }
+
+      // ── Credenciales inválidas con intentos restantes ───
+      if (data.code === 'INVALID_CREDENTIALS') {
+        setErrorVariant('error');
+        setError(data.error || 'Credenciales inválidas.');
+        return;
+      }
+
+      // ── Cuenta suspendida (403) ─────────────────────────
+      if (status === 403) {
+        setErrorVariant('warning');
+        setError(data.error || 'Cuenta suspendida. Contacte al administrador.');
+        return;
+      }
+
+      // ── Cualquier otro error ────────────────────────────
+      setErrorVariant('error');
+      setError(data.error || err.message || 'Error de autenticación. Intente nuevamente.');
     } finally {
       setLoading(false);
     }
   };
+
+  const isDisabled = loading || locked;
 
   return (
     <div className="flex h-screen w-full">
@@ -79,9 +153,25 @@ export default function Login() {
             <p className="text-text-muted font-light">Bienvenido de nuevo al CRM de 2JMC Medios.</p>
           </div>
 
-          {/* Error Alert */}
+          {/* Error / Warning Alert */}
           {error && (
-            <AlertError message={error} onClose={() => setError('')} />
+            <AlertError
+              message={error}
+              variant={errorVariant}
+              onClose={locked ? undefined : () => setError('')}
+            />
+          )}
+
+          {/* Countdown de bloqueo */}
+          {locked && lockCountdown && (
+            <div className="mb-6 flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+              <span className="material-symbols-outlined text-amber-500 text-xl">timer</span>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">Tiempo restante para desbloqueo</p>
+                <p className="text-2xl font-black text-amber-800 font-display tabular-nums">{lockCountdown}</p>
+              </div>
+              <span className="material-symbols-outlined text-amber-400 text-2xl">lock</span>
+            </div>
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
@@ -90,13 +180,14 @@ export default function Login() {
               <label className="block text-text-dark text-sm font-semibold mb-2 font-display">Usuario</label>
               <div className="relative">
                 <input
-                  className="w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display"
+                  className={`w-full h-14 px-4 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display ${isDisabled ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`}
                   placeholder="Nombre de usuario o correo"
                   type="text"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   required
                   autoComplete="username"
+                  disabled={isDisabled}
                 />
               </div>
             </div>
@@ -108,19 +199,21 @@ export default function Login() {
               </div>
               <div className="relative">
                 <input
-                  className="w-full h-14 pl-4 pr-12 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display"
+                  className={`w-full h-14 pl-4 pr-12 bg-background-main border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-text-dark font-display ${isDisabled ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`}
                   placeholder="••••••••••••"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
+                  disabled={isDisabled}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors flex items-center justify-center p-1"
                   tabIndex="-1"
+                  disabled={isDisabled}
                 >
                   <span className="material-symbols-outlined select-none text-xl">
                     {showPassword ? 'visibility_off' : 'visibility'}
@@ -130,19 +223,24 @@ export default function Login() {
             </div>
             {/* Remember Me */}
             <div className="flex items-center">
-              <input className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" id="remember" type="checkbox" />
+              <input className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" id="remember" type="checkbox" disabled={isDisabled} />
               <label className="ml-2 text-sm text-text-muted cursor-pointer" htmlFor="remember">Mantener sesión iniciada</label>
             </div>
             {/* Submit Button */}
             <button
               className="w-full h-14 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed"
               type="submit"
-              disabled={loading}
+              disabled={isDisabled}
             >
               {loading ? (
                 <>
                   <span className="material-symbols-outlined text-xl animate-spin">progress_activity</span>
                   <span>Ingresando...</span>
+                </>
+              ) : locked ? (
+                <>
+                  <span className="material-symbols-outlined text-xl">lock</span>
+                  <span>Cuenta bloqueada</span>
                 </>
               ) : (
                 <>

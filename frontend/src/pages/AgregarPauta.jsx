@@ -643,7 +643,7 @@ export default function AgregarPauta() {
                   value={aliadoId} onChange={(e) => setAliadoId(e.target.value)} required
                   className="w-full h-12 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                   <option value="">Selecciona emisora...</option>
-                  {aliados.map(a => <option key={a.id} value={a.id}>{a.nombre_emisora}</option>)}
+                  {aliados.map(a => <option key={a.id} value={a.id}>{a.nombre_emisora} - {a.frecuencia}</option>)}
                 </select>
               </div>
 
