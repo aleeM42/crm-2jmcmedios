@@ -720,6 +720,232 @@ class ReporteModel {
       emisoras: emisorasRes.rows,
     };
   }
+
+  // 11. Efectividad Vendedores
+  static async getEfectividadVendedores(mes, anio) {
+    let dateFilterVisitas = '';
+    let dateFilterPautas = '';
+    const params = [];
+    
+    if (mes && anio) {
+      dateFilterVisitas = `WHERE EXTRACT(YEAR FROM v.fecha) = $1 AND EXTRACT(MONTH FROM v.fecha) = $2`;
+      dateFilterPautas = `WHERE EXTRACT(YEAR FROM p.fecha_emision) = $1 AND EXTRACT(MONTH FROM p.fecha_emision) = $2`;
+      params.push(parseInt(anio, 10), parseInt(mes, 10));
+    }
+
+    const listQuery = `
+      WITH visitas_cte AS (
+        SELECT 
+          fk_vendedor, 
+          COUNT(id)::INTEGER AS visitas, 
+          SUM(CASE WHEN efectiva = 'si' THEN 1 ELSE 0 END)::INTEGER AS efectivas
+        FROM VISITAS v
+        ${dateFilterVisitas}
+        GROUP BY fk_vendedor
+      ),
+      pautas_cte AS (
+        SELECT fk_vendedor, COALESCE(SUM(monto_oc), 0) AS monto_total
+        FROM PAUTAS p
+        ${dateFilterPautas}
+        GROUP BY fk_vendedor
+      )
+      SELECT 
+        u.id as usuario_id,
+        u.primer_nombre || ' ' || u.primer_apellido AS nombre,
+        COALESCE(vc.visitas, 0) AS visitas,
+        COALESCE(vc.efectivas, 0) AS efectivas,
+        COALESCE(v_vendedor.meta, 0) AS meta,
+        COALESCE(pc.monto_total, 0) AS cumplido
+      FROM USUARIOS u
+      JOIN VENDEDORES v_vendedor ON u.id = v_vendedor.usuario_id
+      LEFT JOIN visitas_cte vc ON vc.fk_vendedor = u.id
+      LEFT JOIN pautas_cte pc ON pc.fk_vendedor = u.id
+      ORDER BY efectivas DESC, visitas DESC
+    `;
+
+    const aniosQuery = `
+      SELECT DISTINCT EXTRACT(YEAR FROM fecha)::INTEGER AS anio 
+      FROM VISITAS 
+      UNION 
+      SELECT DISTINCT EXTRACT(YEAR FROM fecha_emision)::INTEGER AS anio 
+      FROM PAUTAS 
+      ORDER BY anio DESC
+    `;
+
+    const [listRes, aniosRes] = await Promise.all([
+      pool.query(listQuery, params),
+      pool.query(aniosQuery)
+    ]);
+
+    const listData = listRes.rows.map(r => {
+      const pct = r.visitas > 0 ? (r.efectivas / r.visitas) * 100 : 0;
+      return {
+        ...r,
+        pct: parseFloat(pct.toFixed(1)),
+        cumplido: parseFloat(r.cumplido)
+      };
+    });
+
+    return {
+      listData,
+      aniosDisponibles: aniosRes.rows.map(r => r.anio)
+    };
+  }
+
+  // 12. Gastos por Vendedor
+  static async getGastosDetalleVendedor(mes, anio) {
+    let dateFilter = '';
+    const params = [];
+    
+    if (mes && anio) {
+      dateFilter = `WHERE EXTRACT(YEAR FROM gv.fecha) = $1 AND EXTRACT(MONTH FROM gv.fecha) = $2`;
+      params.push(parseInt(anio, 10), parseInt(mes, 10));
+    }
+
+    const listQuery = `
+      SELECT 
+        gv.fecha,
+        u.primer_nombre || ' ' || u.primer_apellido AS vendedor,
+        gv.concepto,
+        gv.categoria,
+        gv.monto,
+        c.nombre AS cliente
+      FROM GASTOS_VISITAS gv
+      JOIN VISITAS v ON gv.fk_visita = v.id
+      JOIN USUARIOS u ON v.fk_vendedor = u.id
+      LEFT JOIN CONTACTOS co ON v.fk_contacto = co.id
+      LEFT JOIN CLIENTE c ON co.fk_cliente = c.id
+      ${dateFilter}
+      ORDER BY gv.fecha DESC
+    `;
+
+    // Metricas de torta: agrupados por categoria
+    const chartQuery = `
+      SELECT gv.categoria, SUM(gv.monto)::NUMERIC as total
+      FROM GASTOS_VISITAS gv
+      ${dateFilter}
+      GROUP BY gv.categoria
+      ORDER BY total DESC
+    `;
+
+    const aniosQuery = `
+      SELECT DISTINCT EXTRACT(YEAR FROM fecha)::INTEGER AS anio
+      FROM GASTOS_VISITAS
+      ORDER BY anio DESC
+    `;
+
+    const [listRes, chartRes, aniosRes] = await Promise.all([
+      pool.query(listQuery, params),
+      pool.query(chartQuery, params),
+      pool.query(aniosQuery)
+    ]);
+
+    const totalGastos = chartRes.rows.reduce((sum, r) => sum + parseFloat(r.total), 0);
+    const chartData = chartRes.rows.map(r => ({
+      nombre: r.categoria,
+      total: parseFloat(r.total),
+      pct: totalGastos > 0 ? Math.round((parseFloat(r.total) / totalGastos) * 100) : 0
+    }));
+
+    return {
+      listData: listRes.rows.map(r => ({ ...r, monto: parseFloat(r.monto) })),
+      chartData,
+      totalGastos,
+      aniosDisponibles: aniosRes.rows.map(r => r.anio)
+    };
+  }
+
+  // ----------------------------------------------------
+  // Emisoras Activas vs Inactivas por Región
+  // ----------------------------------------------------
+  static async getEmisorasActivasRegion() {
+    const query = `
+      SELECT 
+        l.nombre AS region,
+        COUNT(CASE WHEN ac.estado = 'activo' THEN 1 END)::int as activas,
+        COUNT(CASE WHEN ac.estado IN ('inactivo', 'cerrado') THEN 1 END)::int as inactivas,
+        COUNT(ac.id)::int as total
+      FROM LUGAR l
+      RIGHT JOIN ALIADOS_COMERCIALES ac ON ac.fk_region = l.id
+      WHERE l.tipo = 'region' OR ac.fk_region IS NOT NULL
+      GROUP BY l.nombre
+      ORDER BY total DESC;
+    `;
+    const { rows } = await pool.query(query);
+
+    const listData = rows.map(r => {
+      const pct = r.total > 0 ? parseFloat(((r.activas / r.total) * 100).toFixed(1)) : 0;
+      return {
+        nombre: r.region || 'Desconocida',
+        activas: r.activas,
+        inactivas: r.inactivas,
+        total: r.total,
+        pct
+      };
+    });
+
+    return { listData };
+  }
+
+  // ----------------------------------------------------
+  // Top 10 Emisoras por Clientes
+  // ----------------------------------------------------
+  static async getTopEmisorasClientes(mes, anio) {
+    let filterPauta1 = ""; let paramsPauta1 = [];
+
+    let paramCont = 1;
+    if (anio) {
+      filterPauta1 += ` AND EXTRACT(YEAR FROM p.fecha_emision) = $${paramCont}`;
+      paramsPauta1.push(anio);
+      paramCont++;
+    }
+    if (mes) {
+      filterPauta1 += ` AND EXTRACT(MONTH FROM p.fecha_emision) = $${paramCont}`;
+      paramsPauta1.push(mes);
+      paramCont++;
+    }
+
+    const query = `
+      SELECT 
+        ac.nombre_emisora AS nombre,
+        l.nombre AS region,
+        COUNT(DISTINCT p.fk_cliente)::int AS clientes,
+        COUNT(DISTINCT p.id)::int AS pautas,
+        COALESCE(SUM(p.monto_oc), 0)::numeric AS monto
+      FROM ALIADOS_COMERCIALES ac
+      LEFT JOIN LUGAR l ON ac.fk_region = l.id
+      JOIN DETALLE_PAUTA dp ON ac.id = dp.fk_aliado
+      JOIN PAUTAS p ON dp.fk_pauta = p.id ${filterPauta1}
+      GROUP BY ac.id, ac.nombre_emisora, l.nombre
+      ORDER BY clientes DESC, monto DESC
+      LIMIT 10;
+    `;
+    
+    // Y para años sacar el distinct anios
+    const queryAnios = `SELECT DISTINCT EXTRACT(YEAR FROM fecha_emision)::int as anio FROM PAUTAS ORDER BY anio DESC`;
+    
+    const [resTop, resAnios] = await Promise.all([
+      pool.query(query, paramsPauta1),
+      pool.query(queryAnios)
+    ]);
+    
+    // Necesitamos el PCT (Porcentaje relativo al primer lugar)
+    const maxClientes = resTop.rows.length > 0 ? resTop.rows[0].clientes : 0;
+
+    const listData = resTop.rows.map(r => ({
+      nombre: r.nombre,
+      clientes: r.clientes,
+      pautas: r.pautas,
+      monto: parseFloat(r.monto),
+      region: r.region || '—',
+      pct: maxClientes > 0 ? parseFloat(((r.clientes / maxClientes) * 100).toFixed(0)) : 0
+    }));
+
+    return {
+      listData,
+      aniosDisponibles: resAnios.rows.map(r => r.anio)
+    };
+  }
 }
 
 export default ReporteModel;

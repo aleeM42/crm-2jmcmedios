@@ -54,6 +54,25 @@ class ReporteController {
           data = await ReporteModel.getClientesEmisora(emisoraId || null);
           break;
         }
+        case 'efectividad-vendedores': {
+          const { mes, anio } = req.query;
+          data = await ReporteModel.getEfectividadVendedores(mes, anio);
+          break;
+        }
+        case 'gastos-detalle-vendedor': {
+          const { mes, anio } = req.query;
+          data = await ReporteModel.getGastosDetalleVendedor(mes, anio);
+          break;
+        }
+        case 'emisoras-activas-region': {
+          data = await ReporteModel.getEmisorasActivasRegion();
+          break;
+        }
+        case 'top-emisoras-clientes': {
+          const { mes, anio } = req.query;
+          data = await ReporteModel.getTopEmisorasClientes(mes, anio);
+          break;
+        }
         default:
           return res.status(404).json({
             success: false,
