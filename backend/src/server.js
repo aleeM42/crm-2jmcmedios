@@ -39,8 +39,14 @@ const PORT = process.env.PORT || 3001;
 app.use(helmet());
 
 // ---- CORS ----
+// En producción, CORS_ORIGIN debe ser el dominio de Cloudflare (ej: https://crm.tudominio.com)
+// En desarrollo, usa los valores por defecto de localhost
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+  : ['http://localhost:5173', 'http://127.0.0.1:5173'];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: allowedOrigins,
   credentials: true,
 }));
 

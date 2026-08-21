@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   db:
@@ -47,10 +46,11 @@ services:
     container_name: crm-2jmcmedios-prod-backend
     restart: always
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-crm2jmc_root_2024}@db:5432/${POSTGRES_DB:-crm_2jmc}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-crm_2jmc}
       PORT: 3001
-      JWT_SECRET: ${JWT_SECRET:-SuperSecretKeyPara2jmcMediosCRM}
+      JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
+      CORS_ORIGIN: ${CORS_ORIGIN}
     # No exponemos el 3001 al host por seguridad, Nginx se encarga de la comunicación interna
     depends_on:
       db:
@@ -69,7 +69,14 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: crm-2jmcmedios-prod-tunnel
     restart: always
-    command: tunnel --no-autoupdate --protocol http2 run --token eyJhIjoiMmM0ZTZhNWZkMzk5YjQ0NmM1NWI1NDI0ZTFlNDU0MTkiLCJ0IjoiOWVlZjk1ZjEtMWNlOS00NWEyLTlkYmEtNzY3NzdhNjBjYmYwIiwicyI6Ik1tSmxObVppTWpBdE5tWXpOQzAwT1dGbExXRmxOakV0TldKaU9ERXhZakEzTURndyJ9
+    # El token se lee desde .env.prod — nunca hardcodear en este archivo
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    healthcheck:
+      test: ["CMD", "cloudflared", "tunnel", "info"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
     depends_on:
       - frontend
 
