@@ -260,14 +260,17 @@ Create table VISITAS(
     detalle VARCHAR(100),
 	lugar VARCHAR(100) NOT NULL,
 	archivo_adjunto TEXT,
-	fk_contacto INTEGER NOT NULL,
+	fk_contacto INTEGER,          -- Nullable: NULL cuando la visita es a un prospecto
+	fk_oportunidad INTEGER,        -- Nullable: NULL cuando la visita es a un cliente/aliado
 	fk_vendedor UUID NOT NULL,
-	
-    -- Constraints 
+
+    -- Constraints
 	CONSTRAINT check_efectiva CHECK (efectiva 	IN ('si', 'no')),
 	CONSTRAINT check_tipo CHECK (tipo 	IN ('llamada', 'presencial')),
 	CONSTRAINT fk_vendedor  FOREIGN KEY (fk_vendedor) references vendedores(usuario_id) ON DELETE RESTRICT,
-	CONSTRAINT fk_contacto FOREIGN KEY (fk_contacto) references CONTACTOS(id) ON DELETE CASCADE	
+	CONSTRAINT fk_contacto FOREIGN KEY (fk_contacto) references CONTACTOS(id) ON DELETE CASCADE,
+	CONSTRAINT fk_visita_oportunidad FOREIGN KEY (fk_oportunidad) REFERENCES oportunidades(id) ON DELETE SET NULL,
+	CONSTRAINT chk_visita_destino CHECK (fk_contacto IS NOT NULL OR fk_oportunidad IS NOT NULL)
 );
 
 Create table GASTOS_VISITAS (
@@ -382,7 +385,7 @@ CREATE TABLE OPORTUNIDADES (
     descripcion TEXT,                         -- Notas adicionales del vendedor
     monto_estimado NUMERIC(15, 2) DEFAULT 0,  -- Cuánto dinero se espera ganar
     estado VARCHAR(50) NOT NULL DEFAULT 'Contacto inicial', -- La columna en la que está la tarjeta
-    fk_usuario UUID NOT NULL,              -- ¡CLAVE! El vendedor dueño de este lead
+    fk_usuario UUID NOT NULL,              
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 

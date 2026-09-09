@@ -157,7 +157,7 @@ export default function Pipeline() {
               onClick={() => openCreateModal()}
               className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-sm flex-1 sm:flex-initial"
             >
-              <span className="material-symbols-outlined text-lg">add</span>Nuevo Lead
+              <span className="material-symbols-outlined text-lg">add</span>Nuevo Prospecto
             </button>
           )}
         </div>

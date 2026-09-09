@@ -12,6 +12,7 @@ import {
   getVendedores,
   getContactosByCliente,
   getContactosByAliado,
+  getOportunidades,
 } from '../services/visita.service.js';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
 import { getCurrentUser } from '../services/auth.service.js';
@@ -34,17 +35,19 @@ export default function AgregarVisita() {
     detalle: '',
   });
 
-  // Visitado: Cliente o Aliado → luego seleccionar Contacto
+  // Visitado: Cliente, Aliado o Prospecto
   const [tipoVisitado, setTipoVisitado] = useState('');
   const [selectedEntity, setSelectedEntity] = useState('');   // id del cliente o aliado
   const [fkContacto, setFkContacto] = useState('');           // id del contacto
   const [fkVendedor, setFkVendedor] = useState('');            // UUID vendedor
+  const [fkOportunidad, setFkOportunidad] = useState('');      // id del prospecto
 
   // --- Lookups ---
   const [clientes, setClientes] = useState([]);
   const [aliados, setAliados] = useState([]);
   const [vendedores, setVendedores] = useState([]);
   const [contactos, setContactos] = useState([]);
+  const [oportunidades, setOportunidades] = useState([]);
 
   // --- Gastos inline (GASTOS_VISITAS) ---
   const [gastos, setGastos] = useState([]);
@@ -59,10 +62,11 @@ export default function AgregarVisita() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [cliRes, aliRes, venRes] = await Promise.all([
+        const [cliRes, aliRes, venRes, opRes] = await Promise.all([
           getClientes().catch(() => ({ success: false })),
           getAliados().catch(() => ({ success: false })),
           getVendedores().catch(() => ({ success: false })),
+          getOportunidades().catch(() => ({ success: false })),
         ]);
         if (cliRes.success) {
           const d = cliRes.data;
@@ -76,10 +80,13 @@ export default function AgregarVisita() {
           const d = venRes.data;
           const lista = Array.isArray(d) ? d : (d?.vendedores || []);
           setVendedores(lista);
-          // Si es Vendedor, preseleccionar su propio ID
           if (isVendedor && currentUser?.id) {
             setFkVendedor(currentUser.id);
           }
+        }
+        if (opRes.success) {
+          const d = opRes.data;
+          setOportunidades(Array.isArray(d) ? d : (d?.oportunidades || []));
         }
       } catch { /* silently handle */ }
     };
@@ -88,6 +95,7 @@ export default function AgregarVisita() {
 
   // Cargar contactos cuando cambia cliente/aliado seleccionado
   useEffect(() => {
+    if (tipoVisitado === 'prospecto') { setContactos([]); setFkContacto(''); return; }
     if (!selectedEntity) { setContactos([]); setFkContacto(''); return; }
     const loadContactos = async () => {
       try {
@@ -132,8 +140,9 @@ export default function AgregarVisita() {
       // 1. Crear la visita
       const visitaPayload = {
         ...formData,
-        fk_contacto: parseInt(fkContacto, 10),
-        fk_vendedor: fkVendedor || undefined, // backend usará req.user.id si undefined
+        fk_contacto: tipoVisitado === 'prospecto' ? null : parseInt(fkContacto, 10),
+        fk_oportunidad: tipoVisitado === 'prospecto' ? parseInt(fkOportunidad, 10) : null,
+        fk_vendedor: fkVendedor || undefined,
       };
 
       const visitaRes = await crearVisita(visitaPayload);
@@ -247,17 +256,40 @@ export default function AgregarVisita() {
               {/* Visitado: radio */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Visitado<span className="text-red-500 ml-0.5">*</span></label>
-                <div className="flex items-center gap-4">
-                  <label className="flex items-center gap-2 p-3 px-6 rounded-lg border border-slate-200 cursor-pointer hover:border-primary transition-colors">
-                    <input type="radio" name="tipo_visitado" value="cliente" checked={tipoVisitado === 'cliente'} onChange={(e) => { setTipoVisitado(e.target.value); setSelectedEntity(''); setFkContacto(''); }} className="text-primary focus:ring-primary" />
+                <div className="flex items-center gap-3 flex-wrap">
+                  <label className="flex items-center gap-2 p-3 px-5 rounded-lg border border-slate-200 cursor-pointer hover:border-primary transition-colors">
+                    <input type="radio" name="tipo_visitado" value="cliente" checked={tipoVisitado === 'cliente'} onChange={(e) => { setTipoVisitado(e.target.value); setSelectedEntity(''); setFkContacto(''); setFkOportunidad(''); }} className="text-primary focus:ring-primary" />
                     <span className="text-sm font-medium text-slate-700">Cliente</span>
                   </label>
-                  <label className="flex items-center gap-2 p-3 px-6 rounded-lg border border-slate-200 cursor-pointer hover:border-primary transition-colors">
-                    <input type="radio" name="tipo_visitado" value="aliado" checked={tipoVisitado === 'aliado'} onChange={(e) => { setTipoVisitado(e.target.value); setSelectedEntity(''); setFkContacto(''); }} className="text-primary focus:ring-primary" />
+                  <label className="flex items-center gap-2 p-3 px-5 rounded-lg border border-slate-200 cursor-pointer hover:border-primary transition-colors">
+                    <input type="radio" name="tipo_visitado" value="aliado" checked={tipoVisitado === 'aliado'} onChange={(e) => { setTipoVisitado(e.target.value); setSelectedEntity(''); setFkContacto(''); setFkOportunidad(''); }} className="text-primary focus:ring-primary" />
                     <span className="text-sm font-medium text-slate-700">Aliado Comercial</span>
+                  </label>
+                  <label className="flex items-center gap-2 p-3 px-5 rounded-lg border border-slate-200 cursor-pointer hover:border-primary transition-colors">
+                    <input type="radio" name="tipo_visitado" value="prospecto" checked={tipoVisitado === 'prospecto'} onChange={(e) => { setTipoVisitado(e.target.value); setSelectedEntity(''); setFkContacto(''); setFkOportunidad(''); }} className="text-primary focus:ring-primary" />
+                    <span className="text-sm font-medium text-slate-700">Prospecto</span>
                   </label>
                 </div>
               </div>
+
+              {/* Select Prospecto si tipo = prospecto */}
+              {tipoVisitado === 'prospecto' && (
+                <div className="col-span-2">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Prospecto<span className="text-red-500 ml-0.5">*</span></label>
+                  <select
+                    value={fkOportunidad}
+                    onChange={(e) => setFkOportunidad(e.target.value)}
+                    className="w-full h-12 px-4 bg-[#F4FAFB] border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  >
+                    <option value="">Seleccionar prospecto...</option>
+                    {oportunidades.map((op) => (
+                      <option key={op.id} value={op.id}>
+                        {op.nombre_cliente} — {op.estado}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* Select Cliente o Aliado */}
               {tipoVisitado === 'cliente' && (

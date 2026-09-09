@@ -24,13 +24,16 @@ export const findAll = async (vendedorId = null) => {
            c.nombre AS cliente_nombre,
            ac.nombre_emisora AS aliado_nombre,
            u.primer_nombre AS vendedor_nombre,
-           u.primer_apellido AS vendedor_apellido
+           u.primer_apellido AS vendedor_apellido,
+           op.nombre_cliente AS prospecto_nombre,
+           op.estado AS prospecto_estado
     FROM VISITAS v
     LEFT JOIN CONTACTOS ct ON v.fk_contacto = ct.id
     LEFT JOIN CLIENTE c ON ct.fk_cliente = c.id
     LEFT JOIN A_CONTACT ac_link ON ct.id = ac_link.fk_contacto
     LEFT JOIN ALIADOS_COMERCIALES ac ON ac_link.fk_a_c = ac.id
     LEFT JOIN USUARIOS u ON v.fk_vendedor = u.id
+    LEFT JOIN OPORTUNIDADES op ON v.fk_oportunidad = op.id
     ${where}
     ORDER BY v.fecha DESC, v.hora DESC
   `;
@@ -59,13 +62,16 @@ export const findById = async (id, vendedorId = null) => {
            c.nombre AS cliente_nombre,
            ac.nombre_emisora AS aliado_nombre,
            u.primer_nombre AS vendedor_nombre,
-           u.primer_apellido AS vendedor_apellido
+           u.primer_apellido AS vendedor_apellido,
+           op.nombre_cliente AS prospecto_nombre,
+           op.estado AS prospecto_estado
     FROM VISITAS v
     LEFT JOIN CONTACTOS ct ON v.fk_contacto = ct.id
     LEFT JOIN CLIENTE c ON ct.fk_cliente = c.id
     LEFT JOIN A_CONTACT ac_link ON ct.id = ac_link.fk_contacto
     LEFT JOIN ALIADOS_COMERCIALES ac ON ac_link.fk_a_c = ac.id
     LEFT JOIN USUARIOS u ON v.fk_vendedor = u.id
+    LEFT JOIN OPORTUNIDADES op ON v.fk_oportunidad = op.id
     ${where}
   `;
   const result = await pool.query(query, params);
@@ -81,12 +87,15 @@ export const findByVendedorId = async (vendedorId) => {
            ct.pri_nombre AS contacto_nombre,
            ct.pri_apellido AS contacto_apellido,
            c.nombre AS cliente_nombre,
-           ac.nombre_emisora AS aliado_nombre
+           ac.nombre_emisora AS aliado_nombre,
+           op.nombre_cliente AS prospecto_nombre,
+           op.estado AS prospecto_estado
     FROM VISITAS v
     LEFT JOIN CONTACTOS ct ON v.fk_contacto = ct.id
     LEFT JOIN CLIENTE c ON ct.fk_cliente = c.id
     LEFT JOIN A_CONTACT ac_link ON ct.id = ac_link.fk_contacto
     LEFT JOIN ALIADOS_COMERCIALES ac ON ac_link.fk_a_c = ac.id
+    LEFT JOIN OPORTUNIDADES op ON v.fk_oportunidad = op.id
     WHERE v.fk_vendedor = $1
     ORDER BY v.fecha DESC, v.hora DESC
   `;
@@ -98,13 +107,13 @@ export const findByVendedorId = async (vendedorId) => {
  * Crea una visita.
  */
 export const create = async (data) => {
-  const { fecha, hora, objetivo_visita, efectiva, tipo, detalle, lugar, fk_contacto, fk_vendedor } = data;
+  const { fecha, hora, objetivo_visita, efectiva, tipo, detalle, lugar, fk_contacto, fk_vendedor, fk_oportunidad } = data;
   const query = `
-    INSERT INTO VISITAS (fecha, hora, objetivo_visita, efectiva, tipo, detalle, lugar, fk_contacto, fk_vendedor)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    INSERT INTO VISITAS (fecha, hora, objetivo_visita, efectiva, tipo, detalle, lugar, fk_contacto, fk_oportunidad, fk_vendedor)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING *
   `;
-  const values = [fecha, hora, objetivo_visita, efectiva, tipo, detalle || null, lugar, fk_contacto, fk_vendedor];
+  const values = [fecha, hora, objetivo_visita, efectiva, tipo, detalle || null, lugar, fk_contacto || null, fk_oportunidad || null, fk_vendedor];
   const result = await pool.query(query, values);
   return result.rows[0];
 };
@@ -116,10 +125,10 @@ export const create = async (data) => {
  * @param {string|null} vendedorId - RBAC: si no es null, solo puede editar sus propias visitas
  */
 export const update = async (id, data, vendedorId = null) => {
-  const { fecha, hora, objetivo_visita, efectiva, tipo, detalle, lugar, fk_contacto } = data;
+  const { fecha, hora, objetivo_visita, efectiva, tipo, detalle, lugar, fk_contacto, fk_oportunidad } = data;
 
-  let where = 'WHERE id = $9';
-  const values = [fecha, hora, objetivo_visita, efectiva, tipo, detalle, lugar, fk_contacto, id];
+  let where = 'WHERE id = $10';
+  const values = [fecha, hora, objetivo_visita, efectiva, tipo, detalle, lugar, fk_contacto || null, fk_oportunidad || null, id];
 
   if (vendedorId) {
     where += ` AND fk_vendedor = $${values.length + 1}`;
@@ -135,7 +144,8 @@ export const update = async (id, data, vendedorId = null) => {
         tipo = COALESCE($5, tipo),
         detalle = COALESCE($6, detalle),
         lugar = COALESCE($7, lugar),
-        fk_contacto = COALESCE($8, fk_contacto)
+        fk_contacto = $8,
+        fk_oportunidad = $9
     ${where}
     RETURNING *
   `;

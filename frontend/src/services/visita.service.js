@@ -30,3 +30,6 @@ export const modificarVisita = async (id, data) => api.put(`/visitas/${id}`, dat
 
 /** Elimina una visita existente. */
 export const eliminarVisita = async (id) => api.delete(`/visitas/${id}`);
+
+/** Lista de prospectos (oportunidades) activos para el selector del formulario de visita. */
+export const getOportunidades = async () => api.get('/oportunidades');

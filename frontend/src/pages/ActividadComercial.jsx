@@ -138,7 +138,7 @@ function ActividadComercial() {
       'Fecha':    v.fecha?.slice(0, 10) ?? '',
       'Hora':     v.hora?.slice(0, 5)  ?? '',
       'Vendedor': `${v.vendedor_nombre ?? ''} ${v.vendedor_apellido ?? ''}`.trim(),
-      'Visitado': v.cliente_nombre || v.aliado_nombre || '—',
+      'Visitado': v.prospecto_nombre ? `${v.prospecto_nombre} (Prospecto)` : (v.cliente_nombre || v.aliado_nombre || '—'),
       'Tipo':     v.tipo ?? '',
       'Objetivo': v.objetivo_visita ?? '',
       'Efectiva': v.efectiva === 'si' ? 'Sí' : 'No',
@@ -347,12 +347,22 @@ function ActividadComercial() {
                         <td className="px-6 py-4 text-sm text-slate-500 whitespace-nowrap">{v.hora?.slice(0, 5)}</td>
                         <td className="px-6 py-4 text-sm font-medium text-slate-900 whitespace-nowrap">{v.vendedor_nombre} {v.vendedor_apellido}</td>
                         <td className="px-6 py-4 text-sm text-slate-700 whitespace-nowrap">
-                          {v.cliente_nombre || v.aliado_nombre || '—'}
-                          {v.aliado_nombre ? (
-                            <span className="ml-2 px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded text-[9px] uppercase tracking-wider font-bold">Aliado</span>
+                          {v.prospecto_nombre ? (
+                            <>
+                              {v.prospecto_nombre}
+                              <span className="ml-2 px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 rounded text-[9px] uppercase tracking-wider font-bold">Prospecto</span>
+                            </>
+                          ) : v.aliado_nombre ? (
+                            <>
+                              {v.aliado_nombre}
+                              <span className="ml-2 px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded text-[9px] uppercase tracking-wider font-bold">Aliado</span>
+                            </>
                           ) : v.cliente_nombre ? (
-                            <span className="ml-2 px-2 py-0.5 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded text-[9px] uppercase tracking-wider font-bold">Cliente</span>
-                          ) : null}
+                            <>
+                              {v.cliente_nombre}
+                              <span className="ml-2 px-2 py-0.5 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded text-[9px] uppercase tracking-wider font-bold">Cliente</span>
+                            </>
+                          ) : '—'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`${tipoClass} px-3 py-1 rounded-full text-[11px] font-bold uppercase`}>{v.tipo}</span>

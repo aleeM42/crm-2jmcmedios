@@ -40,12 +40,19 @@ export const getById = async (req, res, next) => {
  */
 export const create = async (req, res, next) => {
   try {
-    const { fecha, hora, objetivo_visita, efectiva, tipo, lugar, fk_contacto, fk_vendedor } = req.body;
+    const { fecha, objetivo_visita, fk_contacto, fk_vendedor, fk_oportunidad } = req.body;
 
-    if (!fecha || !objetivo_visita || !fk_contacto || !fk_vendedor) {
+    if (!fecha || !objetivo_visita || !fk_vendedor) {
       return res.status(400).json({
         success: false,
-        error: 'fecha, objetivo_visita, fk_contacto y fk_vendedor son obligatorios',
+        error: 'fecha, objetivo_visita y fk_vendedor son obligatorios',
+      });
+    }
+
+    if (!fk_contacto && !fk_oportunidad) {
+      return res.status(400).json({
+        success: false,
+        error: 'Debes especificar un contacto (fk_contacto) o un prospecto (fk_oportunidad)',
       });
     }
 
