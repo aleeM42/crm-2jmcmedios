@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { getCurrentUser } from '../services/auth.service.js';
 import { toast } from 'sonner';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
 
@@ -21,6 +22,8 @@ const DIAS_SEMANA = [
 
 export default function AgregarPauta() {
   const navigate = useNavigate();
+  const currentUser = getCurrentUser();
+  const isVendedor = currentUser?.rol === 'Vendedor';
 
   // Estados de carga y listas de opciones
   const [loading, setLoading] = useState(true);
@@ -32,7 +35,11 @@ export default function AgregarPauta() {
 
   // Datos generales
   const [clienteId, setClienteId] = useState('');
-  const [vendedorId, setVendedorId] = useState('');
+  // Si el usuario es vendedor, se pre-asigna como vendedor de la pauta
+  const [vendedorId, setVendedorId] = useState(() => {
+    const u = getCurrentUser();
+    return u?.rol === 'Vendedor' ? u.id.toString() : '';
+  });
   const [tipoCompra, setTipoCompra] = useState('');
   const [estado, setEstado] = useState('programada');
   const [marca, setMarca] = useState('');
@@ -134,13 +141,17 @@ export default function AgregarPauta() {
     setMarcas([]);
 
     if (!newClienteId) {
-      setVendedorId('');
+      // Si es vendedor, mantiene su propio ID; si no, limpiar
+      if (!isVendedor) setVendedorId('');
       return;
     }
 
     const clienteObj = clientes.find((c) => c.id.toString() === newClienteId);
     if (clienteObj?.fk_vendedor) {
       setVendedorId(clienteObj.fk_vendedor.toString());
+    } else if (isVendedor) {
+      // El vendedor se auto-asigna si el cliente no tiene vendedor asignado
+      setVendedorId(currentUser.id.toString());
     } else {
       setVendedorId('');
     }
@@ -253,6 +264,11 @@ export default function AgregarPauta() {
 
     if (diasSeleccionados.length === 0) {
       toast.error('Debe seleccionar al menos un día de la semana.');
+      return;
+    }
+
+    if (!vendedorId) {
+      toast.error('No se pudo asignar un vendedor. Seleccione un cliente con vendedor asignado.');
       return;
     }
 
