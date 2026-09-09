@@ -544,6 +544,7 @@ export default function AgregarCliente() {
                       <label className="text-[10px] font-bold text-slate-500 uppercase">Cód. Área</label>
                       <select value={tel.codigo_area} onChange={(e) => handleTelefono(i, 'codigo_area', e.target.value)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary">
                         <option value="">—</option>
+                        <option value="0212">0212</option>
                         <option value="0412">0412</option>
                         <option value="0422">0422</option>
                         <option value="0414">0414</option>

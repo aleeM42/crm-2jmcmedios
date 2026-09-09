@@ -23,6 +23,11 @@ export default function ProtectedRoute({ children, allowedRoles }) {
       return children;
     }
 
+    // Regla Especial: adrianaS2jmc puede agregar pautas (accede a rutas de Gestor de Pautas)
+    if (user?.nombre_usuario === 'adrianaS2jmc' && allowedRoles.includes('Gestor de Pautas')) {
+      return children;
+    }
+
     if (!allowedRoles.includes(rol)) {
       // Regla Global Extraídas del Backend: Invitado y Vendedor tienen lectura global de vistas autorizadas
       // Pero si se les protege específicamente para prohibir lectura (ej. Pantallas de Admin exclusivas)

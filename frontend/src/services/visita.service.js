@@ -11,7 +11,7 @@ export const crearVisita = async (data) => api.post('/visitas', data);
 export const crearGastoVisita = async (data) => api.post('/gastos', data);
 
 /** Lista clientes para select. */
-export const getClientes = async () => api.get('/clientes');
+export const getClientes = async () => api.get('/clientes?limit=1000');
 
 /** Lista aliados comerciales para select. */
 export const getAliados = async () => api.get('/aliados');

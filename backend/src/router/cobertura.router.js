@@ -9,5 +9,6 @@ import authenticate from '../middleware/authenticate.js';
 const router = Router();
 
 router.get('/', authenticate, CoberturaCtrl.getAll);
+router.post('/', authenticate, CoberturaCtrl.create);
 
 export default router;

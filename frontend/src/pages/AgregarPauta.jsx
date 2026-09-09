@@ -68,7 +68,7 @@ export default function AgregarPauta() {
     const fetchData = async () => {
       try {
         const [resClientes, resVendedores, resAliados] = await Promise.all([
-          api.get('/clientes'),
+          api.get('/clientes?limit=1000'),
           api.get('/vendedores'),
           api.get('/aliados')
         ]);

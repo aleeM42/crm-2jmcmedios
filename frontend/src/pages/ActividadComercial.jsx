@@ -50,7 +50,7 @@ function ActividadComercial() {
           api.get('/gastos').catch(() => ({ success: false })),
           api.get('/gastos-marketing').catch(() => ({ success: false })),
           api.get('/vendedores').catch(() => ({ success: false })),
-          api.get('/clientes').catch(() => ({ success: false })),
+          api.get('/clientes?limit=1000').catch(() => ({ success: false })),
         ]);
 
         if (visRes.success) setVisitas(Array.isArray(visRes.data) ? visRes.data : []);

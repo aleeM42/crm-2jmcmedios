@@ -16,7 +16,7 @@ export const crearGastoMarketing = async (data) => {
  * Lista clientes para el select.
  */
 export const getClientes = async () => {
-  return api.get('/clientes');
+  return api.get('/clientes?limit=1000');
 };
 
 /**

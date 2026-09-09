@@ -8,12 +8,12 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD:-crm2jmc_root_2024}
       POSTGRES_DB: crm_2jmc
     ports:
-      - "5433:5432"
+      - "5435:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d crm_2jmc"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d crm_2jmc" ]
       interval: 10s
       timeout: 5s
       retries: 5

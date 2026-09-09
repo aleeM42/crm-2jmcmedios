@@ -13,3 +13,13 @@ export const findAllCoberturas = async () => {
   const result = await pool.query(query);
   return result.rows;
 };
+
+export const createCobertura = async (descripcion, fkLugar) => {
+  const query = `
+    INSERT INTO COBERTURA (descripcion, fk_lugar)
+    VALUES ($1, $2)
+    RETURNING *
+  `;
+  const result = await pool.query(query, [descripcion.trim(), fkLugar]);
+  return result.rows[0];
+};

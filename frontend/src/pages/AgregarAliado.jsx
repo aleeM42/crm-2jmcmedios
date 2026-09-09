@@ -104,6 +104,12 @@ function AgregarAliado() {
   const [coberturas, setCoberturas] = useState([]);
   const [categorias, setCategorias] = useState(CATEGORIAS_DEFAULT);
 
+  // Estado para agregar cobertura manualmente
+  const [selectedCoberturaId, setSelectedCoberturaId] = useState('');
+  const [showCoberturaInput, setShowCoberturaInput] = useState(false);
+  const [nuevaCobertura, setNuevaCobertura] = useState('');
+  const [savingCobertura, setSavingCobertura] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -235,6 +241,28 @@ function AgregarAliado() {
     }
   };
 
+  const handleGuardarCobertura = async () => {
+    if (!nuevaCobertura.trim()) return;
+    if (!selectedEstado) return;
+    setSavingCobertura(true);
+    try {
+      const res = await api.post('/coberturas', {
+        descripcion: nuevaCobertura.trim(),
+        fk_lugar: parseInt(selectedEstado, 10),
+      });
+      if (res.success) {
+        setCoberturas(prev => [...prev, res.data]);
+        setSelectedCoberturaId(String(res.data.id));
+        setNuevaCobertura('');
+        setShowCoberturaInput(false);
+      }
+    } catch (err) {
+      console.error('Error al guardar cobertura:', err);
+    } finally {
+      setSavingCobertura(false);
+    }
+  };
+
   return (
     <>
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -357,14 +385,68 @@ function AgregarAliado() {
                 <h3 className="text-lg font-bold font-display uppercase tracking-tight text-slate-800">Cobertura</h3>
               </div>
             </div>
-            <div className="space-y-1.5 md:w-1/2">
+            <div className="space-y-2 md:w-1/2">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Seleccione Cobertura<span className="text-red-500 ml-0.5">*</span></label>
-              <select name="cobertura" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
-                <option value="">Seleccione una cobertura</option>
-                {coberturas.map(cob => (
-                  <option key={cob.id} value={cob.id}>{cob.descripcion}</option>
-                ))}
-              </select>
+              {!showCoberturaInput ? (
+                <>
+                  <select
+                    name="cobertura"
+                    required
+                    value={selectedCoberturaId}
+                    onChange={(e) => setSelectedCoberturaId(e.target.value)}
+                    className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary"
+                  >
+                    <option value="">Seleccione una cobertura</option>
+                    {coberturas.map(cob => (
+                      <option key={cob.id} value={cob.id}>{cob.descripcion}</option>
+                    ))}
+                  </select>
+                  {selectedEstado ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowCoberturaInput(true)}
+                      className="text-xs text-primary font-semibold hover:text-secondary underline underline-offset-2 transition-colors mt-1 inline-block"
+                    >
+                      + Agregar cobertura manualmente
+                    </button>
+                  ) : (
+                    <p className="text-xs text-slate-400 mt-1">
+                      Para agregar una cobertura manualmente, primero selecciona el{' '}
+                      <span className="font-semibold text-slate-500">Estado Geográfico</span> arriba.
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      autoFocus
+                      value={nuevaCobertura}
+                      onChange={(e) => setNuevaCobertura(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleGuardarCobertura(); } }}
+                      placeholder="Ej: Nacional"
+                      className="flex-1 rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleGuardarCobertura}
+                      disabled={savingCobertura || !nuevaCobertura.trim()}
+                      className="px-4 py-2.5 rounded-lg bg-primary text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
+                    >
+                      {savingCobertura ? 'Guardando...' : 'Guardar'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowCoberturaInput(false); setNuevaCobertura(''); }}
+                      className="px-3 py-2.5 rounded-lg border border-slate-200 text-slate-500 text-sm font-medium hover:bg-slate-100 transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">Escribe el nombre y presiona Guardar o Enter. También puedes <button type="button" onClick={() => setShowCoberturaInput(false)} className="text-primary underline">volver al selector</button>.</p>
+                </>
+              )}
             </div>
           </section>
           {/* Section 3: Contacto de la Emisora */}
@@ -451,6 +533,7 @@ function AgregarAliado() {
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Cód.</label>
                     <select value={tel.codigo_area} onChange={(e) => handleTelefonoChange(idx, 'codigo_area', e.target.value)} className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary">
                       <option value="">—</option>
+                      <option value="0212">0212</option>
                       <option value="0412">0412</option>
                       <option value="0422">0422</option>
                       <option value="0414">0414</option>
