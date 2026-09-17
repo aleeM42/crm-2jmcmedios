@@ -8,20 +8,32 @@ class ReporteModel {
 
   // 1. Ranking Clientes por Pautas
   static async getRankingClientesPautas() {
-    // Chart: Top 5 by monto_oc
+    // Chart: Top 5 by monto_oc (cada OC se cuenta una sola vez)
     const chartQuery = `
-      SELECT c.nombre as name, COUNT(p.id)::INTEGER as pautas, SUM(p.monto_oc) as monto
+      SELECT c.nombre as name, COUNT(DISTINCT p.id)::INTEGER as pautas,
+             COALESCE(SUM(oc_unico.monto_oc), 0) as monto
       FROM CLIENTE c
+      JOIN (
+        SELECT fk_cliente, COALESCE(numero_oc, id::text) AS oc_key, MAX(monto_oc) AS monto_oc
+        FROM PAUTAS
+        GROUP BY fk_cliente, COALESCE(numero_oc, id::text)
+      ) oc_unico ON oc_unico.fk_cliente = c.id
       JOIN PAUTAS p ON c.id = p.fk_cliente
       GROUP BY c.id, c.nombre
       ORDER BY monto DESC
       LIMIT 5
     `;
 
-    // List: All clients sorted by monto
+    // List: All clients sorted by monto (OC deduplicada)
     const listQuery = `
-      SELECT c.nombre, c.rif_fiscal, COUNT(p.id)::INTEGER as total_pautas, SUM(p.monto_oc) as monto_total
+      SELECT c.nombre, c.rif_fiscal, COUNT(DISTINCT p.id)::INTEGER as total_pautas,
+             COALESCE(SUM(oc_unico.monto_oc), 0) as monto_total
       FROM CLIENTE c
+      LEFT JOIN (
+        SELECT fk_cliente, COALESCE(numero_oc, id::text) AS oc_key, MAX(monto_oc) AS monto_oc
+        FROM PAUTAS
+        GROUP BY fk_cliente, COALESCE(numero_oc, id::text)
+      ) oc_unico ON oc_unico.fk_cliente = c.id
       LEFT JOIN PAUTAS p ON c.id = p.fk_cliente
       GROUP BY c.id, c.nombre, c.rif_fiscal
       ORDER BY monto_total DESC NULLS LAST
@@ -123,32 +135,43 @@ class ReporteModel {
   static async getIngresosMensuales(anio) {
     const yearParam = parseInt(anio, 10);
 
-    // Meses con ingreso para el año dado
+    // Meses con ingreso para el año dado (cada OC se suma una sola vez)
     const dataQuery = `
       SELECT
-        EXTRACT(MONTH FROM fecha_emision)::INTEGER  AS mes,
-        COALESCE(SUM(monto_oc), 0)::NUMERIC         AS monto
-      FROM PAUTAS
-      WHERE EXTRACT(YEAR FROM fecha_emision) = $1
+        EXTRACT(MONTH FROM fecha)::INTEGER  AS mes,
+        COALESCE(SUM(monto_oc), 0)::NUMERIC AS monto
+      FROM (
+        SELECT MAX(fecha_emision) AS fecha, MAX(monto_oc) AS monto_oc
+        FROM PAUTAS
+        WHERE EXTRACT(YEAR FROM fecha_emision) = $1
+        GROUP BY COALESCE(numero_oc, id::text)
+      ) t
       GROUP BY mes
       ORDER BY mes ASC
     `;
 
     // KPIs: acumulado y promedio anual
     const kpiTotalesQuery = `
-      SELECT
-        COALESCE(SUM(monto_oc), 0)::NUMERIC AS total_acumulado
-      FROM PAUTAS
-      WHERE EXTRACT(YEAR FROM fecha_emision) = $1
+      SELECT COALESCE(SUM(monto_oc), 0)::NUMERIC AS total_acumulado
+      FROM (
+        SELECT MAX(monto_oc) AS monto_oc
+        FROM PAUTAS
+        WHERE EXTRACT(YEAR FROM fecha_emision) = $1
+        GROUP BY COALESCE(numero_oc, id::text)
+      ) t
     `;
 
     // KPI: mes con mayor ingreso
     const kpiPicoQuery = `
       SELECT
-        EXTRACT(MONTH FROM fecha_emision)::INTEGER AS mes,
-        SUM(monto_oc)::NUMERIC                     AS monto_mes
-      FROM PAUTAS
-      WHERE EXTRACT(YEAR FROM fecha_emision) = $1
+        EXTRACT(MONTH FROM fecha)::INTEGER AS mes,
+        SUM(monto_oc)::NUMERIC             AS monto_mes
+      FROM (
+        SELECT MAX(fecha_emision) AS fecha, MAX(monto_oc) AS monto_oc
+        FROM PAUTAS
+        WHERE EXTRACT(YEAR FROM fecha_emision) = $1
+        GROUP BY COALESCE(numero_oc, id::text)
+      ) t
       GROUP BY mes
       ORDER BY monto_mes DESC
       LIMIT 1
@@ -744,9 +767,13 @@ class ReporteModel {
         GROUP BY fk_vendedor
       ),
       pautas_cte AS (
-        SELECT fk_vendedor, COALESCE(SUM(monto_oc), 0) AS monto_total
-        FROM PAUTAS p
-        ${dateFilterPautas}
+        SELECT fk_vendedor, COALESCE(SUM(monto_oc_unico), 0) AS monto_total
+        FROM (
+          SELECT fk_vendedor, MAX(monto_oc) AS monto_oc_unico
+          FROM PAUTAS p
+          ${dateFilterPautas}
+          GROUP BY fk_vendedor, COALESCE(numero_oc, id::text)
+        ) sub
         GROUP BY fk_vendedor
       )
       SELECT 
@@ -911,11 +938,20 @@ class ReporteModel {
         l.nombre AS region,
         COUNT(DISTINCT p.fk_cliente)::int AS clientes,
         COUNT(DISTINCT p.id)::int AS pautas,
-        COALESCE(SUM(p.monto_oc), 0)::numeric AS monto
+        COALESCE(SUM(oc_u.monto_oc_unico), 0)::numeric AS monto
       FROM ALIADOS_COMERCIALES ac
       LEFT JOIN LUGAR l ON ac.fk_region = l.id
       JOIN DETALLE_PAUTA dp ON ac.id = dp.fk_aliado
       JOIN PAUTAS p ON dp.fk_pauta = p.id ${filterPauta1}
+      LEFT JOIN (
+        SELECT fk_aliado_emisora, COALESCE(numero_oc, id::text) AS oc_key, MAX(monto_oc) AS monto_oc_unico
+        FROM (
+          SELECT dp2.fk_aliado AS fk_aliado_emisora, p2.numero_oc, p2.id, p2.monto_oc
+          FROM PAUTAS p2
+          JOIN DETALLE_PAUTA dp2 ON dp2.fk_pauta = p2.id
+        ) raw
+        GROUP BY fk_aliado_emisora, COALESCE(numero_oc, id::text)
+      ) oc_u ON oc_u.fk_aliado_emisora = ac.id
       GROUP BY ac.id, ac.nombre_emisora, l.nombre
       ORDER BY clientes DESC, monto DESC
       LIMIT 10;

@@ -7,6 +7,13 @@ import api from '../services/api.js';
 import { calcularProgresoPauta } from '../utils/pautasUtils';
 import { getCurrentUser } from '../services/auth.service';
 
+// Parsea una fecha "YYYY-MM-DD" evitando el shift UTC → local
+const formatDate = (ds) => {
+  if (!ds) return '—';
+  const [y, m, d] = (typeof ds === 'string' ? ds.split('T')[0] : ds.toISOString().split('T')[0]).split('-');
+  return new Date(Number(y), Number(m) - 1, Number(d)).toLocaleDateString();
+};
+
 const STATUS_STYLE = {
   'en transmision': 'bg-primary/10 text-primary',
   'programada': 'bg-blue-100 text-blue-600',
@@ -207,7 +214,7 @@ export default function PautasLista() {
                       <td className="py-3 px-5 text-slate-600">{p.marca}</td>
                       <td className="py-3 px-5 text-slate-600 capitalize text-xs">{p.tipo_compra}</td>
                       <td className="py-3 px-5 text-xs text-slate-500 whitespace-nowrap">
-                        {new Date(p.fecha_inicio).toLocaleDateString()} → {new Date(p.fecha_fin).toLocaleDateString()}
+                        {formatDate(p.fecha_inicio)} → {formatDate(p.fecha_fin)}
                       </td>
                       <td className="py-3 px-5">
                         <span className={`px-3 py-1 rounded-full text-[10px] font-bold capitalize ${STATUS_STYLE[p.estado] || 'bg-slate-100 text-slate-500'}`}>{p.estado}</span>
