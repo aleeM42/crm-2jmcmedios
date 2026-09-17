@@ -15,7 +15,15 @@ export async function getResumen(anio) {
 
   // ── KPI cards ──
   const totalClientesQ  = `SELECT COUNT(*)::int AS total FROM cliente`;
-  const totalVentasQ    = `SELECT COALESCE(SUM(monto_oc - monto_ot), 0)::numeric AS total FROM pautas`;
+  
+  const totalVentasQ    = `
+    SELECT COALESCE(SUM(profit), 0)::numeric AS total 
+    FROM (
+      SELECT MAX(monto_oc) - SUM(monto_ot) AS profit
+      FROM pautas
+      GROUP BY COALESCE(numero_oc, id::text)
+    ) t`;
+    
   const pautasTransQ    = `SELECT COUNT(*)::int AS total FROM pautas WHERE estado = 'en transmision'`;
   const totalEmisorasQ  = `SELECT COUNT(*)::int AS total FROM aliados_comerciales`;
 
@@ -23,14 +31,18 @@ export async function getResumen(anio) {
   const variacionQ = `
     SELECT
       COALESCE(SUM(CASE
-        WHEN EXTRACT(MONTH FROM fecha_emision) = EXTRACT(MONTH FROM CURRENT_DATE)
-         AND EXTRACT(YEAR  FROM fecha_emision) = EXTRACT(YEAR  FROM CURRENT_DATE)
-        THEN (monto_oc - monto_ot) END), 0)::numeric AS mes_actual,
+        WHEN EXTRACT(MONTH FROM fecha) = EXTRACT(MONTH FROM CURRENT_DATE)
+         AND EXTRACT(YEAR  FROM fecha) = EXTRACT(YEAR  FROM CURRENT_DATE)
+        THEN profit END), 0)::numeric AS mes_actual,
       COALESCE(SUM(CASE
-        WHEN EXTRACT(MONTH FROM fecha_emision) = EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL '1 month')
-         AND EXTRACT(YEAR  FROM fecha_emision) = EXTRACT(YEAR  FROM CURRENT_DATE - INTERVAL '1 month')
-        THEN (monto_oc - monto_ot) END), 0)::numeric AS mes_anterior
-    FROM pautas`;
+        WHEN EXTRACT(MONTH FROM fecha) = EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL '1 month')
+         AND EXTRACT(YEAR  FROM fecha) = EXTRACT(YEAR  FROM CURRENT_DATE - INTERVAL '1 month')
+        THEN profit END), 0)::numeric AS mes_anterior
+    FROM (
+      SELECT MAX(fecha_emision) as fecha, MAX(monto_oc) - SUM(monto_ot) AS profit
+      FROM pautas
+      GROUP BY COALESCE(numero_oc, id::text)
+    ) t`;
 
   // ── Pipeline de ventas (desde OPORTUNIDADES) ──
   const pipelineQ = `
@@ -46,22 +58,32 @@ export async function getResumen(anio) {
 
   // ── Ingresos mensuales del año solicitado ──
   const ingresosQ = `
-    SELECT EXTRACT(MONTH FROM fecha_emision)::int AS mes,
-           COALESCE(SUM(monto_oc - monto_ot), 0)::numeric AS total
-    FROM pautas
-    WHERE EXTRACT(YEAR FROM fecha_emision) = $1
+    SELECT EXTRACT(MONTH FROM fecha)::int AS mes,
+           COALESCE(SUM(profit), 0)::numeric AS total
+    FROM (
+      SELECT MAX(fecha_emision) as fecha, MAX(monto_oc) - SUM(monto_ot) AS profit
+      FROM pautas
+      GROUP BY COALESCE(numero_oc, id::text)
+    ) t
+    WHERE EXTRACT(YEAR FROM fecha) = $1
     GROUP BY mes
     ORDER BY mes`;
 
   // ── Top 5 clientes por inversión (SUM monto_oc) ──
   const topClientesQ = `
     SELECT c.nombre,
-           COALESCE(SUM(p.monto_oc), 0)::numeric AS inversion,
-           COUNT(CASE WHEN p.estado = 'en transmision' THEN 1 END)::int AS pautas_activas,
+           COALESCE(SUM(t.monto_oc_unico), 0)::numeric AS inversion,
+           COALESCE(SUM(t.pautas_activas), 0)::int AS pautas_activas,
            l.nombre AS region,
            u.primer_nombre || ' ' || u.primer_apellido AS vendedor
     FROM cliente c
-    LEFT JOIN pautas p      ON p.fk_cliente  = c.id
+    INNER JOIN (
+      SELECT fk_cliente, 
+             MAX(monto_oc) as monto_oc_unico,
+             COUNT(CASE WHEN estado = 'en transmision' THEN 1 END) as pautas_activas
+      FROM pautas
+      GROUP BY fk_cliente, COALESCE(numero_oc, id::text)
+    ) t ON t.fk_cliente = c.id
     LEFT JOIN lugar l       ON l.id          = c.fk_lugar
     LEFT JOIN vendedores v  ON v.usuario_id  = c.fk_vendedor
     LEFT JOIN usuarios u    ON u.id          = v.usuario_id
