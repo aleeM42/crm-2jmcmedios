@@ -112,10 +112,8 @@ export default function AgregarPauta() {
       const res = await api.get(`/pautas/oc/${encodeURIComponent(oc)}/monto`);
       if (res.success && res.data.emisoras.length > 0) {
         setDistribucionOC(res.data);
-        // Auto-rellenar monto OC si ya existe
-        if (res.data.montoOC > 0 && !montoOC) {
-          setMontoOC(res.data.montoOC.toString());
-        }
+        // Siempre autocompleta y bloquea el monto OC con el valor real de la BD
+        setMontoOC(res.data.montoOC.toString());
       } else {
         setDistribucionOC(null);
       }
@@ -124,7 +122,7 @@ export default function AgregarPauta() {
     } finally {
       setLoadingDistribucion(false);
     }
-  }, [montoOC]);
+  }, []);
 
   // Debounce para la consulta OC
   useEffect(() => {
@@ -215,25 +213,29 @@ export default function AgregarPauta() {
       return;
     }
 
-    if (Number(montoOC) <= 0) {
-      toast.error('El monto OC debe ser un valor positivo mayor a cero.');
-      return;
-    }
-    if (Number(montoOT) <= 0) {
-      toast.error('El monto OT debe ser un valor positivo mayor a cero.');
-      return;
-    }
-
-    // Monto OC debe ser mayor al monto OT
-    if (Number(montoOC) <= Number(montoOT)) {
-      toast.error('El monto OC debe ser mayor al monto OT.');
-      return;
-    }
-
-    // Validar monto disponible si la OC ya existe
+    // Validar monto OC / OT segun si la OC ya existe o es nueva
     if (distribucionOC && distribucionOC.emisoras.length > 0) {
+      // OC ya tiene otras emisoras: validar contra el disponible
       if (Number(montoOT) > distribucionOC.montoDisponible) {
         toast.error(`El monto OT supera el disponible de esta OC ($${distribucionOC.montoDisponible.toFixed(2)}).`);
+        return;
+      }
+      if (Number(montoOT) >= distribucionOC.montoOC) {
+        toast.error('El monto OT debe ser menor al monto OC.');
+        return;
+      }
+    } else {
+      // OC nueva: OT debe ser estrictamente menor al OC
+      if (Number(montoOC) <= 0) {
+        toast.error('El monto OC debe ser mayor a cero.');
+        return;
+      }
+      if (Number(montoOT) <= 0) {
+        toast.error('El monto OT debe ser mayor a cero.');
+        return;
+      }
+      if (Number(montoOT) >= Number(montoOC)) {
+        toast.error('El monto OT debe ser estrictamente menor al monto OC.');
         return;
       }
     }

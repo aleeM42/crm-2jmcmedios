@@ -55,6 +55,10 @@ export default function EditarPautaModal({ pauta: pautaOriginal, onClose, onSucc
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState('');
 
+  // ── Distribución OC (multi-emisora) ─────────────────────
+  const [distribucionOC, setDistribucionOC] = useState(null);
+  const [loadingDistribucion, setLoadingDistribucion] = useState(false);
+
   // ── Helpers ──────────────────────────────────────────────
   const formatDateField = (d) => {
     if (!d) return '';
@@ -144,6 +148,42 @@ export default function EditarPautaModal({ pauta: pautaOriginal, onClose, onSucc
     return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
 
+  // ── Consulta de distribución OC con debounce ──────────
+  const fetchDistribucionOC = useCallback(async (oc) => {
+    if (!oc || oc.trim() === '') {
+      setDistribucionOC(null);
+      return;
+    }
+    setLoadingDistribucion(true);
+    try {
+      const res = await api.get(`/pautas/oc/${encodeURIComponent(oc)}/monto`);
+      if (res.success && res.data.emisoras.length > 0) {
+        // Filtrar la pauta actual del listado para no contarse a sí misma
+        const emisorasOtras = res.data.emisoras.filter(
+          (em) => em.numeroOt !== pautaOriginal?.numero_ot
+        );
+        if (emisorasOtras.length > 0) {
+          setDistribucionOC({ ...res.data, emisorasOtras });
+          // Bloquear monto OC con el valor de la BD
+          setMontoOC(res.data.montoOC.toString());
+        } else {
+          setDistribucionOC(null);
+        }
+      } else {
+        setDistribucionOC(null);
+      }
+    } catch {
+      setDistribucionOC(null);
+    } finally {
+      setLoadingDistribucion(false);
+    }
+  }, [pautaOriginal?.numero_ot]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => { fetchDistribucionOC(numeroOc); }, 500);
+    return () => clearTimeout(timer);
+  }, [numeroOc, fetchDistribucionOC]);
+
   // ── Cambio de cliente → cargar marcas + auto-vendedor ──
   const handleClienteChange = async (newClienteId) => {
     setClienteId(newClienteId);
@@ -191,9 +231,24 @@ export default function EditarPautaModal({ pauta: pautaOriginal, onClose, onSucc
     if (!fechaEmision) return setError('La fecha de emisión es obligatoria.');
     if (!fechaInicio || !fechaFin) return setError('Las fechas de inicio y fin son obligatorias.');
     if (new Date(fechaInicio) > new Date(fechaFin)) return setError('La fecha de inicio no puede ser posterior a la de fin.');
-    if (Number(montoOC) <= 0) return setError('El monto OC debe ser mayor a cero.');
-    if (Number(montoOT) <= 0) return setError('El monto OT debe ser mayor a cero.');
-    if (Number(montoOC) <= Number(montoOT)) return setError('El monto OC debe ser mayor al monto OT.');
+    // Validaciones de montos OC / OT
+    if (distribucionOC && distribucionOC.emisorasOtras?.length > 0) {
+      // OC con otras emisoras: validar contra el disponible
+      const montoDisponible = distribucionOC.montoOC - distribucionOC.emisorasOtras.reduce(
+        (sum, em) => sum + Number(em.montoOt || 0), 0
+      );
+      if (Number(montoOT) >= distribucionOC.montoOC) {
+        return setError(`El monto OT debe ser menor al monto OC ($${distribucionOC.montoOC.toFixed(2)}).`);
+      }
+      if (Number(montoOT) > montoDisponible) {
+        return setError(`El monto OT supera el disponible de esta OC ($${montoDisponible.toFixed(2)}).`);
+      }
+    } else {
+      // Esta es la única pauta de la OC
+      if (Number(montoOC) <= 0) return setError('El monto OC debe ser mayor a cero.');
+      if (Number(montoOT) <= 0) return setError('El monto OT debe ser mayor a cero.');
+      if (Number(montoOT) >= Number(montoOC)) return setError('El monto OT debe ser estrictamente menor al monto OC.');
+    }
     if (Number(cantidadCunas) <= 0) return setError('La cantidad de cuñas debe ser mayor a cero.');
     if (Number(costoCuna) <= 0) return setError('El costo por cuña debe ser mayor a cero.');
     if (!coordinadora) return setError('Debe seleccionar una coordinadora.');
@@ -494,14 +549,52 @@ export default function EditarPautaModal({ pauta: pautaOriginal, onClose, onSucc
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                   <div className="flex flex-col gap-1">
                     <label className={labelCls}>Monto OC ($) <span className="text-red-500">*</span></label>
-                    <input type="number" step="0.01" min="0" value={montoOC} onChange={(e) => setMontoOC(e.target.value)} required placeholder="0.00" className={inputCls} />
+                    <input
+                      type="number" step="0.01" min="0"
+                      value={montoOC}
+                      onChange={(e) => setMontoOC(e.target.value)}
+                      readOnly={!!(distribucionOC && distribucionOC.emisorasOtras?.length > 0)}
+                      required
+                      placeholder="0.00"
+                      className={`${inputCls} ${distribucionOC?.emisorasOtras?.length > 0 ? 'bg-slate-100 cursor-not-allowed' : ''}`}
+                    />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className={labelCls}>Monto OT ($) <span className="text-red-500">*</span></label>
                     <input type="number" step="0.01" min="0" value={montoOT} onChange={(e) => setMontoOT(e.target.value)} required placeholder="0.00" className={inputCls} />
                   </div>
+
+                  {/* Panel de distribución OC */}
+                  {loadingDistribucion && (
+                    <div className="sm:col-span-2 text-xs text-slate-400 text-center py-2">Consultando distribución OC...</div>
+                  )}
+                  {distribucionOC && distribucionOC.emisorasOtras?.length > 0 && (
+                    <div className="sm:col-span-2 bg-white rounded-lg border border-slate-200 p-4 space-y-2">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Distribución OC</p>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-slate-500">Monto OC Total</span>
+                        <span className="font-bold text-slate-800">${distribucionOC.montoOC.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="space-y-1 mt-1">
+                        <p className="text-[9px] font-bold text-slate-400 uppercase">Otras emisoras:</p>
+                        {distribucionOC.emisorasOtras.map((em, i) => (
+                          <div key={i} className="flex justify-between text-[11px] text-slate-500">
+                            <span>{em.nombreEmisora} ({em.numeroOt})</span>
+                            <span className="font-bold">${Number(em.montoOt).toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex justify-between text-xs border-t border-slate-100 pt-2">
+                        <span className="text-slate-500 font-bold">Disponible para este OT</span>
+                        <span className="font-black text-accent-green">
+                          ${(distribucionOC.montoOC - distribucionOC.emisorasOtras.reduce((s, em) => s + Number(em.montoOt || 0), 0)).toLocaleString('es-VE', { minimumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </section>
+
             </form>
           )}
         </div>

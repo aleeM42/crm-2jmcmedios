@@ -166,7 +166,7 @@ export async function createAliado(data) {
         if (!tel.codigo_area || !tel.numero || tel.numero.length !== 7) continue;
         await client.query(
           'INSERT INTO TELEFONOS (codigo_area, numero, fk_usuario, fk_contacto) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-          [tel.codigo_area, tel.numero, usuarioId, primerContactoId]
+          [tel.codigo_area, tel.numero, null, primerContactoId]
         );
       }
     }
@@ -263,7 +263,7 @@ export async function updateAliado(id, data) {
         if (usuarioId) {
           await client.query(
             'INSERT INTO TELEFONOS (codigo_area, numero, fk_usuario, fk_contacto) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-            [t.codigo_area, t.numero, usuarioId, c.id]
+            [t.codigo_area, t.numero, null, c.id]
           );
         }
       }
@@ -302,7 +302,7 @@ export async function updateAliado(id, data) {
         if (usuarioId) {
           await client.query(
             'INSERT INTO TELEFONOS (codigo_area, numero, fk_usuario, fk_contacto) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-            [t.codigo_area, t.numero, usuarioId, nuevoContactoId]
+            [t.codigo_area, t.numero, null, nuevoContactoId]
           );
         }
       }

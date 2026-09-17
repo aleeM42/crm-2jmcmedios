@@ -20,7 +20,8 @@ export const createBatch = async (contactoId, usuarioId, telefonos, client) => {
       INSERT INTO TELEFONOS (codigo_area, numero, fk_usuario, fk_contacto)
       VALUES ($1, $2, $3, $4)
     `;
-    const values = [tel.codigo_area, tel.numero, usuarioId, contactoId];
+    const finalUsuarioId = contactoId ? null : usuarioId;
+    const values = [tel.codigo_area, tel.numero, finalUsuarioId, contactoId];
     await dbClient.query(query, values);
     results.push({ codigo_area: tel.codigo_area, numero: tel.numero });
   }

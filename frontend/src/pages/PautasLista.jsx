@@ -73,7 +73,14 @@ export default function PautasLista() {
 
   const totalPautas = filteredPautas.length;
   const enTransmision = filteredPautas.filter(p => p.estado === 'en transmision').length;
-  const montoOC = filteredPautas.reduce((sum, p) => sum + Number(p.monto_oc || 0), 0);
+  const uniqueOCs = new Set();
+  const montoOC = filteredPautas.reduce((sum, p) => {
+    if (p.numero_oc && !uniqueOCs.has(p.numero_oc)) {
+      uniqueOCs.add(p.numero_oc);
+      return sum + Number(p.monto_oc || 0);
+    }
+    return sum;
+  }, 0);
   const montoOT = filteredPautas.reduce((sum, p) => sum + Number(p.monto_ot || 0), 0);
 
   return (

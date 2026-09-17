@@ -120,6 +120,21 @@ export async function getPautaById(id) {
 }
 
 /**
+ * Verifica si un numero_ot ya existe en la BD.
+ * @param {string} numeroOt - Número OT a verificar
+ * @param {number|null} excludeId - ID de pauta a excluir (útil en edición)
+ * @returns {boolean} true si ya existe
+ */
+export async function checkNumeroOtExists(numeroOt, excludeId = null) {
+  const query = excludeId
+    ? 'SELECT 1 FROM PAUTAS WHERE numero_ot = $1 AND id != $2 LIMIT 1'
+    : 'SELECT 1 FROM PAUTAS WHERE numero_ot = $1 LIMIT 1';
+  const params = excludeId ? [numeroOt, excludeId] : [numeroOt];
+  const result = await pool.query(query, params);
+  return result.rows.length > 0;
+}
+
+/**
  * Crea una pauta con 1 emisora asociada.
  * Inserta en PAUTAS, CUNAS, DETALLE_PAUTA.
  */
@@ -215,16 +230,22 @@ export async function getPautasByOC(numeroOC) {
  * Calcula el monto disponible restante de una OC.
  * Retorna: { montoOC, montoAsignado, montoDisponible, emisoras: [] }
  */
-export async function getMontoDisponibleOC(numeroOC) {
-  const query = `
-    SELECT p.monto_oc, p.monto_ot, ac.nombre_emisora, p.numero_ot
-    FROM PAUTAS p
-    LEFT JOIN DETALLE_PAUTA dp ON dp.fk_pauta = p.id
-    LEFT JOIN ALIADOS_COMERCIALES ac ON dp.fk_aliado = ac.id
-    WHERE p.numero_oc = $1
-    ORDER BY p.id
-  `;
-  const result = await pool.query(query, [numeroOC]);
+export async function getMontoDisponibleOC(numeroOC, excludeId = null) {
+  const query = excludeId
+    ? `SELECT p.monto_oc, p.monto_ot, ac.nombre_emisora, p.numero_ot
+       FROM PAUTAS p
+       LEFT JOIN DETALLE_PAUTA dp ON dp.fk_pauta = p.id
+       LEFT JOIN ALIADOS_COMERCIALES ac ON dp.fk_aliado = ac.id
+       WHERE p.numero_oc = $1 AND p.id != $2
+       ORDER BY p.id`
+    : `SELECT p.monto_oc, p.monto_ot, ac.nombre_emisora, p.numero_ot
+       FROM PAUTAS p
+       LEFT JOIN DETALLE_PAUTA dp ON dp.fk_pauta = p.id
+       LEFT JOIN ALIADOS_COMERCIALES ac ON dp.fk_aliado = ac.id
+       WHERE p.numero_oc = $1
+       ORDER BY p.id`;
+  const params = excludeId ? [numeroOC, excludeId] : [numeroOC];
+  const result = await pool.query(query, params);
 
   if (result.rows.length === 0) {
     return { montoOC: 0, montoAsignado: 0, montoDisponible: 0, emisoras: [] };

@@ -34,21 +34,51 @@ export async function create(req, res, next) {
       return res.status(400).json({ success: false, error: 'Debe seleccionar una emisora (aliado comercial).' });
     }
 
-    if (Number(data.montoOC) <= Number(data.montoOT)) {
-      return res.status(400).json({ success: false, error: 'El monto OC debe ser mayor al monto OT.' });
+    // Validar que el numero_ot no esté ya registrado
+    if (data.numeroOt) {
+      const otExiste = await PautaModel.checkNumeroOtExists(data.numeroOt);
+      if (otExiste) {
+        return res.status(400).json({
+          success: false,
+          error: `El número OT "${data.numeroOt}" ya está registrado. Verifica el número e inténtalo de nuevo.`
+        });
+      }
     }
 
-    // Validar que el monto OT no supere el disponible de la OC (si ya existen registros con esa OC)
-    if (data.numeroOc) {
-      const distribucion = await PautaModel.getMontoDisponibleOC(data.numeroOc);
-      if (distribucion.emisoras.length > 0) {
-        const nuevoMontoOT = Number(data.montoOT);
-        if (nuevoMontoOT > distribucion.montoDisponible) {
-          return res.status(400).json({
-            success: false,
-            error: `El monto OT ($${nuevoMontoOT}) supera el monto disponible de la OC ($${distribucion.montoDisponible.toFixed(2)}).`
-          });
-        }
+    // ── Validación de montos OC / OT ──────────────────────────────
+    // Regla: OT siempre debe ser estrictamente menor al OC.
+    // En multi-emisora: el monto OC real se toma de la BD para evitar duplicación;
+    // se valida contra el monto disponible de esa OC.
+    const distribucionCreate = await PautaModel.getMontoDisponibleOC(data.numeroOc);
+
+    if (distribucionCreate.emisoras.length > 0) {
+      // OC ya existe → usar montoOC de la BD (no del payload)
+      const montoOC_BD = distribucionCreate.montoOC;
+      const nuevoMontoOT = Number(data.montoOT);
+      if (nuevoMontoOT >= montoOC_BD) {
+        return res.status(400).json({
+          success: false,
+          error: `El monto OT ($${nuevoMontoOT.toFixed(2)}) debe ser menor al monto OC ($${montoOC_BD.toFixed(2)}).`
+        });
+      }
+      if (nuevoMontoOT > distribucionCreate.montoDisponible) {
+        return res.status(400).json({
+          success: false,
+          error: `El monto OT ($${nuevoMontoOT.toFixed(2)}) supera el monto disponible de la OC ($${distribucionCreate.montoDisponible.toFixed(2)}).`
+        });
+      }
+      // Forzar el monto OC real de la BD para no guardar valores inconsistentes
+      data.montoOC = montoOC_BD.toString();
+    } else {
+      // OC nueva (primera pauta con este número OC)
+      if (Number(data.montoOC) <= 0) {
+        return res.status(400).json({ success: false, error: 'El monto OC debe ser mayor a cero.' });
+      }
+      if (Number(data.montoOT) <= 0) {
+        return res.status(400).json({ success: false, error: 'El monto OT debe ser mayor a cero.' });
+      }
+      if (Number(data.montoOT) >= Number(data.montoOC)) {
+        return res.status(400).json({ success: false, error: 'El monto OT debe ser estrictamente menor al monto OC.' });
       }
     }
 
@@ -80,8 +110,49 @@ export async function update(req, res, next) {
       return res.status(400).json({ success: false, error: 'Debe seleccionar una emisora (aliado comercial).' });
     }
 
-    if (Number(data.montoOC) <= Number(data.montoOT)) {
-      return res.status(400).json({ success: false, error: 'El monto OC debe ser mayor al monto OT.' });
+    // Validar que el numero_ot no pertenezca a otra pauta diferente
+    if (data.numeroOt) {
+      const otExiste = await PautaModel.checkNumeroOtExists(data.numeroOt, id);
+      if (otExiste) {
+        return res.status(400).json({
+          success: false,
+          error: `El número OT "${data.numeroOt}" ya está registrado en otra pauta. Verifica el número e inténtalo de nuevo.`
+        });
+      }
+    }
+
+    // ── Validación de montos OC / OT (update) ─────────────────────
+    // Excluye la pauta actual del cálculo para no bloquearse a sí misma.
+    const distribucionUpdate = await PautaModel.getMontoDisponibleOC(data.numeroOc, id);
+
+    if (distribucionUpdate.emisoras.length > 0) {
+      // OC ya tiene otras emisoras → usar montoOC de la BD
+      const montoOC_BD = distribucionUpdate.montoOC;
+      const nuevoMontoOT = Number(data.montoOT);
+      if (nuevoMontoOT >= montoOC_BD) {
+        return res.status(400).json({
+          success: false,
+          error: `El monto OT ($${nuevoMontoOT.toFixed(2)}) debe ser menor al monto OC ($${montoOC_BD.toFixed(2)}).`
+        });
+      }
+      if (nuevoMontoOT > distribucionUpdate.montoDisponible) {
+        return res.status(400).json({
+          success: false,
+          error: `El monto OT ($${nuevoMontoOT.toFixed(2)}) supera el monto disponible de la OC ($${distribucionUpdate.montoDisponible.toFixed(2)}).`
+        });
+      }
+      data.montoOC = montoOC_BD.toString();
+    } else {
+      // Esta es la única pauta con esta OC
+      if (Number(data.montoOC) <= 0) {
+        return res.status(400).json({ success: false, error: 'El monto OC debe ser mayor a cero.' });
+      }
+      if (Number(data.montoOT) <= 0) {
+        return res.status(400).json({ success: false, error: 'El monto OT debe ser mayor a cero.' });
+      }
+      if (Number(data.montoOT) >= Number(data.montoOC)) {
+        return res.status(400).json({ success: false, error: 'El monto OT debe ser estrictamente menor al monto OC.' });
+      }
     }
 
     const updated = await PautaModel.updatePauta(id, data);
