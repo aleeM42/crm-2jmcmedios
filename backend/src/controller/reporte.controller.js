@@ -27,8 +27,8 @@ class ReporteController {
           break;
         }
         case 'pautas-filtro': {
-          const { region, marca, cliente, estado, fechaDesde, fechaHasta } = req.query;
-          data = await ReporteModel.getPautasFiltro({ region, marca, cliente, estado, fechaDesde, fechaHasta });
+          const { region, marca, cliente, estado, fechaDesde, fechaHasta, emisora } = req.query;
+          data = await ReporteModel.getPautasFiltro({ region, marca, cliente, estado, fechaDesde, fechaHasta, emisora });
           break;
         }
         case 'gastos-cliente':

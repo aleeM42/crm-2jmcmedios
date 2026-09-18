@@ -53,7 +53,6 @@ export default function AgregarPauta() {
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
   const [cantidadCunas, setCantidadCunas] = useState('');
-  const [costoCuna, setCostoCuna] = useState('');
   const [duracionCuna, setDuracionCuna] = useState('');
   const [programa, setPrograma] = useState('');
   const [presentadora, setPresentadora] = useState('');
@@ -63,6 +62,11 @@ export default function AgregarPauta() {
   // Montos
   const [montoOC, setMontoOC] = useState('');
   const [montoOT, setMontoOT] = useState('');
+
+  // Costo por cuña: derivado de montoOT / cantidadCunas (sin estado manual)
+  const costoCuna = (Number(montoOT) > 0 && Number(cantidadCunas) > 0)
+    ? (Number(montoOT) / Number(cantidadCunas)).toFixed(4)
+    : '';
 
   // Emisora (una sola)
   const [aliadoId, setAliadoId] = useState('');
@@ -242,10 +246,6 @@ export default function AgregarPauta() {
 
     if (Number(cantidadCunas) <= 0) {
       toast.error('La cantidad de cuñas debe ser mayor a cero.');
-      return;
-    }
-    if (Number(costoCuna) <= 0) {
-      toast.error('El costo por cuña debe ser un valor positivo mayor a cero.');
       return;
     }
 
@@ -526,10 +526,11 @@ export default function AgregarPauta() {
                   placeholder="0" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Costo por Cuña ($)<span className="text-red-500 ml-0.5">*</span></label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Costo por Cuña ($)</label>
                 <input
-                  type="number" step="0.01" min="0" value={costoCuna} onChange={(e) => setCostoCuna(e.target.value)} required
-                  placeholder="0.00" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                  type="text" readOnly
+                  value={costoCuna ? `$${Number(costoCuna).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}
+                  className="w-full h-12 px-4 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-500 cursor-not-allowed" />
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Duración de Cuña<span className="text-red-500 ml-0.5">*</span></label>

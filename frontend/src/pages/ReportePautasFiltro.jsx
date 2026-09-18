@@ -37,12 +37,13 @@ export default function ReportePautasFiltro() {
   const [estado, setEstado] = useState('');
   const [fechaDesde, setFechaDesde] = useState('');
   const [fechaHasta, setFechaHasta] = useState('');
+  const [emisora, setEmisora] = useState('');
 
   // ── Data state ──
   const [listData, setListData] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
-  const [filterOptions, setFilterOptions] = useState({ regiones: [], marcas: [], clientes: [], estados: [] });
+  const [filterOptions, setFilterOptions] = useState({ regiones: [], marcas: [], clientes: [], estados: [], emisoras: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [exporting, setExporting] = useState(null); // 'pdf' | 'excel' | null
@@ -61,6 +62,7 @@ export default function ReportePautasFiltro() {
     if (estado) params.set('estado', estado);
     if (fechaDesde) params.set('fechaDesde', fechaDesde);
     if (fechaHasta) params.set('fechaHasta', fechaHasta);
+    if (emisora) params.set('emisora', emisora);
 
     const qs = params.toString();
     const endpoint = `/reportes/pautas-filtro${qs ? `?${qs}` : ''}`;
@@ -79,7 +81,7 @@ export default function ReportePautasFiltro() {
       .finally(() => {
         setLoading(false);
       });
-  }, [region, marca, cliente, estado, fechaDesde, fechaHasta]);
+  }, [region, marca, cliente, estado, fechaDesde, fechaHasta, emisora]);
 
   useEffect(() => {
     fetchData();
@@ -96,9 +98,10 @@ export default function ReportePautasFiltro() {
     setEstado('');
     setFechaDesde('');
     setFechaHasta('');
+    setEmisora('');
   };
 
-  const hasFilters = region || marca || cliente || estado || fechaDesde || fechaHasta;
+  const hasFilters = region || marca || cliente || estado || fechaDesde || fechaHasta || emisora;
   const isEmpty = !loading && listData.length === 0;
 
   // ── Export handlers ──────────────────────────────────────────────────────
@@ -196,12 +199,12 @@ export default function ReportePautasFiltro() {
       )}
 
       {/* FILTERS */}
-      <div className="bg-[#F4FAFB] p-4 rounded-xl shadow-sm border border-slate-100 mb-8 flex flex-wrap items-center gap-4">
+      <div className="bg-[#F4FAFB] p-4 rounded-xl shadow-sm border border-slate-100 mb-8 flex flex-wrap items-center gap-3">
         <select
           id="filtro-region"
           value={region}
           onChange={(e) => setRegion(e.target.value)}
-          className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+          className="min-w-[130px] bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
         >
           <option value="">Región: Todas</option>
           {filterOptions.regiones.map((r) => (
@@ -213,7 +216,7 @@ export default function ReportePautasFiltro() {
           id="filtro-marca"
           value={marca}
           onChange={(e) => setMarca(e.target.value)}
-          className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+          className="min-w-[130px] bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
         >
           <option value="">Marca: Todas</option>
           {filterOptions.marcas.map((m) => (
@@ -225,7 +228,7 @@ export default function ReportePautasFiltro() {
           id="filtro-cliente"
           value={cliente}
           onChange={(e) => setCliente(e.target.value)}
-          className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+          className="min-w-[140px] bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
         >
           <option value="">Cliente: Todos</option>
           {filterOptions.clientes.map((c) => (
@@ -237,13 +240,27 @@ export default function ReportePautasFiltro() {
           id="filtro-estado"
           value={estado}
           onChange={(e) => setEstado(e.target.value)}
-          className="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+          className="min-w-[130px] bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
         >
           <option value="">Estado: Todos</option>
           {filterOptions.estados.map((e) => (
             <option key={e} value={e}>{ESTADO_LABEL[e] || e}</option>
           ))}
         </select>
+
+        <select
+          id="filtro-emisora"
+          value={emisora}
+          onChange={(e) => setEmisora(e.target.value)}
+          className="min-w-[140px] bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 py-2.5 px-3 focus:ring-primary focus:outline-none"
+        >
+          <option value="">Emisora: Todas</option>
+          {(filterOptions.emisoras || []).map((em) => (
+            <option key={em.id} value={em.id}>{em.nombre}</option>
+          ))}
+        </select>
+
+        <div className="w-px h-6 bg-slate-200 mx-1 hidden sm:block" />
 
         <div className="flex items-center gap-2">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Desde</label>
@@ -277,6 +294,7 @@ export default function ReportePautasFiltro() {
           </button>
         )}
       </div>
+
 
       {/* DONUT */}
       <section ref={chartRef} className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-100 p-6 mb-8">

@@ -220,7 +220,7 @@ class ReporteModel {
   }
   // 5. Pautas por Filtro (Región, Marca, Cliente, Estado, Fechas)
   static async getPautasFiltro(filters = {}) {
-    const { region, marca, cliente, estado, fechaDesde, fechaHasta } = filters;
+    const { region, marca, cliente, estado, fechaDesde, fechaHasta, emisora } = filters;
 
     // ── Build dynamic WHERE clauses ──
     const conditions = [];
@@ -250,6 +250,10 @@ class ReporteModel {
     if (fechaHasta) {
       conditions.push(`p.fecha_emision <= $${paramIdx++}`);
       params.push(fechaHasta);
+    }
+    if (emisora) {
+      conditions.push(`ac.id = $${paramIdx++}`);
+      params.push(parseInt(emisora, 10));
     }
 
     const whereClause = conditions.length > 0
@@ -312,14 +316,21 @@ class ReporteModel {
     const estadosQuery = `
       SELECT DISTINCT estado FROM PAUTAS ORDER BY estado
     `;
+    const emisorasQuery = `
+      SELECT DISTINCT ac.id, ac.nombre_emisora
+      FROM ALIADOS_COMERCIALES ac
+      JOIN DETALLE_PAUTA dp ON dp.fk_aliado = ac.id
+      ORDER BY ac.nombre_emisora
+    `;
 
-    const [listRes, chartRes, regionesRes, marcasRes, clientesRes, estadosRes] = await Promise.all([
+    const [listRes, chartRes, regionesRes, marcasRes, clientesRes, estadosRes, emisorasRes] = await Promise.all([
       pool.query(listQuery, params),
       pool.query(chartQuery, params),
       pool.query(regionesQuery),
       pool.query(marcasQuery),
       pool.query(clientesQuery),
       pool.query(estadosQuery),
+      pool.query(emisorasQuery),
     ]);
 
     return {
@@ -331,6 +342,7 @@ class ReporteModel {
         marcas: marcasRes.rows.map(r => r.marca),
         clientes: clientesRes.rows.map(r => ({ id: r.id, nombre: r.nombre })),
         estados: estadosRes.rows.map(r => r.estado),
+        emisoras: emisorasRes.rows.map(r => ({ id: r.id, nombre: r.nombre_emisora })),
       },
     };
   }
