@@ -192,7 +192,7 @@ export default function AgregarCliente() {
 
   // ── Validaciones locales antes del submit ──────────────────────────────
   const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
-  const RIF_RE = /^[JGVP]\d{9}$/;
+  const RIF_RE = /^[JGVP]\d{1,9}$/;
   const PHONE_RE = /^\d{7}$/;
 
   const handleSubmit = async (e) => {
@@ -208,7 +208,7 @@ export default function AgregarCliente() {
     if (!cliente.rif_fiscal?.trim())
       return setError('El RIF fiscal es obligatorio.');
     if (!RIF_RE.test(cliente.rif_fiscal))
-      return setError('El RIF debe comenzar con J, G, V o P seguido de exactamente 9 dígitos (ej: J123456789).');
+      return setError('El RIF debe comenzar con J, G, V o P seguido de hasta 9 dígitos (ej: J123456789).');
     if (!cliente.fk_lugar)
       return setError('Debe seleccionar la ubicación (estado) del cliente.');
     if (!cliente.clasificacion)

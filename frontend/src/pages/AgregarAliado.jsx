@@ -51,8 +51,8 @@ function AgregarAliado() {
     const formatted = firstChar + digits;
     setRif(formatted);
 
-    if (digits.length > 0 && digits.length < 9) {
-      setRifError('El RIF debe tener exactamente 9 dígitos después de la letra');
+    if (digits.length > 0 && digits.length > 9) {
+      setRifError('El RIF debe tener hasta 9 dígitos después de la letra');
     } else {
       setRifError('');
     }
@@ -171,8 +171,8 @@ function AgregarAliado() {
     e.preventDefault();
 
     // ── Validar RIF ──────────────────────────────────────
-    if (!rif || rif.slice(1).replace(/\D/g, '').length !== 9) {
-      setRifError('El RIF debe tener la letra (J/G/V/P) + exactamente 9 dígitos');
+    if (!rif || rif.slice(1).replace(/\D/g, '').length < 1 || rif.slice(1).replace(/\D/g, '').length > 9) {
+      setRifError('El RIF debe tener la letra (J/G/V/P) + hasta 9 dígitos');
       return;
     }
 

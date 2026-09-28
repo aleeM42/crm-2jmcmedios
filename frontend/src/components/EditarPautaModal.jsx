@@ -530,8 +530,8 @@ export default function EditarPautaModal({ pauta: pautaOriginal, onClose, onSucc
                     <input type="text" value={programa} onChange={(e) => setPrograma(e.target.value)} required={esEnVivo} placeholder="Nombre del programa" className={inputCls} />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className={labelCls}>Presentadora{esEnVivo && <span className="text-red-500 ml-0.5">*</span>}</label>
-                    <input type="text" value={presentadora} onChange={(e) => setPresentadora(e.target.value)} required={esEnVivo} placeholder="Nombre de la presentadora" className={inputCls} />
+                    <label className={labelCls}>Presentadora(s){esEnVivo && <span className="text-red-500 ml-0.5">*</span>}</label>
+                    <input type="text" value={presentadora} onChange={(e) => setPresentadora(e.target.value)} required={esEnVivo} placeholder="Nombres separados por comas" className={inputCls} />
                   </div>
                   <div className="flex flex-col gap-1 sm:col-span-2">
                     <label className={labelCls}>Horario{esEnVivo && <span className="text-red-500 ml-0.5">*</span>}</label>
