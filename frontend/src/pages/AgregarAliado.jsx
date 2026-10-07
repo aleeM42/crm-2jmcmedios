@@ -289,11 +289,13 @@ function AgregarAliado() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Razón Social<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="razon_social" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Circuito Radiofonico Nacional C.A." type="text" />
+                <input name="razon_social" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: Circuito Radiofonico Nacional C.A." type="text" maxLength={150} />
+                <p className="text-right text-[10px] text-slate-300">0/150</p>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre de la Emisora<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="nombre_emisora" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: La Mega 107.3" type="text" />
+                <input name="nombre_emisora" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Ej: La Mega 107.3" type="text" maxLength={150} />
+                <p className="text-right text-[10px] text-slate-300">0/150</p>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">RIF<span className="text-red-500 ml-0.5">*</span></label>
@@ -319,6 +321,7 @@ function AgregarAliado() {
                   className={`w-full rounded-lg bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary ${frecuenciaError ? 'border-red-400 ring-1 ring-red-400' : 'border-slate-200'}`}
                   placeholder="Ej: 107.3 FM"
                   type="text"
+                  maxLength={20}
                 />
                 {frecuenciaError && <p className="text-xs text-red-500 mt-1">{frecuenciaError}</p>}
               </div>
@@ -345,7 +348,8 @@ function AgregarAliado() {
               </div>
               <div className="space-y-1.5 md:col-span-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Dirección<span className="text-red-500 ml-0.5">*</span></label>
-                <textarea name="direccion" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Av. Principal de las Mercedes..." rows="2"></textarea>
+                <textarea name="direccion" required className="w-full rounded-lg border-slate-200 bg-slate-50 p-2.5 text-sm focus:ring-primary focus:border-primary" placeholder="Av. Principal de las Mercedes..." rows="2" maxLength={255}></textarea>
+                <p className="text-right text-[10px] text-slate-300">0/255</p>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Región<span className="text-red-500 ml-0.5">*</span></label>

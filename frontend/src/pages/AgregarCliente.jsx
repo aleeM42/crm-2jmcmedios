@@ -353,11 +353,13 @@ export default function AgregarCliente() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nombre <span className="text-red-500">*</span></label>
-              <input name="nombre" value={cliente.nombre} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Comercial" type="text" required />
+              <input name="nombre" value={cliente.nombre} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Comercial" type="text" maxLength={150} required />
+              <p className={`text-right text-[10px] mt-0.5 ${cliente.nombre.length >= 150 ? 'text-red-500 font-bold' : cliente.nombre.length >= 120 ? 'text-orange-400' : 'text-slate-300'}`}>{cliente.nombre.length}/150</p>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Razón Social <span className="text-red-500">*</span></label>
-              <input name="razon_social" value={cliente.razon_social} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Legal Completo" type="text" required />
+              <input name="razon_social" value={cliente.razon_social} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Nombre Legal Completo" type="text" maxLength={150} required />
+              <p className={`text-right text-[10px] mt-0.5 ${cliente.razon_social.length >= 150 ? 'text-red-500 font-bold' : cliente.razon_social.length >= 120 ? 'text-orange-400' : 'text-slate-300'}`}>{cliente.razon_social.length}/150</p>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">RIF Fiscal <span className="text-red-500">*</span></label>
@@ -374,7 +376,8 @@ export default function AgregarCliente() {
             </div>
             <div className="flex flex-col gap-1.5 md:col-span-2">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Dirección <span className="text-red-500">*</span></label>
-              <input name="direccion" value={cliente.direccion} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Dirección completa del cliente" type="text" required />
+              <input name="direccion" value={cliente.direccion} onChange={handleCliente} className="rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Dirección completa del cliente" type="text" maxLength={200} required />
+              <p className={`text-right text-[10px] mt-0.5 ${cliente.direccion.length >= 200 ? 'text-red-500 font-bold' : cliente.direccion.length >= 160 ? 'text-orange-400' : 'text-slate-300'}`}>{cliente.direccion.length}/200</p>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Clasificación <span className="text-red-500">*</span></label>
@@ -386,7 +389,8 @@ export default function AgregarCliente() {
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nombre de Agencia {cliente.clasificacion === 'Agencia' && <span className="text-red-500">*</span>}</label>
-              <input name="nombre_agencia" value={cliente.nombre_agencia} onChange={handleCliente} disabled={cliente.clasificacion !== 'Agencia'} className={`rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary ${cliente.clasificacion !== 'Agencia' ? 'bg-slate-50 opacity-60' : ''}`} placeholder="Solo si clasificación es Agencia" type="text" />
+              <input name="nombre_agencia" value={cliente.nombre_agencia} onChange={handleCliente} disabled={cliente.clasificacion !== 'Agencia'} className={`rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary ${cliente.clasificacion !== 'Agencia' ? 'bg-slate-50 opacity-60' : ''}`} placeholder="Solo si clasificación es Agencia" type="text" maxLength={150} />
+              {cliente.clasificacion === 'Agencia' && <p className={`text-right text-[10px] mt-0.5 ${cliente.nombre_agencia.length >= 150 ? 'text-red-500 font-bold' : cliente.nombre_agencia.length >= 120 ? 'text-orange-400' : 'text-slate-300'}`}>{cliente.nombre_agencia.length}/150</p>}
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sector <span className="text-red-500">*</span></label>
@@ -394,6 +398,7 @@ export default function AgregarCliente() {
                 <option value="">Seleccione sector</option>
                 <option value="Salud">Salud</option>
                 <option value="Alimentación">Alimentación</option>
+                <option value="Bebídas">Bebidas</option>
                 <option value="Telemática">Telemática</option>
                 <option value="Ferretería">Ferretería</option>
                 <option value="Bancario">Bancario</option>
@@ -437,7 +442,7 @@ export default function AgregarCliente() {
               ))}
             </div>
             <div className="flex gap-3">
-              <input type="text" value={nuevaMarca} onChange={(e) => setNuevaMarca(e.target.value)} placeholder="Nombre de la marca" className="flex-1 rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addMarca())} />
+              <input type="text" value={nuevaMarca} onChange={(e) => setNuevaMarca(e.target.value)} placeholder="Nombre de la marca" maxLength={150} className="flex-1 rounded-lg  bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addMarca())} />
               <button type="button" onClick={addMarca} className="px-4 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-xs font-bold flex items-center gap-1">
                 <span className="material-symbols-outlined text-sm">add_circle</span>Agregar
               </button>
@@ -486,30 +491,36 @@ export default function AgregarCliente() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Nombre <span className="text-red-500">*</span></label>
-                      <input name="pri_nombre" value={contacto.pri_nombre} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                      <input name="pri_nombre" value={contacto.pri_nombre} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" maxLength={50} />
+                      <p className={`text-right text-[10px] mt-0.5 ${contacto.pri_nombre.length >= 50 ? 'text-red-500 font-bold' : contacto.pri_nombre.length >= 40 ? 'text-orange-400' : 'text-slate-300'}`}>{contacto.pri_nombre.length}/50</p>
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Segundo Nombre</label>
-                      <input name="seg_nombre" value={contacto.seg_nombre} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                      <input name="seg_nombre" value={contacto.seg_nombre} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" maxLength={50} />
+                      <p className={`text-right text-[10px] mt-0.5 ${contacto.seg_nombre.length >= 50 ? 'text-red-500 font-bold' : contacto.seg_nombre.length >= 40 ? 'text-orange-400' : 'text-slate-300'}`}>{contacto.seg_nombre.length}/50</p>
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Primer Apellido <span className="text-red-500">*</span></label>
-                    <input name="pri_apellido" value={contacto.pri_apellido} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" />
+                    <input name="pri_apellido" value={contacto.pri_apellido} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" type="text" maxLength={50} />
+                    <p className={`text-right text-[10px] mt-0.5 ${contacto.pri_apellido.length >= 50 ? 'text-red-500 font-bold' : contacto.pri_apellido.length >= 40 ? 'text-orange-400' : 'text-slate-300'}`}>{contacto.pri_apellido.length}/50</p>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Departamento <span className="text-red-500">*</span></label>
-                      <input name="departamento" value={contacto.departamento} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Mercadeo" type="text" />
+                      <input name="departamento" value={contacto.departamento} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Mercadeo" type="text" maxLength={100} />
+                      <p className={`text-right text-[10px] mt-0.5 ${contacto.departamento.length >= 100 ? 'text-red-500 font-bold' : contacto.departamento.length >= 80 ? 'text-orange-400' : 'text-slate-300'}`}>{contacto.departamento.length}/100</p>
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rol <span className="text-red-500">*</span></label>
-                      <input name="rol" value={contacto.rol} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Decisor, Operativo..." type="text" />
+                      <input name="rol" value={contacto.rol} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="Decisor, Operativo..." type="text" maxLength={100} />
+                      <p className={`text-right text-[10px] mt-0.5 ${contacto.rol.length >= 100 ? 'text-red-500 font-bold' : contacto.rol.length >= 80 ? 'text-orange-400' : 'text-slate-300'}`}>{contacto.rol.length}/100</p>
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Correo <span className="text-red-500">*</span></label>
-                    <input name="correo" value={contacto.correo} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="email@dominio.com" type="email" />
+                    <input name="correo" value={contacto.correo} onChange={(e) => handleContactoChange(index, e)} className="rounded-lg bg-[#F4FAFB] border-slate-200 text-sm p-3 focus:ring-primary focus:border-primary" placeholder="email@dominio.com" type="email" maxLength={150} />
+                    <p className={`text-right text-[10px] mt-0.5 ${contacto.correo.length >= 150 ? 'text-red-500 font-bold' : contacto.correo.length >= 120 ? 'text-orange-400' : 'text-slate-300'}`}>{contacto.correo.length}/150</p>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fecha de Nacimiento</label>

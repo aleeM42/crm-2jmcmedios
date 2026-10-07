@@ -424,16 +424,18 @@ export default function AgregarPauta() {
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Número OC<span className="text-red-500 ml-0.5">*</span></label>
                 <input
-                  type="text" value={numeroOc} onChange={(e) => setNumeroOc(e.target.value)} required
+                  type="text" value={numeroOc} onChange={(e) => setNumeroOc(e.target.value)} required maxLength={45}
                   placeholder="Ej: OC-00100" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                <p className={`text-right text-[10px] mt-1 ${numeroOc.length >= 45 ? 'text-red-500 font-bold' : numeroOc.length >= 36 ? 'text-orange-400' : 'text-slate-300'}`}>{numeroOc.length}/45</p>
               </div>
 
               {/* Número OT */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Número OT<span className="text-red-500 ml-0.5">*</span></label>
                 <input
-                  type="text" value={numeroOt} onChange={(e) => setNumeroOt(e.target.value)} required
+                  type="text" value={numeroOt} onChange={(e) => setNumeroOt(e.target.value)} required maxLength={30}
                   placeholder="Ej: OT-00125" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                <p className={`text-right text-[10px] mt-1 ${numeroOt.length >= 30 ? 'text-red-500 font-bold' : numeroOt.length >= 24 ? 'text-orange-400' : 'text-slate-300'}`}>{numeroOt.length}/30</p>
               </div>
 
               {/* Coordinadora */}
@@ -494,8 +496,9 @@ export default function AgregarPauta() {
               <div className="col-span-2">
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Observaciones</label>
                 <textarea
-                  value={observaciones} onChange={(e) => setObservaciones(e.target.value)}
+                  value={observaciones} onChange={(e) => setObservaciones(e.target.value)} maxLength={300}
                   rows={2} placeholder="Notas sobre la pauta..." className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none" />
+                <p className={`text-right text-[10px] mt-1 ${observaciones.length >= 300 ? 'text-red-500 font-bold' : observaciones.length >= 240 ? 'text-orange-400' : 'text-slate-300'}`}>{observaciones.length}/300</p>
               </div>
             </div>
           </section>
@@ -574,20 +577,23 @@ export default function AgregarPauta() {
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Programa{esEnVivo && <span className="text-red-500 ml-0.5">*</span>}</label>
                 <input
-                  type="text" value={programa} onChange={(e) => setPrograma(e.target.value)} required={esEnVivo}
+                  type="text" value={programa} onChange={(e) => setPrograma(e.target.value)} required={esEnVivo} maxLength={100}
                   placeholder="Nombre del programa" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                <p className={`text-right text-[10px] mt-1 ${programa.length >= 100 ? 'text-red-500 font-bold' : programa.length >= 80 ? 'text-orange-400' : 'text-slate-300'}`}>{programa.length}/100</p>
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Presentadora(s){esEnVivo && <span className="text-red-500 ml-0.5">*</span>}</label>
                 <input
-                  type="text" value={presentadora} onChange={(e) => setPresentadora(e.target.value)} required={esEnVivo}
+                  type="text" value={presentadora} onChange={(e) => setPresentadora(e.target.value)} required={esEnVivo} maxLength={50}
                   placeholder="Nombres separados por comas" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                <p className={`text-right text-[10px] mt-1 ${presentadora.length >= 50 ? 'text-red-500 font-bold' : presentadora.length >= 40 ? 'text-orange-400' : 'text-slate-300'}`}>{presentadora.length}/50</p>
               </div>
               <div className="col-span-2">
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Horario{esEnVivo && <span className="text-red-500 ml-0.5">*</span>}</label>
                 <input
-                  type="text" value={horario} onChange={(e) => setHorario(e.target.value)} required={esEnVivo}
+                  type="text" value={horario} onChange={(e) => setHorario(e.target.value)} required={esEnVivo} maxLength={50}
                   placeholder="Ej: 06:00 - 10:00 AM" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                <p className={`text-right text-[10px] mt-1 ${horario.length >= 50 ? 'text-red-500 font-bold' : horario.length >= 40 ? 'text-orange-400' : 'text-slate-300'}`}>{horario.length}/50</p>
               </div>
             </div>
           </section>

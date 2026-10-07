@@ -170,9 +170,7 @@ export default function AgregarVisita() {
         fk_vendedor: fkVendedor || undefined,
       };
 
-      console.log('[AgregarVisita] payload →', visitaPayload);
       const visitaRes = await crearVisita(visitaPayload);
-      console.log('[AgregarVisita] response →', visitaRes);
       if (!visitaRes.success) throw new Error(visitaRes.error || 'Error creando visita');
 
       const visitaId = visitaRes.data.id;
@@ -196,8 +194,6 @@ export default function AgregarVisita() {
       setSuccess('Visita registrada exitosamente');
       setTimeout(() => navigate('/actividad-comercial'), 1500);
     } catch (err) {
-      console.error('[AgregarVisita] error completo →', err);
-      // Intentar mostrar el mensaje exacto del backend antes de usar el helper
       const backendMsg = err?.response?.data?.error || err?.message;
       setError(backendMsg || resolveErrorMessage(err, 'visitas'));
     } finally {
@@ -417,12 +413,14 @@ export default function AgregarVisita() {
               {/* Lugar */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Lugar<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="lugar" type="text" value={formData.lugar} onChange={handleChange} placeholder="Dirección o nombre del lugar" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" required />
+                <input name="lugar" type="text" value={formData.lugar} onChange={handleChange} maxLength={100} placeholder="Dirección o nombre del lugar" className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" required />
+                <p className={`text-right text-[10px] mt-1 ${formData.lugar.length >= 100 ? 'text-red-500 font-bold' : formData.lugar.length >= 80 ? 'text-orange-400' : 'text-slate-300'}`}>{formData.lugar.length}/100</p>
               </div>
               {/* Objetivo */}
               <div className="col-span-2">
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Objetivo de la Visita<span className="text-red-500 ml-0.5">*</span></label>
-                <input name="objetivo_visita" type="text" value={formData.objetivo_visita} onChange={handleChange} placeholder="Describir el objetivo de la visita..." className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" required />
+                <input name="objetivo_visita" type="text" value={formData.objetivo_visita} onChange={handleChange} maxLength={100} placeholder="Describir el objetivo de la visita..." className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" required />
+                <p className={`text-right text-[10px] mt-1 ${formData.objetivo_visita.length >= 100 ? 'text-red-500 font-bold' : formData.objetivo_visita.length >= 80 ? 'text-orange-400' : 'text-slate-300'}`}>{formData.objetivo_visita.length}/100</p>
               </div>
             </div>
           </section>
@@ -449,7 +447,8 @@ export default function AgregarVisita() {
               </div>
               <div className="col-span-2">
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Detalle</label>
-                <textarea name="detalle" rows={4} value={formData.detalle} onChange={handleChange} placeholder="Describir el resultado de la visita..." className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none" />
+                <textarea name="detalle" rows={4} value={formData.detalle} onChange={handleChange} maxLength={100} placeholder="Describir el resultado de la visita..." className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none" />
+                <p className={`text-right text-[10px] mt-1 ${formData.detalle.length >= 100 ? 'text-red-500 font-bold' : formData.detalle.length >= 80 ? 'text-orange-400' : 'text-slate-300'}`}>{formData.detalle.length}/100</p>
               </div>
             </div>
           </section>

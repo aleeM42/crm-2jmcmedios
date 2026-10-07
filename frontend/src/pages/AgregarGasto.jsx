@@ -168,7 +168,8 @@ export default function AgregarGasto() {
               </div>
               <div className="col-span-2">
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Concepto / Descripción<span className="text-red-500 ml-0.5">*</span></label>
-                <textarea name="concepto" rows={3} value={formData.concepto} onChange={handleChange} placeholder="Describir el gasto realizado..." className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none" required />
+                <textarea name="concepto" rows={3} value={formData.concepto} onChange={handleChange} maxLength={100} placeholder="Describir el gasto realizado..." className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none" required />
+                <p className={`text-right text-[10px] mt-1 ${formData.concepto.length >= 100 ? 'text-red-500 font-bold' : formData.concepto.length >= 80 ? 'text-orange-400' : 'text-slate-300'}`}>{formData.concepto.length}/100</p>
               </div>
             </div>
           </section>
