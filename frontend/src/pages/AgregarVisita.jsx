@@ -170,7 +170,9 @@ export default function AgregarVisita() {
         fk_vendedor: fkVendedor || undefined,
       };
 
+      console.log('[AgregarVisita] payload →', visitaPayload);
       const visitaRes = await crearVisita(visitaPayload);
+      console.log('[AgregarVisita] response →', visitaRes);
       if (!visitaRes.success) throw new Error(visitaRes.error || 'Error creando visita');
 
       const visitaId = visitaRes.data.id;
@@ -194,7 +196,10 @@ export default function AgregarVisita() {
       setSuccess('Visita registrada exitosamente');
       setTimeout(() => navigate('/actividad-comercial'), 1500);
     } catch (err) {
-      setError(resolveErrorMessage(err, 'visitas'));
+      console.error('[AgregarVisita] error completo →', err);
+      // Intentar mostrar el mensaje exacto del backend antes de usar el helper
+      const backendMsg = err?.response?.data?.error || err?.message;
+      setError(backendMsg || resolveErrorMessage(err, 'visitas'));
     } finally {
       setLoading(false);
     }
