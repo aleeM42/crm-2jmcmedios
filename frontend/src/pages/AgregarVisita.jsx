@@ -134,13 +134,38 @@ export default function AgregarVisita() {
     e.preventDefault();
     setError('');
     setSuccess('');
-    setLoading(true);
 
+    // --- Validación completa: acumular todos los errores antes de enviar ---
+    const errors = [];
+
+    if (!formData.fecha) errors.push('La fecha de la visita es obligatoria.');
+    if (!formData.hora) errors.push('La hora de la visita es obligatoria.');
+    if (!formData.tipo) errors.push('El tipo de visita (Llamada / Presencial) es obligatorio.');
+    if (!formData.lugar) errors.push('El lugar de la visita es obligatorio.');
+    if (!formData.objetivo_visita) errors.push('El objetivo de la visita es obligatorio.');
+    if (!formData.efectiva) errors.push('Debes indicar si la visita fue efectiva o no.');
+    if (!fkVendedor) errors.push('Debes asignar un vendedor a la visita.');
+    if (!tipoVisitado) {
+      errors.push('Debes seleccionar el tipo de visitado (Cliente, Aliado o Prospecto).');
+    } else if (tipoVisitado === 'prospecto') {
+      if (!fkOportunidad) errors.push('Debes seleccionar el prospecto al que se realizó la visita.');
+    } else {
+      // cliente o aliado
+      if (!selectedEntity) errors.push(`Debes seleccionar el ${tipoVisitado === 'cliente' ? 'cliente' : 'aliado comercial'}.`);
+      if (!fkContacto) errors.push('Debes seleccionar el contacto con quien se realizó la visita.');
+    }
+
+    if (errors.length > 0) {
+      setError(errors);
+      return;
+    }
+
+    setLoading(true);
     try {
       // 1. Crear la visita
       const visitaPayload = {
         ...formData,
-        fk_contacto: tipoVisitado === 'prospecto' ? null : parseInt(fkContacto, 10),
+        fk_contacto: tipoVisitado === 'prospecto' || !fkContacto ? null : parseInt(fkContacto, 10),
         fk_oportunidad: tipoVisitado === 'prospecto' ? parseInt(fkOportunidad, 10) : null,
         fk_vendedor: fkVendedor || undefined,
       };
@@ -201,9 +226,17 @@ export default function AgregarVisita() {
 
       {/* Messages */}
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
-          <span className="material-symbols-outlined text-red-500">error</span>
-          <p className="text-sm text-red-600 font-medium">{error}</p>
+        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3">
+          <span className="material-symbols-outlined text-red-500 shrink-0 mt-0.5">error</span>
+          {Array.isArray(error) ? (
+            <ul className="space-y-1">
+              {error.map((msg, i) => (
+                <li key={i} className="text-sm text-red-600 font-medium">{msg}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-red-600 font-medium">{error}</p>
+          )}
         </div>
       )}
       {success && (
