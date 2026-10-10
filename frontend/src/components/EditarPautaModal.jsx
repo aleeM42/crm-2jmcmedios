@@ -4,7 +4,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import AlertError from './AlertError.jsx';
-import { resolveErrorMessage } from '../utils/errorMessages.js';
+import { resolveErrorMessage, isPermissionError } from '../utils/errorMessages.js';
+import { toast } from 'sonner';
 
 const COORDINADORAS = ['Oriana Mendoza', 'Ysabel Pérez'];
 
@@ -54,6 +55,7 @@ export default function EditarPautaModal({ pauta: pautaOriginal, onClose, onSucc
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
 
   // ── Distribución OC (multi-emisora) ─────────────────────
   const [distribucionOC, setDistribucionOC] = useState(null);
@@ -225,6 +227,7 @@ export default function EditarPautaModal({ pauta: pautaOriginal, onClose, onSucc
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setErrors([]);
 
     // Validaciones
     if (!aliadoId) return setError('Debe seleccionar una emisora.');
@@ -289,7 +292,11 @@ export default function EditarPautaModal({ pauta: pautaOriginal, onClose, onSucc
       }
     } catch (err) {
       console.error('[EditarPauta] Error:', err?.data || err);
-      setError(resolveErrorMessage(err, 'pautas'));
+      if (isPermissionError(err)) {
+        toast.error(resolveErrorMessage(err, 'pautas'));
+      } else {
+        setErrors(err?.data?.errors || [resolveErrorMessage(err, 'pautas')]);
+      }
     } finally {
       setLoading(false);
     }
@@ -334,7 +341,7 @@ export default function EditarPautaModal({ pauta: pautaOriginal, onClose, onSucc
             <div className="p-12 text-center text-slate-400">Cargando datos...</div>
           ) : (
             <form id="editar-pauta-form" className="p-6 space-y-6" onSubmit={handleSubmit}>
-              {error && <AlertError message={error} onClose={() => setError('')} />}
+              {(error || errors.length > 0) && <AlertError message={error} errors={errors} onClose={() => { setError(''); setErrors([]); }} />}
 
               {/* ═══ Datos Generales ═══ */}
               <section>

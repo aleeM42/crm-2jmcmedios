@@ -45,7 +45,8 @@ export const create = async (req, res) => {
   try {
     const { nombre, apellido, clienteId } = req.body;
     if (!nombre || !apellido || !clienteId) {
-      return res.status(400).json({ error: 'nombre, apellido y clienteId son obligatorios' });
+      const msg = 'nombre, apellido y clienteId son obligatorios';
+      return res.status(400).json({ error: msg, errors: [msg] });
     }
     const contacto = await ContactoModel.create(req.body);
     res.status(201).json(contacto);

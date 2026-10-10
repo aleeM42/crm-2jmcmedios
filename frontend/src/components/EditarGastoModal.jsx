@@ -3,7 +3,8 @@
 // ==============================================
 import { useState, useEffect } from 'react';
 import AlertError from './AlertError.jsx';
-import { resolveErrorMessage } from '../utils/errorMessages.js';
+import { resolveErrorMessage, isPermissionError } from '../utils/errorMessages.js';
+import { toast } from 'sonner';
 import { modificarGastoMarketing } from '../services/gasto.service.js';
 
 export default function EditarGastoModal({ gasto: gastoOriginal, onClose, onSuccess }) {
@@ -68,7 +69,11 @@ export default function EditarGastoModal({ gasto: gastoOriginal, onClose, onSucc
         onSuccess(result.data);
       }
     } catch (err) {
-      setError(resolveErrorMessage(err, 'gastos'));
+      if (isPermissionError(err)) {
+        toast.error(resolveErrorMessage(err, 'gastos'));
+      } else {
+        setError(resolveErrorMessage(err, 'gastos'));
+      }
     } finally {
       setLoading(false);
     }

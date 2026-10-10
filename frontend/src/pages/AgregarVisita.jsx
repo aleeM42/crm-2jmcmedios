@@ -16,6 +16,7 @@ import {
 } from '../services/visita.service.js';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
 import { getCurrentUser } from '../services/auth.service.js';
+import AlertError from '../components/AlertError.jsx';
 
 export default function AgregarVisita() {
   const navigate = useNavigate();
@@ -56,6 +57,7 @@ export default function AgregarVisita() {
   // --- UI ---
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState('');
 
   // Cargar lookups iniciales
@@ -133,30 +135,31 @@ export default function AgregarVisita() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setErrors([]);
     setSuccess('');
 
     // --- Validación completa: acumular todos los errores antes de enviar ---
-    const errors = [];
+    const localErrors = [];
 
-    if (!formData.fecha) errors.push('La fecha de la visita es obligatoria.');
-    if (!formData.hora) errors.push('La hora de la visita es obligatoria.');
-    if (!formData.tipo) errors.push('El tipo de visita (Llamada / Presencial) es obligatorio.');
-    if (!formData.lugar) errors.push('El lugar de la visita es obligatorio.');
-    if (!formData.objetivo_visita) errors.push('El objetivo de la visita es obligatorio.');
-    if (!formData.efectiva) errors.push('Debes indicar si la visita fue efectiva o no.');
-    if (!fkVendedor) errors.push('Debes asignar un vendedor a la visita.');
+    if (!formData.fecha) localErrors.push('La fecha de la visita es obligatoria.');
+    if (!formData.hora) localErrors.push('La hora de la visita es obligatoria.');
+    if (!formData.tipo) localErrors.push('El tipo de visita (Llamada / Presencial) es obligatorio.');
+    if (!formData.lugar) localErrors.push('El lugar de la visita es obligatorio.');
+    if (!formData.objetivo_visita) localErrors.push('El objetivo de la visita es obligatorio.');
+    if (!formData.efectiva) localErrors.push('Debes indicar si la visita fue efectiva o no.');
+    if (!fkVendedor) localErrors.push('Debes asignar un vendedor a la visita.');
     if (!tipoVisitado) {
-      errors.push('Debes seleccionar el tipo de visitado (Cliente, Aliado o Prospecto).');
+      localErrors.push('Debes seleccionar el tipo de visitado (Cliente, Aliado o Prospecto).');
     } else if (tipoVisitado === 'prospecto') {
-      if (!fkOportunidad) errors.push('Debes seleccionar el prospecto al que se realizó la visita.');
+      if (!fkOportunidad) localErrors.push('Debes seleccionar el prospecto al que se realizó la visita.');
     } else {
       // cliente o aliado
-      if (!selectedEntity) errors.push(`Debes seleccionar el ${tipoVisitado === 'cliente' ? 'cliente' : 'aliado comercial'}.`);
-      if (!fkContacto) errors.push('Debes seleccionar el contacto con quien se realizó la visita.');
+      if (!selectedEntity) localErrors.push(`Debes seleccionar el ${tipoVisitado === 'cliente' ? 'cliente' : 'aliado comercial'}.`);
+      if (!fkContacto) localErrors.push('Debes seleccionar el contacto con quien se realizó la visita.');
     }
 
-    if (errors.length > 0) {
-      setError(errors);
+    if (localErrors.length > 0) {
+      setErrors(localErrors);
       return;
     }
 
@@ -194,8 +197,7 @@ export default function AgregarVisita() {
       setSuccess('Visita registrada exitosamente');
       setTimeout(() => navigate('/actividad-comercial'), 1500);
     } catch (err) {
-      const backendMsg = err?.response?.data?.error || err?.message;
-      setError(backendMsg || resolveErrorMessage(err, 'visitas'));
+      setErrors(err?.data?.errors || [resolveErrorMessage(err, 'visitas')]);
     } finally {
       setLoading(false);
     }
@@ -226,18 +228,9 @@ export default function AgregarVisita() {
       </div>
 
       {/* Messages */}
-      {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3">
-          <span className="material-symbols-outlined text-red-500 shrink-0 mt-0.5">error</span>
-          {Array.isArray(error) ? (
-            <ul className="space-y-1">
-              {error.map((msg, i) => (
-                <li key={i} className="text-sm text-red-600 font-medium">{msg}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-red-600 font-medium">{error}</p>
-          )}
+      {(error || errors.length > 0) && (
+        <div className="mb-6">
+          <AlertError message={error} errors={errors} onClose={() => { setError(''); setErrors([]); }} />
         </div>
       )}
       {success && (

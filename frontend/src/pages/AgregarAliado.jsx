@@ -13,6 +13,7 @@ const today = new Date().toISOString().split('T')[0];
 function AgregarAliado() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
 
   // RIF controlado
   const [rif, setRif] = useState('');
@@ -231,13 +232,14 @@ function AgregarAliado() {
 
     try {
       setError('');
+      setErrors([]);
       const response = await api.post('/aliados', payload);
       if (response.success) {
         navigate('/aliados-comerciales');
       }
     } catch (err) {
       console.error('Error creating aliado:', err);
-      setError(resolveErrorMessage(err, 'aliados'));
+      setErrors(err?.data?.errors || [resolveErrorMessage(err, 'aliados')]);
     }
   };
 
@@ -276,7 +278,7 @@ function AgregarAliado() {
         </div>
       </header>
 
-      {error && <AlertError message={error} onClose={() => setError('')} />}
+      {(error || errors.length > 0) && <AlertError message={error} errors={errors} onClose={() => { setError(''); setErrors([]); }} />}
 
       <div className="bg-[#F4FAFB] rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <form className="p-8 space-y-12" onSubmit={handleSubmit}>

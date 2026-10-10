@@ -40,19 +40,22 @@ export const getById = async (req, res, next) => {
 export const create = async (req, res, next) => {
   try {
     const { fecha, concepto, monto, categoria, fk_visita } = req.body;
-    if (!fecha || !concepto || !monto || !categoria || !fk_visita) {
-      return res.status(400).json({
-        success: false,
-        error: 'fecha, concepto, monto, categoria y fk_visita son obligatorios',
-      });
-    }
+    const errores = [];
+    if (!fecha)      errores.push('La fecha del gasto es obligatoria.');
+    if (!concepto)   errores.push('El concepto del gasto es obligatorio.');
+    if (!monto)      errores.push('El monto del gasto es obligatorio.');
+    if (!categoria)  errores.push('La categoría del gasto es obligatoria.');
+    if (!fk_visita)  errores.push('Debe asociar el gasto a una visita.');
+
     const montoNum = parseFloat(monto);
-    if (isNaN(montoNum) || montoNum <= 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'El monto del gasto debe ser un número positivo mayor a cero.',
-      });
+    if (errores.length === 0 && (isNaN(montoNum) || montoNum <= 0)) {
+      errores.push('El monto del gasto debe ser un número positivo mayor a cero.');
     }
+
+    if (errores.length > 0) {
+      return res.status(400).json({ success: false, error: errores[0], errors: errores });
+    }
+
     const gasto = await GastoModel.create(req.body);
     res.status(201).json({ success: true, data: gasto });
   } catch (err) {

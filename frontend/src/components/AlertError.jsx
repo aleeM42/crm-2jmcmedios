@@ -5,28 +5,32 @@
 import { useState, useEffect } from 'react';
 
 /**
- * @param {string}   message    — Mensaje de error a mostrar.
+ * @param {string}   message    — Mensaje de error a mostrar (opcional si se usa errors).
+ * @param {string[]} errors     — Arreglo de mensajes de error a mostrar.
  * @param {function} onClose    — Callback opcional al cerrar la alerta.
  * @param {number}   autoClose  — Milisegundos para cerrar automáticamente (0 = no cerrar).
  * @param {'error'|'warning'} variant — Variante visual (default: 'error').
  */
-export default function AlertError({ message, onClose, autoClose = 0, variant = 'error' }) {
+export default function AlertError({ message, errors = [], onClose, autoClose = 0, variant = 'error' }) {
   const [visible, setVisible] = useState(true);
   const [exiting, setExiting] = useState(false);
 
+  const hasErrors = errors && errors.length > 0;
+  const showContent = message || hasErrors;
+
   useEffect(() => {
-    if (message) {
+    if (showContent) {
       setVisible(true);
       setExiting(false);
     }
-  }, [message]);
+  }, [message, errors, showContent]);
 
   useEffect(() => {
-    if (autoClose > 0 && message) {
+    if (autoClose > 0 && showContent) {
       const timer = setTimeout(() => handleClose(), autoClose);
       return () => clearTimeout(timer);
     }
-  }, [autoClose, message]);
+  }, [autoClose, message, errors, showContent]);
 
   const handleClose = () => {
     setExiting(true);
@@ -36,7 +40,7 @@ export default function AlertError({ message, onClose, autoClose = 0, variant = 
     }, 300);
   };
 
-  if (!message || !visible) return null;
+  if (!showContent || !visible) return null;
 
   const isWarning = variant === 'warning';
 
@@ -69,10 +73,18 @@ export default function AlertError({ message, onClose, autoClose = 0, variant = 
             {iconName}
           </span>
 
-          {/* Texto */}
-          <p className={`text-sm font-medium leading-relaxed ${textColor} flex-1 min-w-0`}>
-            {message}
-          </p>
+          {/* Texto o Lista */}
+          <div className={`text-sm font-medium leading-relaxed ${textColor} flex-1 min-w-0`}>
+            {hasErrors ? (
+              <ul className="list-disc pl-4 space-y-1">
+                {errors.map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>{message}</p>
+            )}
+          </div>
 
           {/* Botón cerrar */}
           {onClose && (

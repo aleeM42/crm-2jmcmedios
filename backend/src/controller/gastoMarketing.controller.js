@@ -38,29 +38,22 @@ export const create = async (req, res, next) => {
   try {
     const { fecha, concepto, monto, tipo, fk_cliente, fk_aliado_c } = req.body;
 
-    // Validar campos obligatorios
-    if (!fecha || !concepto || !monto || !tipo) {
-      return res.status(400).json({
-        success: false,
-        error: 'fecha, concepto, monto y tipo son obligatorios',
-      });
-    }
+    const errores = [];
+    if (!fecha)    errores.push('La fecha es obligatoria.');
+    if (!concepto) errores.push('El concepto es obligatorio.');
+    if (!monto)    errores.push('El monto es obligatorio.');
+    if (!tipo)     errores.push('El tipo es obligatorio.');
 
-    // Validar arco exclusivo: exactamente uno de fk_cliente o fk_aliado_c
     const tieneCliente = fk_cliente != null && fk_cliente !== '';
     const tieneAliado  = fk_aliado_c != null && fk_aliado_c !== '';
 
-    if (!tieneCliente && !tieneAliado) {
-      return res.status(400).json({
-        success: false,
-        error: 'Debe asociar el gasto a un Cliente o a un Aliado Comercial',
-      });
-    }
-    if (tieneCliente && tieneAliado) {
-      return res.status(400).json({
-        success: false,
-        error: 'El gasto solo puede asociarse a un Cliente O a un Aliado Comercial, no ambos',
-      });
+    if (!tieneCliente && !tieneAliado)
+      errores.push('Debe asociar el gasto a un Cliente o a un Aliado Comercial.');
+    if (tieneCliente && tieneAliado)
+      errores.push('El gasto solo puede asociarse a un Cliente O a un Aliado Comercial, no ambos.');
+
+    if (errores.length > 0) {
+      return res.status(400).json({ success: false, error: errores[0], errors: errores });
     }
 
     const gasto = await GastoMktModel.create({

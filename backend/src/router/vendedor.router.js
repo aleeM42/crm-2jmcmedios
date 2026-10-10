@@ -6,7 +6,6 @@ import { Router } from 'express';
 import * as VendedorCtrl from '../controller/vendedor.controller.js';
 import authenticate from '../middleware/authenticate.js';
 import authorize from '../middleware/authorize.js';
-import validateBody from '../middleware/validateBody.js';
 
 const router = Router();
 
@@ -26,16 +25,6 @@ router.post(
   '/',
   authenticate,
   authorize('Administrador'),
-  validateBody([
-    'usuario.primer_nombre',
-    'usuario.primer_apellido',
-    'usuario.correo',
-    'usuario.nombre_usuario',
-    'usuario.password',
-    'usuario.rol',
-    'vendedor.meta',
-    'vendedor.tipo',
-  ]),
   VendedorCtrl.create
 );
 
@@ -44,15 +33,6 @@ router.put(
   '/:id',
   authenticate,
   authorize('Administrador', 'Director', 'Vendedor'),
-  validateBody([
-    'usuario.primer_nombre',
-    'usuario.primer_apellido',
-    'usuario.correo',
-    'usuario.nombre_usuario',
-    'usuario.rol',
-    'vendedor.meta',
-    'vendedor.tipo',
-  ]),
   VendedorCtrl.update
 );
 

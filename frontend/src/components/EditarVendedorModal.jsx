@@ -4,8 +4,9 @@
 // ==============================================
 import { useState, useEffect } from 'react';
 import { actualizarVendedor, getDirectores } from '../services/vendedor.service.js';
-import { resolveErrorMessage } from '../utils/errorMessages.js';
+import { resolveErrorMessage, isPermissionError } from '../utils/errorMessages.js';
 import AlertError from './AlertError.jsx';
+import { toast } from 'sonner';
 
 export default function EditarVendedorModal({ vendedorOriginal, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -27,6 +28,7 @@ export default function EditarVendedorModal({ vendedorOriginal, onClose, onSucce
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -99,6 +101,7 @@ export default function EditarVendedorModal({ vendedorOriginal, onClose, onSucce
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setErrors([]);
 
     // ── Validaciones locales ─────────────────────────────
     const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
@@ -165,7 +168,11 @@ export default function EditarVendedorModal({ vendedorOriginal, onClose, onSucce
         onSuccess(result.data);
       }
     } catch (err) {
-      setError(resolveErrorMessage(err, 'vendedores'));
+      if (isPermissionError(err)) {
+        toast.error(resolveErrorMessage(err, 'vendedores'));
+      } else {
+        setErrors(err?.data?.errors || [resolveErrorMessage(err, 'vendedores')]);
+      }
     } finally {
       setLoading(false);
     }
@@ -203,7 +210,7 @@ export default function EditarVendedorModal({ vendedorOriginal, onClose, onSucce
             <div className="p-12 text-center text-slate-400">Cargando datos...</div>
           ) : (
             <form id="editar-vendedor-form" className="p-8 space-y-10" onSubmit={handleSubmit}>
-              {error && <AlertError message={error} onClose={() => setError('')} />}
+              {(error || errors.length > 0) && <AlertError message={error} errors={errors} onClose={() => { setError(''); setErrors([]); }} />}
 
               {/* SECCIÓN 1 — Datos Personales */}
               <section>

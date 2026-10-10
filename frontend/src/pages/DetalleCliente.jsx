@@ -30,7 +30,7 @@ export default function DetalleCliente() {
       toast.success('Cliente eliminado exitosamente');
       navigate('/clientes');
     } catch (err) {
-      toast.error(err.message || 'Error al eliminar el cliente');
+      toast.error(resolveErrorMessage(err, 'clientes'));
       setDeleteConfirm(false);
     } finally {
       setDeleting(false);

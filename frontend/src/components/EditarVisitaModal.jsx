@@ -3,7 +3,8 @@
 // ==============================================
 import { useState, useEffect } from 'react';
 import AlertError from './AlertError.jsx';
-import { resolveErrorMessage } from '../utils/errorMessages.js';
+import { resolveErrorMessage, isPermissionError } from '../utils/errorMessages.js';
+import { toast } from 'sonner';
 import { modificarVisita } from '../services/visita.service.js';
 
 export default function EditarVisitaModal({ visita: visitaOriginal, onClose, onSuccess }) {
@@ -19,6 +20,7 @@ export default function EditarVisitaModal({ visita: visitaOriginal, onClose, onS
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
 
   // ── Pre-llenar datos al montar ──────────────────────────
   useEffect(() => {
@@ -51,6 +53,7 @@ export default function EditarVisitaModal({ visita: visitaOriginal, onClose, onS
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setErrors([]);
 
     // Validaciones
     if (!formData.fecha) return setError('La fecha es obligatoria.');
@@ -77,7 +80,11 @@ export default function EditarVisitaModal({ visita: visitaOriginal, onClose, onS
         onSuccess(result.data);
       }
     } catch (err) {
-      setError(resolveErrorMessage(err, 'visitas'));
+      if (isPermissionError(err)) {
+        toast.error(resolveErrorMessage(err, 'actividad'));
+      } else {
+        setErrors(err?.data?.errors || [resolveErrorMessage(err, 'visitas')]);
+      }
     } finally {
       setLoading(false);
     }
@@ -112,7 +119,7 @@ export default function EditarVisitaModal({ visita: visitaOriginal, onClose, onS
         {/* Body — scrollable */}
         <div className="overflow-y-auto flex-1 custom-scrollbar">
           <form id="editar-visita-form" className="p-6 space-y-6" onSubmit={handleSubmit}>
-            {error && <AlertError message={error} onClose={() => setError('')} />}
+            {(error || errors.length > 0) && <AlertError message={error} errors={errors} onClose={() => { setError(''); setErrors([]); }} />}
 
             <section>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">

@@ -208,10 +208,10 @@ const ERROR_DICTIONARY = {
  * @returns {string}             Mensaje amigable para mostrar al usuario.
  *
  * Prioridad de resolución:
- *   1. byStatus del módulo específico
- *   2. byKeyword del módulo específico (busca coincidencia en el mensaje del error)
- *   3. byStatus del módulo "general"
- *   4. byKeyword del módulo "general"
+ *   1. byKeyword del módulo específico (busca coincidencia en el mensaje del error)
+ *   2. byKeyword del módulo "general"
+ *   3. byStatus del módulo específico
+ *   4. byStatus del módulo "general"
  *   5. Fallback del módulo específico
  *   6. Fallback general
  */
@@ -229,26 +229,37 @@ export function resolveErrorMessage(error, module = 'general') {
   const moduleDef = ERROR_DICTIONARY[module];
   const generalDef = ERROR_DICTIONARY.general;
 
-  // 1. Status match en módulo específico
-  if (moduleDef?.byStatus?.[status]) return moduleDef.byStatus[status];
-
-  // 2. Keyword match en módulo específico
+  // 1. Keyword match en módulo específico
   if (moduleDef?.byKeyword) {
     for (const [keyword, msg] of moduleDef.byKeyword) {
       if (rawMsg.includes(keyword.toLowerCase())) return msg;
     }
   }
 
-  // 3. Status match general
-  if (generalDef.byStatus[status]) return generalDef.byStatus[status];
-
-  // 4. Keyword match general
+  // 2. Keyword match general
   for (const [keyword, msg] of generalDef.byKeyword) {
     if (rawMsg.includes(keyword.toLowerCase())) return msg;
   }
 
+  // 3. Status match en módulo específico
+  if (moduleDef?.byStatus?.[status]) return moduleDef.byStatus[status];
+
+  // 4. Status match general
+  if (generalDef.byStatus[status]) return generalDef.byStatus[status];
+
   // 5. Fallback del módulo → 6. Fallback general
   return moduleDef?.fallback || generalDef.fallback;
+}
+
+/**
+ * Devuelve true si el error es de autorización/permisos (403 o mensaje relacionado).
+ * Usar para bifurcar entre toast.error (permisos) vs AlertError (validación).
+ */
+export function isPermissionError(error) {
+  const status = error?.status || error?.response?.status || null;
+  if (status === 403) return true;
+  const rawMsg = (error?.data?.error || error?.message || '').toLowerCase();
+  return rawMsg.includes('permiso') || rawMsg.includes('autorizado') || rawMsg.includes('forbidden');
 }
 
 export default ERROR_DICTIONARY;

@@ -58,7 +58,7 @@ export default function GastosLista() {
       setDeleteConfirmGasto(null);
       fetchGastos(); // reload
     } catch (err) {
-      toast.error(err.message || 'Error al eliminar el gasto');
+      toast.error(resolveErrorMessage(err, 'gastos'));
       setDeleteConfirmGasto(null);
     } finally {
       setDeleting(false);

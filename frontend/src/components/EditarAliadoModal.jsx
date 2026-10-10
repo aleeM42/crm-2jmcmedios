@@ -4,7 +4,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import AlertError from './AlertError.jsx';
-import { resolveErrorMessage } from '../utils/errorMessages.js';
+import { resolveErrorMessage, isPermissionError } from '../utils/errorMessages.js';
+import { toast } from 'sonner';
 
 const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PHONE_RE = /^\d{7}$/;
@@ -49,6 +50,7 @@ export default function EditarAliadoModal({ emisora: emisoraOriginal, onClose, o
   // ── UI ───────────────────────────────────────────────────
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
   const [rifError, setRifError] = useState('');
   const [frecuenciaError, setFrecuenciaError] = useState('');
 
@@ -256,6 +258,7 @@ export default function EditarAliadoModal({ emisora: emisoraOriginal, onClose, o
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setErrors([]);
 
     // Validar aliado
     if (!aliado.razon_social?.trim()) return setError('La razón social es obligatoria.');
@@ -319,7 +322,11 @@ export default function EditarAliadoModal({ emisora: emisoraOriginal, onClose, o
       }
     } catch (err) {
       console.error('[EditarAliado] Error:', err?.data || err);
-      setError(resolveErrorMessage(err, 'aliados'));
+      if (isPermissionError(err)) {
+        toast.error(resolveErrorMessage(err, 'aliados'));
+      } else {
+        setErrors(err?.data?.errors || [resolveErrorMessage(err, 'aliados')]);
+      }
     } finally {
       setLoading(false);
     }
@@ -357,7 +364,7 @@ export default function EditarAliadoModal({ emisora: emisoraOriginal, onClose, o
         {/* Body — scrollable */}
         <div className="overflow-y-auto flex-1 custom-scrollbar">
           <form id="editar-aliado-form" className="p-6 space-y-6" onSubmit={handleSubmit}>
-            {error && <AlertError message={error} onClose={() => setError('')} />}
+            {(error || errors.length > 0) && <AlertError message={error} errors={errors} onClose={() => { setError(''); setErrors([]); }} />}
 
             {/* ═══ Datos de la Emisora ═══ */}
             <section>

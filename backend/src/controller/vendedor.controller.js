@@ -131,7 +131,7 @@ export const create = async (req, res, next) => {
     if (errores.length > 0) {
       await client.query('ROLLBACK');
       client.release();
-      return res.status(400).json({ success: false, error: errores[0] });
+      return res.status(400).json({ success: false, error: errores[0], errors: errores });
     }
 
     // ── Hash de contraseña ───────────────────────────────
@@ -211,7 +211,7 @@ export const update = async (req, res, next) => {
     if (errores.length > 0) {
       await client.query('ROLLBACK');
       client.release();
-      return res.status(400).json({ success: false, error: errores[0] });
+      return res.status(400).json({ success: false, error: errores[0], errors: errores });
     }
 
     // ── Hash de contraseña (opcional en update) ────────

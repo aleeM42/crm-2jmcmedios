@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { crearGastoMarketing, getClientes, getAliados } from '../services/gasto.service.js';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
+import AlertError from '../components/AlertError.jsx';
 
 export default function AgregarGasto() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ export default function AgregarGasto() {
   // --- UI State ---
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState('');
 
   // Cargar lookups
@@ -63,6 +65,7 @@ export default function AgregarGasto() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setErrors([]);
     setSuccess('');
 
     // ── Validaciones locales ─────────────────────────────
@@ -88,7 +91,7 @@ export default function AgregarGasto() {
         setTimeout(() => navigate('/actividad-comercial/gastos'), 1500);
       }
     } catch (err) {
-      setError(resolveErrorMessage(err, 'gastos'));
+      setErrors(err?.data?.errors || [resolveErrorMessage(err, 'gastos')]);
     } finally {
       setLoading(false);
     }
@@ -126,10 +129,9 @@ export default function AgregarGasto() {
       </div>
 
       {/* Messages */}
-      {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
-          <span className="material-symbols-outlined text-red-500">error</span>
-          <p className="text-sm text-red-600 font-medium">{error}</p>
+      {(error || errors.length > 0) && (
+        <div className="mb-6">
+          <AlertError message={error} errors={errors} onClose={() => { setError(''); setErrors([]); }} />
         </div>
       )}
       {success && (

@@ -93,6 +93,7 @@ export default function AgregarCliente() {
   // --- UI State ---
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState('');
 
   // Cargar lookups
@@ -198,6 +199,7 @@ export default function AgregarCliente() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setErrors([]);
     setSuccess('');
 
     // ── Campos obligatorios del cliente ───────────────────
@@ -278,7 +280,7 @@ export default function AgregarCliente() {
       }
     } catch (err) {
       console.error('[AgregarCliente] Error:', err?.data || err);
-      setError(resolveErrorMessage(err, 'clientes'));
+      setErrors(err?.data?.errors || [resolveErrorMessage(err, 'clientes')]);
     } finally {
       setLoading(false);
     }
@@ -299,8 +301,8 @@ export default function AgregarCliente() {
       </header>
 
       {/* Messages */}
-      {error && (
-        <AlertError message={error} onClose={() => setError('')} />
+      {(error || errors.length > 0) && (
+        <AlertError message={error} errors={errors} onClose={() => { setError(''); setErrors([]); }} />
       )}
       {success && (
         <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 flex items-center gap-3">

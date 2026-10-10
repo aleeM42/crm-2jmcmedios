@@ -3,7 +3,8 @@
 // ==============================================
 import { useState, useEffect, useCallback } from 'react';
 import AlertError from './AlertError.jsx';
-import { resolveErrorMessage } from '../utils/errorMessages.js';
+import { resolveErrorMessage, isPermissionError } from '../utils/errorMessages.js';
+import { toast } from 'sonner';
 import { actualizarCliente, getLugares, getVendedores } from '../services/cliente.service.js';
 
 const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -48,6 +49,7 @@ export default function EditarClienteModal({ cliente: clienteOriginal, onClose, 
   // ── UI ───────────────────────────────────────────────────
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
 
   // ── Pre-llenar datos al montar ──────────────────────────
   useEffect(() => {
@@ -234,6 +236,7 @@ export default function EditarClienteModal({ cliente: clienteOriginal, onClose, 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setErrors([]);
 
     // Validar cliente
     if (!cliente.nombre?.trim()) return setError('El nombre comercial es obligatorio.');
@@ -302,7 +305,11 @@ export default function EditarClienteModal({ cliente: clienteOriginal, onClose, 
       }
     } catch (err) {
       console.error('[EditarCliente] Error:', err?.data || err);
-      setError(resolveErrorMessage(err, 'clientes'));
+      if (isPermissionError(err)) {
+        toast.error(resolveErrorMessage(err, 'clientes'));
+      } else {
+        setErrors(err?.data?.errors || [resolveErrorMessage(err, 'clientes')]);
+      }
     } finally {
       setLoading(false);
     }
@@ -340,7 +347,7 @@ export default function EditarClienteModal({ cliente: clienteOriginal, onClose, 
         {/* Body — scrollable */}
         <div className="overflow-y-auto flex-1 custom-scrollbar">
           <form id="editar-cliente-form" className="p-6 space-y-6" onSubmit={handleSubmit}>
-            {error && <AlertError message={error} onClose={() => setError('')} />}
+            {(error || errors.length > 0) && <AlertError message={error} errors={errors} onClose={() => { setError(''); setErrors([]); }} />}
 
             {/* ═══ Datos de la Empresa ═══ */}
             <section>

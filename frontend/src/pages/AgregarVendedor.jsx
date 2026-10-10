@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { crearVendedor, getDirectores } from '../services/vendedor.service.js';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
+import AlertError from '../components/AlertError.jsx';
 
 const INITIAL_FORM = {
   // --- USUARIO ---
@@ -28,6 +29,7 @@ export default function AgregarVendedor() {
   const [directores, setDirectores] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -70,6 +72,7 @@ export default function AgregarVendedor() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setErrors([]);
     setSuccess('');
 
     // ── Validaciones locales ─────────────────────────────
@@ -140,7 +143,7 @@ export default function AgregarVendedor() {
         setTimeout(() => navigate('/equipo-ventas'), 1500);
       }
     } catch (err) {
-      setError(resolveErrorMessage(err, 'vendedores'));
+      setErrors(err?.data?.errors || [resolveErrorMessage(err, 'vendedores')]);
     } finally {
       setLoading(false);
     }
@@ -168,11 +171,8 @@ export default function AgregarVendedor() {
       </header>
 
       {/* Messages */}
-      {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
-          <span className="material-symbols-outlined text-red-500">error</span>
-          <p className="text-sm text-red-600 font-medium">{error}</p>
-        </div>
+      {(error || errors.length > 0) && (
+        <AlertError message={error} errors={errors} onClose={() => { setError(''); setErrors([]); }} />
       )}
       {success && (
         <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 flex items-center gap-3">

@@ -42,17 +42,18 @@ export const create = async (req, res, next) => {
   try {
     const { fecha, objetivo_visita, fk_contacto, fk_vendedor, fk_oportunidad } = req.body;
 
-    if (!fecha || !objetivo_visita || !fk_vendedor) {
-      return res.status(400).json({
-        success: false,
-        error: 'fecha, objetivo_visita y fk_vendedor son obligatorios',
-      });
-    }
+    const errores = [];
+    if (!fecha)            errores.push('La fecha de la visita es obligatoria.');
+    if (!objetivo_visita)  errores.push('El objetivo de la visita es obligatorio.');
+    if (!fk_vendedor)      errores.push('Debe seleccionar el vendedor responsable.');
+    if (!fk_contacto && !fk_oportunidad)
+      errores.push('Debes especificar un contacto (fk_contacto) o un prospecto (fk_oportunidad).');
 
-    if (!fk_contacto && !fk_oportunidad) {
+    if (errores.length > 0) {
       return res.status(400).json({
         success: false,
-        error: 'Debes especificar un contacto (fk_contacto) o un prospecto (fk_oportunidad)',
+        error: errores[0],
+        errors: errores,
       });
     }
 

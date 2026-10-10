@@ -64,11 +64,11 @@ export default function DetalleEmisora() {
           navigate('/aliados-comerciales');
         }, 800);
       } else {
-        alert(response.error || 'Error al eliminar el aliado');
+        toast.error(response.error || 'Error al eliminar el aliado');
       }
     } catch (error) {
       console.error('Error deleting aliado:', error);
-      alert('Error de conexión al intentar eliminar');
+      toast.error(error?.data?.error || 'Error al eliminar el aliado');
     } finally {
       setIsDeleting(false);
     }

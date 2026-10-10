@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { toast } from 'sonner';
 import { getCurrentUser } from '../services/auth.service';
 import { calcularProgresoPauta } from '../utils/pautasUtils';
 import EditarPautaModal from '../components/EditarPautaModal';
@@ -69,7 +70,7 @@ export default function DetallePauta() {
       console.error('Error eliminando pauta:', err);
       setDeleteConfirm(false);
       setSuccessMsg('');
-      alert(err?.response?.data?.error || 'Error al eliminar la pauta.');
+      toast.error(err?.data?.error || 'Error al eliminar la pauta.');
     } finally {
       setDeleting(false);
     }

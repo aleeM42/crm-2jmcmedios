@@ -88,7 +88,7 @@ function ActividadComercial() {
       setDeleteConfirmVisita(null);
       fetchActividad(); // reload
     } catch (err) {
-      toast.error(err.message || 'Error al eliminar visita');
+      toast.error(resolveErrorMessage(err, 'actividad'));
       setDeleteConfirmVisita(null);
     } finally {
       setDeleting(false);

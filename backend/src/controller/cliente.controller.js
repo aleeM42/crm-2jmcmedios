@@ -152,14 +152,9 @@ export const create = async (req, res, next) => {
 
     // ── Validaciones de negocio ──────────────────────────
     const errCliente = validarCliente(cliente || {});
-    if (errCliente.length > 0) {
-      await client.query('ROLLBACK');
-      client.release();
-      return res.status(400).json({ success: false, error: errCliente[0] });
-    }
 
     // Normalizar RIF a mayúsculas
-    if (cliente.rif_fiscal) cliente.rif_fiscal = cliente.rif_fiscal.toUpperCase();
+    if (cliente?.rif_fiscal) cliente.rif_fiscal = cliente.rif_fiscal.toUpperCase();
 
     const reqContactos = contactos && Array.isArray(contactos)
       ? contactos
@@ -167,20 +162,18 @@ export const create = async (req, res, next) => {
 
     const contactosActivos = reqContactos.filter(c => c.pri_nombre);
 
-    for (let i = 0; i < contactosActivos.length; i++) {
-      const errC = validarContacto(contactosActivos[i], i);
-      if (errC.length > 0) {
-        await client.query('ROLLBACK');
-        client.release();
-        return res.status(400).json({ success: false, error: errC[0] });
-      }
-    }
-
+    const errContactos = contactosActivos.flatMap((c, i) => validarContacto(c, i));
     const errTel = validarTelefonos(telefonos);
-    if (errTel.length > 0) {
+
+    const todosLosErrores = [...errCliente, ...errContactos, ...errTel];
+    if (todosLosErrores.length > 0) {
       await client.query('ROLLBACK');
       client.release();
-      return res.status(400).json({ success: false, error: errTel[0] });
+      return res.status(400).json({
+        success: false,
+        error: todosLosErrores[0],
+        errors: todosLosErrores,
+      });
     }
 
     // ── 1. Crear cliente ─────────────────────────────────
@@ -289,14 +282,26 @@ export const update = async (req, res, next) => {
 
     // ── Validaciones de negocio ──────────────────────────
     const errCliente = validarCliente(cliente || {});
-    if (errCliente.length > 0) {
-      await client.query('ROLLBACK');
-      client.release();
-      return res.status(400).json({ success: false, error: errCliente[0] });
-    }
 
     // Normalizar RIF a mayúsculas
-    if (cliente.rif_fiscal) cliente.rif_fiscal = cliente.rif_fiscal.toUpperCase();
+    if (cliente?.rif_fiscal) cliente.rif_fiscal = cliente.rif_fiscal.toUpperCase();
+
+    const contactosActivos2 = (contactos && Array.isArray(contactos))
+      ? contactos.filter(c => c.pri_nombre)
+      : [];
+    const errContactosUpdate = contactosActivos2.flatMap((c, i) => validarContacto(c, i));
+    const errTelUpdate = validarTelefonos(telefonos);
+
+    const todosErroresUpdate = [...errCliente, ...errContactosUpdate, ...errTelUpdate];
+    if (todosErroresUpdate.length > 0) {
+      await client.query('ROLLBACK');
+      client.release();
+      return res.status(400).json({
+        success: false,
+        error: todosErroresUpdate[0],
+        errors: todosErroresUpdate,
+      });
+    }
 
     // ── 1. Actualizar cliente ────────────────────────────
     const updatedCliente = await ClienteModel.update(clienteId, cliente, client);
@@ -312,23 +317,7 @@ export const update = async (req, res, next) => {
     if (contactos && Array.isArray(contactos)) {
       const contactosActivos = contactos.filter(c => c.pri_nombre);
 
-      // Validar contactos
-      for (let i = 0; i < contactosActivos.length; i++) {
-        const errC = validarContacto(contactosActivos[i], i);
-        if (errC.length > 0) {
-          await client.query('ROLLBACK');
-          client.release();
-          return res.status(400).json({ success: false, error: errC[0] });
-        }
-      }
-
-      // Validar teléfonos
-      const errTel = validarTelefonos(telefonos);
-      if (errTel.length > 0) {
-        await client.query('ROLLBACK');
-        client.release();
-        return res.status(400).json({ success: false, error: errTel[0] });
-      }
+      // (validation already done above)
 
       // IDs de contactos enviados que ya existen (para actualizar)
       const contactosConId = contactosActivos.filter(c => c.id);

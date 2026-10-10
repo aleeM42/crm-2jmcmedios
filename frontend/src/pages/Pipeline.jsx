@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api.js';
+import { toast } from 'sonner';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
 
 const ESTADOS = [
@@ -79,13 +80,15 @@ export default function Pipeline() {
       const payload = { ...formData, monto_estimado: formData.monto_estimado || 0 };
       if (editingLead) {
         await api.put(`/oportunidades/${editingLead.id}`, payload);
+        toast.success('Oportunidad actualizada exitosamente');
       } else {
         await api.post('/oportunidades', payload);
+        toast.success('Oportunidad creada exitosamente');
       }
       setShowModal(false);
       fetchData();
     } catch (err) {
-      alert(resolveErrorMessage(err, 'actividad_comercial'));
+      toast.error(resolveErrorMessage(err, 'actividad_comercial'));
     } finally {
       setSaving(false);
     }

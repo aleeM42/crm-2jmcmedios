@@ -6,7 +6,6 @@ import { Router } from 'express';
 import * as ClienteCtrl from '../controller/cliente.controller.js';
 import authenticate from '../middleware/authenticate.js';
 import authorize from '../middleware/authorize.js';
-import validateBody from '../middleware/validateBody.js';
 
 const router = Router();
 
@@ -30,18 +29,6 @@ router.post(
   '/',
   authenticate,
   authorize(...ROLES_CLIENTES),
-  validateBody([
-    'cliente.nombre',
-    'cliente.razon_social',
-    'cliente.tipo',
-    'cliente.direccion',
-    'cliente.rif_fiscal',
-    'cliente.clasificacion',
-    'cliente.sector',
-    'cliente.estado',
-    'cliente.fk_lugar',
-    'cliente.fk_vendedor',
-  ]),
   ClienteCtrl.create
 );
 

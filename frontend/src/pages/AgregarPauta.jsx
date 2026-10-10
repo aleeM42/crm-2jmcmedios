@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { getCurrentUser } from '../services/auth.service.js';
+import AlertError from '../components/AlertError.jsx';
 import { toast } from 'sonner';
 import { resolveErrorMessage } from '../utils/errorMessages.js';
 
@@ -27,6 +28,7 @@ export default function AgregarPauta() {
 
   // Estados de carga y listas de opciones
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [vendedores, setVendedores] = useState([]);
   const [aliados, setAliados] = useState([]);
@@ -190,87 +192,51 @@ export default function AgregarPauta() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    setErrors([]);
 
     // ── Validaciones de negocio ────────────────────────────
-    if (!aliadoId) {
-      toast.error('Debe seleccionar una emisora.');
-      return;
-    }
+    const localErrors = [];
 
-    if (!fechaEmision) {
-      toast.error('La fecha de emisión de la pauta es obligatoria.');
-      return;
-    }
-
-    if (!fechaInicio || !fechaFin) {
-      toast.error('Las fechas de inicio y fin de las cuñas son obligatorias.');
-      return;
-    }
-
-    if (new Date(fechaInicio) < new Date(fechaEmision)) {
-      toast.error('La fecha de inicio de la cuña debe ser igual o posterior a la fecha de emisión de la pauta.');
-      return;
-    }
-
-    if (new Date(fechaInicio) > new Date(fechaFin)) {
-      toast.error('La fecha de inicio no puede ser posterior a la fecha de fin de la cuña.');
-      return;
+    if (!aliadoId) localErrors.push('Debe seleccionar una emisora.');
+    if (!fechaEmision) localErrors.push('La fecha de emisión de la pauta es obligatoria.');
+    if (!fechaInicio || !fechaFin) localErrors.push('Las fechas de inicio y fin de las cuñas son obligatorias.');
+    else {
+      if (new Date(fechaInicio) < new Date(fechaEmision)) localErrors.push('La fecha de inicio de la cuña debe ser igual o posterior a la fecha de emisión de la pauta.');
+      if (new Date(fechaInicio) > new Date(fechaFin)) localErrors.push('La fecha de inicio no puede ser posterior a la fecha de fin de la cuña.');
     }
 
     // Validar monto OC / OT segun si la OC ya existe o es nueva
     if (distribucionOC && distribucionOC.emisoras.length > 0) {
       // OC ya tiene otras emisoras: validar contra el disponible
       if (Number(montoOT) > distribucionOC.montoDisponible) {
-        toast.error(`El monto OT supera el disponible de esta OC ($${distribucionOC.montoDisponible.toFixed(2)}).`);
-        return;
+        localErrors.push(`El monto OT supera el disponible de esta OC ($${distribucionOC.montoDisponible.toFixed(2)}).`);
       }
       if (Number(montoOT) >= distribucionOC.montoOC) {
-        toast.error('El monto OT debe ser menor al monto OC.');
-        return;
+        localErrors.push('El monto OT debe ser menor al monto OC.');
       }
     } else {
       // OC nueva: OT debe ser estrictamente menor al OC
       if (Number(montoOC) <= 0) {
-        toast.error('El monto OC debe ser mayor a cero.');
-        return;
+        localErrors.push('El monto OC debe ser mayor a cero.');
       }
       if (Number(montoOT) <= 0) {
-        toast.error('El monto OT debe ser mayor a cero.');
-        return;
+        localErrors.push('El monto OT debe ser mayor a cero.');
       }
       if (Number(montoOT) >= Number(montoOC)) {
-        toast.error('El monto OT debe ser estrictamente menor al monto OC.');
-        return;
+        localErrors.push('El monto OT debe ser estrictamente menor al monto OC.');
       }
     }
 
-    if (Number(cantidadCunas) <= 0) {
-      toast.error('La cantidad de cuñas debe ser mayor a cero.');
-      return;
-    }
+    if (Number(cantidadCunas) <= 0) localErrors.push('La cantidad de cuñas debe ser mayor a cero.');
+    if (!coordinadora) localErrors.push('Debe seleccionar una coordinadora.');
+    if (!numeroOt) localErrors.push('El número OT es obligatorio.');
+    if (!numeroOc) localErrors.push('El número OC es obligatorio.');
+    if (diasSeleccionados.length === 0) localErrors.push('Debe seleccionar al menos un día de la semana.');
+    if (!vendedorId) localErrors.push('No se pudo asignar un vendedor. Seleccione un cliente con vendedor asignado.');
 
-    if (!coordinadora) {
-      toast.error('Debe seleccionar una coordinadora.');
-      return;
-    }
-
-    if (!numeroOt) {
-      toast.error('El número OT es obligatorio.');
-      return;
-    }
-
-    if (!numeroOc) {
-      toast.error('El número OC es obligatorio.');
-      return;
-    }
-
-    if (diasSeleccionados.length === 0) {
-      toast.error('Debe seleccionar al menos un día de la semana.');
-      return;
-    }
-
-    if (!vendedorId) {
-      toast.error('No se pudo asignar un vendedor. Seleccione un cliente con vendedor asignado.');
+    if (localErrors.length > 0) {
+      setErrors(localErrors);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -305,11 +271,11 @@ export default function AgregarPauta() {
         toast.success('Pauta guardada exitosamente');
         navigate('/pautas');
       } else {
-        toast.error(resolveErrorMessage(response, 'pautas'));
+        setErrors(response?.data?.errors || [resolveErrorMessage(response, 'pautas')]);
       }
     } catch (err) {
       console.error(err);
-      toast.error(resolveErrorMessage(err, 'pautas'));
+      setErrors(err?.data?.errors || [resolveErrorMessage(err, 'pautas')]);
     }
   };
 
@@ -334,6 +300,8 @@ export default function AgregarPauta() {
           <button type="submit" className="flex-1 sm:flex-initial px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">Guardar Pauta</button>
         </div>
       </div>
+
+      {errors.length > 0 && <AlertError errors={errors} onClose={() => setErrors([])} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* LEFT COLUMN */}
